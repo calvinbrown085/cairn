@@ -1,18 +1,47 @@
 import SwiftUI
 import UIKit
 
-/// The ink sitting over one block of an article.
+/// Where each block currently sits, in the reader's own document-space
+/// coordinate system — collected from every mounted `ArticleBlockView` so the
+/// ink layer can place existing strokes and choose an anchor for a new one.
 ///
-/// Strokes are always drawn; input is only captured while the pen or the eraser
-/// is the active tool, so an ordinary read never has a transparent view eating
-/// its taps. Points are held in the block's unit space — see `InkStroke` — and
-/// are only turned into pixels here, at the size the block happens to be right
-/// now.
+/// The space this is measured in is anchored to the scrolling content itself,
+/// not the screen: a block's rect here only changes when the layout actually
+/// changes (a re-render, a resize), never as a side effect of scrolling. That
+/// is what lets ink stay put while the page moves under it.
+struct BlockFramePreferenceKey: PreferenceKey {
+    static var defaultValue: [Int: CGRect] = [:]
+
+    static func reduce(value: inout [Int: CGRect], nextValue: () -> [Int: CGRect]) {
+        value.merge(nextValue()) { _, latest in latest }
+    }
+}
+
+/// The named coordinate space block frames are reported in. Shared between
+/// the blocks that report their own frame and the canvas that reads them
+/// back — both must be anchored to the same ancestor for the numbers to mean
+/// the same thing.
+enum ReaderInkSpace {
+    static let name = "reader-ink-space"
+}
+
+/// The ink layer for the whole reader, not one block. It sits over the entire
+/// scrolling column — including the margins on either side, which is space no
+/// per-block layer could ever reach — and uses `blockFrames` to translate
+/// between a block's unit space and this canvas's own coordinates.
+///
+/// Strokes are always drawn; input is only captured while the pen or the
+/// eraser is the active tool, so an ordinary read never has a transparent
+/// view eating its taps, and scrolling or text selection is untouched while
+/// markup is off.
 struct InkCanvas: View {
     let strokes: [InkStroke]
+    let blockFrames: [Int: CGRect]
     let tool: MarkupTool?
     let ink: InkColor
-    let onFinish: ([CGPoint]) -> Void
+    /// The anchor block chosen for a finished stroke, plus its points in that
+    /// block's unit space.
+    let onFinish: (Int, [CGPoint]) -> Void
     let onErase: (InkStroke) -> Void
 
     @State private var live: [CGPoint] = []
@@ -21,56 +50,58 @@ struct InkCanvas: View {
     private var isErasing: Bool { tool == .erase }
 
     var body: some View {
-        GeometryReader { geometry in
-            let size = geometry.size
-
-            ZStack {
-                Canvas { context, _ in
-                    for stroke in strokes {
-                        context.stroke(
-                            Self.path(unit: stroke.points, in: size),
-                            with: .color(stroke.color.color.opacity(0.92)),
-                            style: strokeStyle(width: stroke.width)
-                        )
-                    }
-                    if live.count > 1 {
-                        context.stroke(
-                            Self.path(points: live),
-                            with: .color(ink.color.opacity(0.92)),
-                            style: strokeStyle(width: InkCanvas.penWidth)
-                        )
-                    }
-                }
-                .allowsHitTesting(false)
-
-                if isDrawing || isErasing {
-                    InkCapture(
-                        // In pen mode the layer owns every touch. Erasing, it
-                        // only claims taps that landed on a stroke — everything
-                        // else falls through to the text underneath, which is
-                        // what erases a highlight.
-                        claims: { point in isDrawing || hit(point, in: size) != nil },
-                        onBegan: { point in
-                            guard isDrawing else { return }
-                            live = [point]
-                        },
-                        onMoved: { points in
-                            guard isDrawing else { return }
-                            live.append(contentsOf: points)
-                        },
-                        onEnded: { isTap, point in
-                            if isErasing {
-                                if let target = hit(point, in: size) { onErase(target) }
-                                return
-                            }
-                            defer { live = [] }
-                            guard !isTap, live.count > 1, size.width > 0, size.height > 0 else { return }
-                            onFinish(live.map {
-                                CGPoint(x: $0.x / size.width, y: $0.y / size.height)
-                            })
-                        }
+        ZStack {
+            Canvas { context, _ in
+                for stroke in strokes {
+                    guard let rect = blockFrames[stroke.blockIndex] else { continue }
+                    context.stroke(
+                        Self.path(points: stroke.documentPoints(in: rect)),
+                        with: .color(stroke.color.color.opacity(0.92)),
+                        style: strokeStyle(width: stroke.width)
                     )
                 }
+                if live.count > 1 {
+                    context.stroke(
+                        Self.path(points: live),
+                        with: .color(ink.color.opacity(0.92)),
+                        style: strokeStyle(width: InkCanvas.penWidth)
+                    )
+                }
+            }
+            .allowsHitTesting(false)
+
+            if isDrawing || isErasing {
+                InkCapture(
+                    // In pen mode the layer owns every touch, anywhere over
+                    // the document. Erasing, it only claims taps that landed
+                    // on a stroke — everything else falls through to the text
+                    // underneath, which is what erases a highlight instead.
+                    claims: { point in isDrawing || hit(point) != nil },
+                    onBegan: { point in
+                        guard isDrawing else { return }
+                        live = [point]
+                    },
+                    onMoved: { points in
+                        guard isDrawing else { return }
+                        live.append(contentsOf: points)
+                    },
+                    onEnded: { isTap, point in
+                        if isErasing {
+                            if let target = hit(point) { onErase(target) }
+                            return
+                        }
+                        defer { live = [] }
+                        guard !isTap, live.count > 1, let start = live.first,
+                              let anchor = anchorBlock(for: start),
+                              let rect = blockFrames[anchor],
+                              rect.width > 0, rect.height > 0
+                        else { return }
+                        let unitPoints = live.map {
+                            CGPoint(x: ($0.x - rect.minX) / rect.width, y: ($0.y - rect.minY) / rect.height)
+                        }
+                        onFinish(anchor, unitPoints)
+                    }
+                )
             }
         }
     }
@@ -81,17 +112,37 @@ struct InkCanvas: View {
         StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round)
     }
 
+    /// The block a document-space point anchors to. The block whose vertical
+    /// span contains the point wins even when the point sits to its left or
+    /// right — that is exactly what lets a margin stroke anchor to the
+    /// paragraph beside it rather than needing a block of its own.
+    ///
+    /// A point above every block anchors to the first one, overflowing above
+    /// it. A point below every block — or in the gap beneath one — anchors to
+    /// the nearest block above it, overflowing past its bottom: the same
+    /// "runs past the edge" case `InkStroke` already documents for text
+    /// growing taller than its block, just reached by drawing into the gap
+    /// instead.
+    private func anchorBlock(for point: CGPoint) -> Int? {
+        let ordered = blockFrames.sorted { $0.value.minY < $1.value.minY }
+        guard let first = ordered.first else { return nil }
+        var candidate = first.key
+        for (index, rect) in ordered {
+            guard rect.minY <= point.y else { break }
+            candidate = index
+        }
+        return candidate
+    }
+
     /// The stroke nearest a tap, if the tap landed close enough to count. The
     /// threshold is a finger, not a pixel — erasing should not need aim.
-    private func hit(_ point: CGPoint, in size: CGSize) -> InkStroke? {
-        guard size.width > 0, size.height > 0 else { return nil }
+    private func hit(_ point: CGPoint) -> InkStroke? {
         let threshold: CGFloat = 18
 
         var best: (stroke: InkStroke, distance: CGFloat)?
         for stroke in strokes {
-            let points = stroke.points.map {
-                CGPoint(x: $0.x * size.width, y: $0.y * size.height)
-            }
+            guard let rect = blockFrames[stroke.blockIndex], rect.width > 0, rect.height > 0 else { continue }
+            let points = stroke.documentPoints(in: rect)
             guard points.count > 1 else { continue }
             var closest = CGFloat.greatestFiniteMagnitude
             for index in 0..<(points.count - 1) {
@@ -111,10 +162,6 @@ struct InkCanvas: View {
         guard lengthSquared > 0 else { return hypot(point.x - a.x, point.y - a.y) }
         let t = max(0, min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSquared))
         return hypot(point.x - (a.x + t * dx), point.y - (a.y + t * dy))
-    }
-
-    private static func path(unit points: [CGPoint], in size: CGSize) -> Path {
-        path(points: points.map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) })
     }
 
     /// Midpoint quadratics: a raw polyline through touch samples reads as

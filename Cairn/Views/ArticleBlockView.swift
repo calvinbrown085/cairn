@@ -2,13 +2,16 @@ import SwiftUI
 import SwiftReadability
 
 /// Everything the reader needs to know about markup while a block is on screen.
-/// Nil means markup is off — the block draws its ink but takes no input.
+/// Nil means markup is off.
+///
+/// Ink itself isn't here: it is drawn and captured by one document-spanning
+/// `InkCanvas` in `ReaderView`, not per block — a per-block layer could never
+/// reach the margins on either side of the column. A block still needs to
+/// know the tool, though, since a plain tap means something different while
+/// highlighting than it does while marking up a note.
 struct MarkupContext {
     var tool: MarkupTool
-    var ink: InkColor
     var onSentenceTap: (Int, NSRange, String) -> Void
-    var onDrawStroke: (Int, [CGPoint]) -> Void
-    var onEraseStroke: (InkStroke) -> Void
 }
 
 /// Renders one article block in the reader's current typography.
@@ -18,7 +21,6 @@ struct ArticleBlockView: View {
     let post: Post
     let builder: AttributedTextBuilder
     let highlights: [Highlight]
-    var strokes: [InkStroke] = []
     var markup: MarkupContext?
     let onHighlight: (NSRange, String) -> Void
     let onOpenLink: (URL) -> Void
@@ -34,31 +36,25 @@ struct ArticleBlockView: View {
         ReaderRenderCache.shared.string(block: key(part), build: build)
     }
 
-    /// Ink is always drawn — it is part of the page now — but only listens
-    /// while the pen or the eraser is out. A block with no ink and no pen over
-    /// it gets no layer at all: a long essay is 200+ blocks, and an overlay
-    /// each is 200+ containers nothing would ever draw into.
-    private var needsInkLayer: Bool {
-        !strokes.isEmpty || markup?.tool == .pen || markup?.tool == .erase
+    var body: some View {
+        content.background(frameReporter)
     }
 
-    @ViewBuilder
-    var body: some View {
-        if needsInkLayer {
-            content.overlay {
-                InkCanvas(
-                    strokes: strokes,
-                    tool: markup?.tool,
-                    ink: markup?.ink ?? .graphite,
-                    onFinish: { points in markup?.onDrawStroke(index, points) },
-                    onErase: { stroke in markup?.onEraseStroke(stroke) }
-                )
-                // A stroke is not something VoiceOver can read out.
-                .accessibilityHidden(true)
-            }
-        } else {
-            content
+    /// Reports this block's current frame into the document's ink coordinate
+    /// space, so the reader-wide `InkCanvas` can place strokes anchored here
+    /// and can pick this block as the anchor for a new one. Every block
+    /// reports unconditionally — a margin stroke can land beside any block,
+    /// including one with no ink of its own yet — but a `GeometryReader`
+    /// behind inert, non-hit-testing content costs nothing an ordinary layout
+    /// pass wasn't already doing.
+    private var frameReporter: some View {
+        GeometryReader { geometry in
+            Color.clear.preference(
+                key: BlockFramePreferenceKey.self,
+                value: [index: geometry.frame(in: .named(ReaderInkSpace.name))]
+            )
         }
+        .allowsHitTesting(false)
     }
 
     @ViewBuilder

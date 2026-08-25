@@ -36,6 +36,11 @@ struct ReaderView: View {
     @State private var ink: InkColor = .graphite
     @State private var hasUsedTool = false
     @State private var noteTarget: Highlight?
+    /// Every mounted block's current frame, in the document's own ink
+    /// coordinate space — see `ReaderInkSpace`. Feeds the one reader-wide
+    /// `InkCanvas` that draws and captures ink over the whole column,
+    /// margins included.
+    @State private var blockFrames: [Int: CGRect] = [:]
 
     // Full screen is where every post starts — not a remembered preference,
     // just this view's own initial state. RootView mounts a fresh `ReaderView`
@@ -178,7 +183,6 @@ struct ReaderView: View {
         // Grouped once per pass rather than filtered once per block, which was
         // O(blocks × highlights) on every scroll tick.
         let highlightsByBlock = Dictionary(grouping: post.highlights ?? [], by: \.blockIndex)
-        let strokesByBlock = Dictionary(grouping: post.inkStrokes ?? [], by: \.blockIndex)
 
         return ScrollViewReader { scroller in
             ScrollView {
@@ -196,7 +200,6 @@ struct ReaderView: View {
                             post: post,
                             builder: builder,
                             highlights: highlightsByBlock[entry.id] ?? [],
-                            strokes: strokesByBlock[entry.id] ?? [],
                             markup: markupContext,
                             onHighlight: { range, text in
                                 addHighlight(blockIndex: entry.id, range: range, text: text)
@@ -215,6 +218,14 @@ struct ReaderView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, 20)
+                // The measure column above is only the text; this spans the
+                // whole padded width, margins included, which is what makes a
+                // stroke drawable beside the column rather than only across
+                // it. It shares `ReaderInkSpace` with every block's own frame
+                // report, so its coordinates and theirs mean the same thing.
+                .coordinateSpace(.named(ReaderInkSpace.name))
+                .overlay(alignment: .topLeading) { documentInkCanvas }
+                .onPreferenceChange(BlockFramePreferenceKey.self) { blockFrames = $0 }
                 .scrollTargetLayout()
             }
             .scrollPosition(id: $topBlock, anchor: .top)
@@ -223,6 +234,24 @@ struct ReaderView: View {
             .scrollDisabled(isMarkingUp && tool == .pen)
             .onAppear { restorePosition(using: scroller, in: document) }
         }
+    }
+
+    /// The one ink layer for the whole reader — see `InkCanvas`. Overlaying
+    /// the fully padded column (rather than any single block) is what lets a
+    /// stroke reach the margins on either side of the text, and what keeps it
+    /// live in full screen: nothing about markup depends on leaving
+    /// `isImmersive`.
+    private var documentInkCanvas: some View {
+        InkCanvas(
+            strokes: post.inkStrokes ?? [],
+            blockFrames: blockFrames,
+            tool: isMarkingUp ? tool : nil,
+            ink: ink,
+            onFinish: addStroke,
+            onErase: erase
+        )
+        // A stroke is not something VoiceOver can read out.
+        .accessibilityHidden(true)
     }
 
     /// Wide screens get roomier margins; the column itself is already capped by
@@ -466,13 +495,7 @@ struct ReaderView: View {
 
     private var markupContext: MarkupContext? {
         guard isMarkingUp else { return nil }
-        return MarkupContext(
-            tool: tool,
-            ink: ink,
-            onSentenceTap: handleSentenceTap,
-            onDrawStroke: addStroke,
-            onEraseStroke: erase
-        )
+        return MarkupContext(tool: tool, onSentenceTap: handleSentenceTap)
     }
 
     /// A tap on a sentence, resolved against the current tool. Highlighting the
