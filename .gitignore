@@ -7,7 +7,9 @@ xcuserdata/
 *.xcresult
 
 # The project file is generated from project.yml by XcodeGen.
-Cairn.xcodeproj/
+# Any generated project, not one named for the app: a rename un-ignores the
+# old name, and `git add -A` will then sweep the stale one into a commit.
+*.xcodeproj/
 
 .DS_Store
 
