@@ -10,9 +10,19 @@ struct RootView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var isAddingURL = false
     @State private var clipboardOffer: URL?
+    // `columnVisibility` only controls which columns share the screen at
+    // regular width; on compact width (iPhone) the split view collapses to
+    // one stacked column and looks at this instead to decide which one is
+    // topmost. Nothing else pushes the stack forward: the library's row
+    // button sets `selectedPost` directly rather than going through a
+    // `List(selection:)` the split view can watch itself (that binding is
+    // already spoken for — see `LibraryView`'s multi-select edit mode) — so
+    // without this, selecting a post rebuilds the detail column in place
+    // without ever bringing it on screen.
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .content
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
+        NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
             SidebarView(filter: $filter)
                 .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
         } content: {
@@ -51,6 +61,13 @@ struct RootView: View {
         }
         .task { await offerClipboardURL() }
         .onChange(of: filter) { _, _ in selectedPost = nil }
+        // The one thing that must push the compact stack to the detail
+        // column, and the one thing that must let it fall back — whether
+        // `selectedPost` changed because a row was tapped, a filter switch
+        // cleared it above, or a post was deleted out from under the reader.
+        .onChange(of: selectedPost) { _, post in
+            preferredCompactColumn = post == nil ? .content : .detail
+        }
     }
 
     /// Offers whatever URL is on the clipboard, without reading its contents
