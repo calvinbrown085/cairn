@@ -10,3 +10,7 @@ xcuserdata/
 Stacks.xcodeproj/
 
 .DS_Store
+
+# Factory: transient run state, locks, logs, escalations, per-worktree DerivedData.
+.claude/factory/state/
+.dd/

@@ -1,0 +1,27 @@
+{
+  "id": "T-0015",
+  "title": "Search result snippets with the matched phrase highlighted in context",
+  "type": "implement",
+  "status": "draft",
+  "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Retrieval, before intelligence > Search result snippets",
+  "depends_on": [],
+  "acceptance": [
+    "Each result shows surrounding context with the matched phrase highlighted",
+    "Snippet extraction does not load full searchText for every row",
+    "Multiple matches in one post pick the most representative snippet",
+    "Search remains responsive at 1,000 posts"
+  ],
+  "touches": [
+    "Stacks/Views/LibraryView.swift",
+    "Stacks/Views/LibraryIndex.swift",
+    "Stacks/Views/PostRow.swift",
+    "Stacks/Views/LibraryFilter.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Retrieval before intelligence — this ships before any embedding work.",
+  "history": []
+}

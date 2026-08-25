@@ -60,6 +60,9 @@ final class Post {
     @Relationship(deleteRule: .cascade, inverse: \Highlight.post)
     var highlights: [Highlight]?
 
+    @Relationship(deleteRule: .cascade, inverse: \InkStroke.post)
+    var inkStrokes: [InkStroke]?
+
     init(url: URL) {
         self.id = UUID()
         self.urlString = url.absoluteString
@@ -71,6 +74,7 @@ final class Post {
         self.stateRaw = PostState.pending.rawValue
         self.images = []
         self.highlights = []
+        self.inkStrokes = []
     }
 
     init() {}
@@ -102,6 +106,11 @@ final class Post {
         return formatter.string(from: publishedAt)
     }
 
+    /// Anything the reader added on top of the text.
+    var hasMarkup: Bool {
+        !(highlights ?? []).isEmpty || !(inkStrokes ?? []).isEmpty
+    }
+
     var sortedHighlights: [Highlight] {
         (highlights ?? []).sorted {
             ($0.blockIndex, $0.start) < ($1.blockIndex, $1.start)
@@ -114,6 +123,12 @@ final class Post {
     }
 
     var leadImage: StoredImage? { image(id: leadImageID) }
+
+    /// The single letter a card falls back to when a post has no lead image.
+    static func initial(for host: String) -> String {
+        guard let first = host.first else { return "·" }
+        return String(first).uppercased()
+    }
 
     static func displayHost(for url: URL) -> String {
         guard let host = url.host() else { return url.absoluteString }

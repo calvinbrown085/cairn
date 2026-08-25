@@ -1,0 +1,14 @@
+{
+  "id": "T-0004", "title": "Verify CloudKit sync on two real devices",
+  "type": "spike", "status": "draft", "quarter": "Q1",
+  "roadmap_anchor": "Q1 > Debt > Verify CloudKit sync on two real devices",
+  "depends_on": [],
+  "acceptance": [
+    "A post saved on device A appears on device B, observed, not assumed",
+    "Highlights, tags, and read state all round-trip",
+    "Conflict behaviour on simultaneous edits is characterised"
+  ],
+  "touches": [], "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Physical hardware. A load-bearing unverified assumption under the whole product; kill criterion 3 hangs off it.",
+  "history": []
+}

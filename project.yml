@@ -8,6 +8,11 @@ options:
   groupSortPosition: top
   xcodeVersion: "2620"
 
+fileGroups:
+  - README.md
+  - ROADMAP.md
+  - project.yml
+
 settings:
   base:
     DEVELOPMENT_TEAM: ZM4J56DC3Q

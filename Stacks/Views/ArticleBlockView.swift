@@ -1,5 +1,15 @@
 import SwiftUI
 
+/// Everything the reader needs to know about markup while a block is on screen.
+/// Nil means markup is off — the block draws its ink but takes no input.
+struct MarkupContext {
+    var tool: MarkupTool
+    var ink: InkColor
+    var onSentenceTap: (Int, NSRange, String) -> Void
+    var onDrawStroke: (Int, [CGPoint]) -> Void
+    var onEraseStroke: (InkStroke) -> Void
+}
+
 /// Renders one article block in the reader's current typography.
 struct ArticleBlockView: View {
     let block: ArticleBlock
@@ -7,6 +17,8 @@ struct ArticleBlockView: View {
     let post: Post
     let builder: AttributedTextBuilder
     let highlights: [Highlight]
+    var strokes: [InkStroke] = []
+    var markup: MarkupContext?
     let onHighlight: (NSRange, String) -> Void
     let onOpenLink: (URL) -> Void
 
@@ -21,7 +33,35 @@ struct ArticleBlockView: View {
         ReaderRenderCache.shared.string(block: key(part), build: build)
     }
 
+    /// Ink is always drawn — it is part of the page now — but only listens
+    /// while the pen or the eraser is out. A block with no ink and no pen over
+    /// it gets no layer at all: a long essay is 200+ blocks, and an overlay
+    /// each is 200+ containers nothing would ever draw into.
+    private var needsInkLayer: Bool {
+        !strokes.isEmpty || markup?.tool == .pen || markup?.tool == .erase
+    }
+
+    @ViewBuilder
     var body: some View {
+        if needsInkLayer {
+            content.overlay {
+                InkCanvas(
+                    strokes: strokes,
+                    tool: markup?.tool,
+                    ink: markup?.ink ?? .graphite,
+                    onFinish: { points in markup?.onDrawStroke(index, points) },
+                    onErase: { stroke in markup?.onEraseStroke(stroke) }
+                )
+                // A stroke is not something VoiceOver can read out.
+                .accessibilityHidden(true)
+            }
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch block {
         case .heading(let level, let text):
             SelectableTextView(
@@ -34,7 +74,9 @@ struct ArticleBlockView: View {
                     )
                 },
                 measurementKey: key(),
+                markupTool: markup?.tool,
                 onHighlight: onHighlight,
+                onSentenceTap: { markup?.onSentenceTap(index, $0, $1) },
                 onOpenLink: onOpenLink
             )
             .padding(.top, level <= 2 ? typography.bodySize * 1.1 : typography.bodySize * 0.7)
@@ -44,7 +86,9 @@ struct ArticleBlockView: View {
             SelectableTextView(
                 attributed: cachedText { builder.paragraph(text, highlights: highlights) },
                 measurementKey: key(),
+                markupTool: markup?.tool,
                 onHighlight: onHighlight,
+                onSentenceTap: { markup?.onSentenceTap(index, $0, $1) },
                 onOpenLink: onOpenLink
             )
 
@@ -64,7 +108,9 @@ struct ArticleBlockView: View {
                         )
                     },
                     measurementKey: key(),
+                    markupTool: markup?.tool,
                     onHighlight: onHighlight,
+                    onSentenceTap: { markup?.onSentenceTap(index, $0, $1) },
                     onOpenLink: onOpenLink
                 )
             }

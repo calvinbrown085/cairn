@@ -1,0 +1,58 @@
+{
+  "$comment": "Runtime knobs for the Stacks factory. See DESIGN.md.",
+  "auto_merge": false,
+  "$auto_merge": "OFF until verify.sh has been seen catching a real regression on main. While off, an approved task opens a PR and waits for you. Phase 3 flips this.",
+  "max_parallel": 2,
+  "$max_parallel": "Implementers in flight. Ceiling is 3 on this machine; Xcode, not the harness, is the constraint.",
+  "max_attempts": 3,
+  "$max_attempts": "Implementer attempts before the Opus rescue attempt. After the rescue, the task is parked.",
+  "rescue_model": "opus",
+  "models": {
+    "implementer": "sonnet",
+    "reviewer": "opus"
+  },
+  "dispatchable_types": [
+    "implement",
+    "chore",
+    "debt"
+  ],
+  "$dispatchable_types": "decide and spike are never dispatched. They queue to the human.",
+  "worktree_root": "../stacks-worktrees",
+  "derived_data_dir": ".dd",
+  "simulator": "iPhone 17 Pro",
+  "$simulator": "Single named destination for all sim work, held under state/locks/sim.lock.",
+  "invariant_baselines": {
+    "system_size_call_sites": null,
+    "$system_size_call_sites": "Deliberately null. This number moves with active development (29 at HEAD f93d48f, 57 in the working tree on 2026-08-24). invariants.sh must measure it against the merge-base with main at run time and assert non-increase, never against a number frozen in this file.",
+    "allowed_imports": [
+      "SwiftUI",
+      "Foundation",
+      "SwiftData",
+      "UIKit",
+      "Observation",
+      "UniformTypeIdentifiers",
+      "ImageIO",
+      "CoreGraphics",
+      "XCTest",
+      "Testing",
+      "NaturalLanguage",
+      "OSLog",
+      "MetricKit",
+      "StoreKit",
+      "CloudKit",
+      "Compression",
+      "CryptoKit",
+      "CoreText",
+      "PDFKit"
+    ],
+    "$allowed_imports": "Apple frameworks only. Anything outside this list fails the gate: the Data Not Collected privacy label depends on there being no third-party SDK, ever."
+  },
+  "banned_identifiers": [
+    "unreadCount",
+    "unreadBadge",
+    "streak",
+    "dailyDigest",
+    "readingStreak"
+  ],
+  "$banned_identifiers": "The guilt-engine ban from ROADMAP.md. A library does not nag."
+}

@@ -1,0 +1,21 @@
+{
+  "id": "D-0001",
+  "title": "Decide the test host: iOS unit target vs. SwiftReadability SPM package",
+  "type": "decide",
+  "status": "todo",
+  "quarter": "bootstrap",
+  "roadmap_anchor": "Q2 > Open source > Extract SwiftReadability as an SPM package",
+  "depends_on": [],
+  "acceptance": [
+    "A written decision recorded in DESIGN.md under Open",
+    "If SPM: Stacks/Content and the pure-logic parts of Stacks/Services move to a local package whose tests run via `swift test` on macOS with no simulator",
+    "If iOS target: accept that the sim lock serializes the gate and cap max_parallel accordingly"
+  ],
+  "touches": [],
+  "risk": "high",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Gates every Phase 1 task. An iOS unit-test target needs a booted simulator, so the sim lock serializes the gate and largely defeats parallelism. Extracting the extractor (Content/*, ~1700 lines, the most fixture-driven code in the repo) as a local SPM package makes the gate seconds-long, simulator-free, and parallel-safe. It also pulls a Q2 roadmap item forward. Human decision, never dispatched.",
+  "history": []
+}

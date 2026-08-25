@@ -9,8 +9,30 @@ final class ReadingFlowUITests: XCTestCase {
 
     override func setUp() {
         continueAfterFailure = false
-        app = XCUIApplication()
-        app.launch()
+        app = launchIntoLibrary()
+    }
+
+    /// The library opens on Unread, and reading a post empties it — so a test
+    /// that has run before finds nothing there. Everything is the filter that
+    /// is always populated, so that is where these tests start.
+    /// Opens the first post in the library. Tapped by coordinate: a card is one
+    /// combined accessibility element, so its centre is the honest target.
+    private func openReader() {
+        firstPost(in: app).coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    /// The first prose block that is actually on screen. Blocks are lazy, so
+    /// indexing into `textViews` can land on one the reader has not laid out
+    /// yet — which has no frame and cannot be tapped.
+    private func bodyTextView() -> XCUIElement {
+        let views = app.textViews
+        XCTAssertTrue(views.firstMatch.waitForExistence(timeout: 15), "The reader should show article text")
+
+        for element in views.allElementsBoundByIndex
+        where element.exists && element.isHittable && element.frame.height > 20 {
+            return element
+        }
+        return views.firstMatch
     }
 
     private func capture(_ name: String) {
@@ -21,15 +43,9 @@ final class ReadingFlowUITests: XCTestCase {
     }
 
     func testReadingAPost() {
-        // Addressed by identifier rather than position: on iPad the sidebar's
-        // own cells come first in the query order.
-        let firstPost = app.descendants(matching: .any)
-            .matching(identifier: "post.row")
-            .firstMatch
-        XCTAssertTrue(firstPost.waitForExistence(timeout: 20), "The library should list saved posts")
         capture("01-library")
-
-        firstPost.tap()
+        openReader()
+        capture("01b-after-tap")
 
         // The reader renders each prose block as its own text view.
         let body = app.textViews.firstMatch
@@ -55,14 +71,9 @@ final class ReadingFlowUITests: XCTestCase {
     /// Highlighting is the one reader feature that depends on UIKit text
     /// selection, so it is worth driving rather than assuming.
     func testHighlightingAPassage() {
-        let firstPost = app.descendants(matching: .any)
-            .matching(identifier: "post.row")
-            .firstMatch
-        XCTAssertTrue(firstPost.waitForExistence(timeout: 20))
-        firstPost.tap()
+        openReader()
 
-        let body = app.textViews.element(boundBy: 1)
-        XCTAssertTrue(body.waitForExistence(timeout: 15))
+        let body = bodyTextView()
 
         // A long press starts a selection and raises the edit menu.
         body.press(forDuration: 1.2)
@@ -82,6 +93,128 @@ final class ReadingFlowUITests: XCTestCase {
         XCTAssertTrue(entry.waitForExistence(timeout: 5), "The highlight should be recorded on the post")
         entry.tap()
         capture("09-highlights-list")
+    }
+
+    /// Markup mode is the design's headline interaction: no selection handles,
+    /// no menu — put the pen out, tap a sentence, and it is marked.
+    func testMarkingUpASentence() {
+        openReader()
+
+        let body = bodyTextView()
+
+        let markup = app.buttons["reader.markup"]
+        XCTAssertTrue(markup.waitForExistence(timeout: 5), "The dock should offer markup")
+        markup.tap()
+        capture("10-markup-dock")
+
+        // The dock has become the pen tray, and a plain tap now marks text.
+        XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 5), "Markup should be leavable")
+        // Near the top of the block rather than its centre: a paragraph can be
+        // taller than the screen, and its centre can sit under the dock.
+        body.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2)).tap()
+        capture("11-markup-highlighted")
+
+        app.buttons["Done"].tap()
+
+        let highlights = app.buttons["reader.highlights"]
+        XCTAssertTrue(highlights.waitForExistence(timeout: 5))
+        highlights.tap()
+        _ = app.buttons["Delete"].firstMatch.waitForExistence(timeout: 5)
+        capture("12-markup-highlights-list")
+
+        XCTAssertTrue(
+            app.buttons["Delete"].firstMatch.exists,
+            "Tapping a sentence in markup should have recorded a highlight"
+        )
+    }
+
+    /// Ink is the one part of markup that is not text: a stroke has to land on
+    /// the page instead of scrolling it, and has to still be there afterwards.
+    func testDrawingWithThePen() {
+        let target = firstPost(in: app)
+        // Reading takes the post out of Unread, so remember which one it was.
+        let marker = String(target.label.prefix(40))
+        target.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        let body = bodyTextView()
+
+        app.buttons["reader.markup"].tap()
+        let pen = app.buttons["Graphite ink"]
+        XCTAssertTrue(pen.waitForExistence(timeout: 5), "The pen tray should offer ink")
+        pen.tap()
+
+        // A stroke and a scroll are the same gesture; with the pen out the
+        // page must hold still under it.
+        let before = body.frame.origin.y
+        body.swipeUp(velocity: .fast)
+        XCTAssertEqual(body.frame.origin.y, before, accuracy: 1, "The pen should lock scrolling")
+        capture("15-pen-stroke")
+
+        app.buttons["Done"].tap()
+        app.returnToLibrary()
+        app.showEverything()
+
+        // The post now reads as marked up, which means the stroke was saved
+        // rather than merely drawn.
+        let marked = app.descendants(matching: .any)
+            .matching(identifier: "post.row")
+            .matching(NSPredicate(format: "label BEGINSWITH %@", marker))
+            .firstMatch
+        XCTAssertTrue(marked.waitForExistence(timeout: 10), "The post should still be in the library")
+        XCTAssertTrue(
+            marked.label.contains("Marked up"),
+            "A drawn stroke should be recorded on the post — got \(marked.label)"
+        )
+        capture("16-marked-up-card")
+    }
+
+    /// Full screen takes the chrome away and has to hand it back without the
+    /// reader having to remember a gesture.
+    func testFullScreenReading() {
+        openReader()
+        XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["reader.star"].waitForExistence(timeout: 5))
+
+        let fullScreen = app.buttons["reader.fullscreen"]
+        XCTAssertTrue(fullScreen.waitForExistence(timeout: 5), "The dock should offer full screen")
+        fullScreen.tap()
+        // Let the chrome finish animating out before looking.
+        _ = app.staticTexts["nothing"].waitForExistence(timeout: 1.5)
+        capture("13-full-screen")
+
+        XCTAssertFalse(app.buttons["reader.star"].exists, "Full screen should put the toolbar away")
+
+        // The dock stays: it is the way back out.
+        XCTAssertTrue(fullScreen.waitForExistence(timeout: 5))
+        fullScreen.tap()
+
+        XCTAssertTrue(
+            app.buttons["reader.star"].waitForExistence(timeout: 5),
+            "Leaving full screen should bring the toolbar back"
+        )
+        capture("14-full-screen-exited")
+    }
+
+    /// The two sheets that hang off the library: how it is ordered and drawn,
+    /// and how a link gets in.
+    func testBrowsingControls() {
+        _ = firstPost(in: app)
+
+        app.buttons["Sort & group…"].tap()
+        XCTAssertTrue(app.buttons["Cards"].waitForExistence(timeout: 5), "Sort & group should offer a layout")
+        XCTAssertTrue(app.switches["Group by site"].exists, "Sort & group should offer grouping")
+        capture("17-sort-sheet")
+        app.buttons["Done"].tap()
+
+        app.buttons["Save a link"].tap()
+        XCTAssertTrue(
+            app.staticTexts["Paste or type a web address."].waitForExistence(timeout: 5),
+            "The link sheet should prompt for a URL"
+        )
+        capture("18-add-sheet")
+        app.buttons["Cancel"].tap()
+
+        XCTAssertTrue(app.firstPostRow.waitForExistence(timeout: 5), "Both sheets should dismiss")
     }
 
     func testSidebarAndSearch() {

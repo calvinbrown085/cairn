@@ -1,0 +1,16 @@
+{
+  "id": "T-0014", "title": "Contrast audit of the warm palette in all three reader themes",
+  "type": "implement", "status": "draft", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Accessibility > Contrast audit",
+  "depends_on": [],
+  "acceptance": [
+    "Every text-on-background pair in all three themes is measured against WCAG AA",
+    "Failing pairs are corrected without abandoning the warm palette's character",
+    "Highlight colours remain distinguishable in all three themes",
+    "The measured ratios are recorded so the audit is repeatable"
+  ],
+  "touches": ["Stacks/Design/**"],
+  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Contained to Design/. Computable, so a test can hold the line afterwards.",
+  "history": []
+}

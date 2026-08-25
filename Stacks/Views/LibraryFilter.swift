@@ -100,6 +100,10 @@ enum LibrarySort: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// The orders worth a chip under the search field; the rest live in the
+    /// sort sheet.
+    static let quickChoices: [LibrarySort] = [.recentlySaved, .oldestFirst, .longestFirst]
+
     var label: String {
         switch self {
         case .recentlySaved: "Recently saved"

@@ -53,7 +53,7 @@ struct StacksApp: App {
     /// iCloud container isn't available — an unsigned build or a device with no
     /// iCloud account should still run rather than crash on launch.
     private static func makeContainer() -> ModelContainer {
-        let schema = Schema([Post.self, StoredImage.self, Highlight.self])
+        let schema = Schema([Post.self, StoredImage.self, Highlight.self, InkStroke.self])
 
         let synced = ModelConfiguration(
             schema: schema,

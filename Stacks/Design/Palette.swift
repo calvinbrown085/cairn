@@ -50,3 +50,25 @@ enum Metrics {
     static let readingWidth: CGFloat = 680
     static let cornerRadius: CGFloat = 14
 }
+
+extension Palette {
+    /// The warm tints behind a card that has no lead image. Picked from the
+    /// host so a site keeps the same colour every time it appears.
+    private static let tones: [(light: UInt32, dark: UInt32)] = [
+        (0xEDE3D2, 0x241F19), (0xE7E4D6, 0x201F18), (0xE4E6DC, 0x1D2019),
+        (0xEAE1D9, 0x231D19), (0xE2E3E6, 0x1B1D20), (0xEEE3E1, 0x241D1C),
+        (0xE9E5DA, 0x21201A), (0xE3E5E9, 0x1C1E21),
+    ]
+
+    static func tone(for key: String) -> Color {
+        guard !key.isEmpty else { return dynamic(light: tones[0].light, dark: tones[0].dark) }
+        // FNV-1a rather than `hashValue`, which is seeded per launch and would
+        // repaint every card on every run.
+        var hash: UInt32 = 2_166_136_261
+        for byte in key.utf8 {
+            hash = (hash ^ UInt32(byte)) &* 16_777_619
+        }
+        let tone = tones[Int(hash % UInt32(tones.count))]
+        return dynamic(light: tone.light, dark: tone.dark)
+    }
+}

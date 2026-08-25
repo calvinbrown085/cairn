@@ -1,0 +1,16 @@
+{
+  "id": "T-0016", "title": "Intent capture — an optional one-line why at save time",
+  "type": "implement", "status": "draft", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Retrieval, before intelligence > Intent capture",
+  "depends_on": [],
+  "acceptance": [
+    "An optional single-line why field is offered at save time in both the app and the share extension",
+    "Skipping it costs nothing and never blocks a save",
+    "The field is searchable and shown in search results",
+    "Existing posts are unaffected and the field stays empty for them"
+  ],
+  "touches": ["Stacks/Models/Post.swift", "Stacks/Views/AddURLSheet.swift", "StacksShareExtension/**", "Stacks/Services/SharedInbox.swift"],
+  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "The roadmap's most differentiated cheap feature and the highest-signal text to embed in Q3. Data-model plus extension change.",
+  "history": []
+}

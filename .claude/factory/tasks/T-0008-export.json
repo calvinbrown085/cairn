@@ -1,0 +1,16 @@
+{
+  "id": "T-0008", "title": "Export: whole-library Markdown bundle and per-post EPUB",
+  "type": "implement", "status": "draft", "quarter": "Q1",
+  "roadmap_anchor": "Q1 > Durability > Export",
+  "depends_on": [],
+  "acceptance": [
+    "Whole-library export produces a Markdown bundle including tags, highlights, and source URLs",
+    "Per-post EPUB opens in Books with correct title, body, and images",
+    "Export runs off the main thread and reports progress",
+    "A library of 100 posts exports without exhausting memory"
+  ],
+  "touches": ["Stacks/Services/**", "Stacks/Views/**"],
+  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "A trust feature before a convenience one — an archive you can't leave is a trap.",
+  "history": []
+}

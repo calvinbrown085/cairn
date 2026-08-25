@@ -13,7 +13,11 @@ struct SelectableTextView: UIViewRepresentable {
     /// Block index, used to memoise the measured height. Nil means measure every
     /// time — correct, just slower.
     var measurementKey: Int?
+    /// Non-nil while the reader is marking up, which changes what a plain tap
+    /// means: it selects a sentence instead of following a link.
+    var markupTool: MarkupTool?
     var onHighlight: ((NSRange, String) -> Void)?
+    var onSentenceTap: ((NSRange, String) -> Void)?
     var onOpenLink: ((URL) -> Void)?
 
     func makeUIView(context: Context) -> UITextView {
@@ -100,16 +104,63 @@ struct SelectableTextView: UIViewRepresentable {
 
         @objc func handleTap(_ recognizer: UITapGestureRecognizer) {
             guard let textView = recognizer.view as? UITextView else { return }
-            // A tap that dismisses a selection shouldn't also follow a link.
+            // A tap that dismisses a selection shouldn't also do anything else.
             guard textView.selectedTextRange?.isEmpty ?? true else { return }
-            guard let url = textView.linkURL(at: recognizer.location(in: textView)) else { return }
+            let point = recognizer.location(in: textView)
+
+            // Marking up, a tap picks the sentence it landed in. The pen draws
+            // through its own layer, so it never reaches here.
+            if let tool = parent.markupTool, tool != .pen, let onSentenceTap = parent.onSentenceTap {
+                guard let range = textView.sentenceRange(at: point) else { return }
+                let text = (textView.attributedText.string as NSString).substring(with: range)
+                onSentenceTap(range, text)
+                return
+            }
+
+            guard let url = textView.linkURL(at: point) else { return }
             parent.onOpenLink?(url)
         }
     }
 }
 
-/// Resolves a tap location to the link stored at that character, if any.
 extension UITextView {
+    /// The sentence a tap landed in, as a range into the block's plain text.
+    ///
+    /// A sentence is the unit a reader actually decides about — it is what you
+    /// would draw a line under on paper — and it anchors exactly like a dragged
+    /// selection does, because it *is* a character range.
+    func sentenceRange(at point: CGPoint) -> NSRange? {
+        let string = attributedText.string as NSString
+        guard string.length > 0 else { return nil }
+
+        // A tap past the last line shouldn't silently mark the last sentence.
+        guard bounds.contains(point) else { return nil }
+        guard let position = closestPosition(to: point) else { return nil }
+        let index = min(max(offset(from: beginningOfDocument, to: position), 0), string.length - 1)
+
+        var found: NSRange?
+        string.enumerateSubstrings(
+            in: NSRange(location: 0, length: string.length),
+            options: [.bySentences, .substringNotRequired]
+        ) { _, range, _, stop in
+            if NSLocationInRange(index, range) {
+                found = range
+                stop.pointee = true
+            }
+        }
+
+        guard var range = found else { return nil }
+        // Sentence enumeration keeps the space that follows the full stop;
+        // painting it would leave a tinted gap before the next sentence.
+        while range.length > 0,
+              let scalar = Unicode.Scalar(string.character(at: range.location + range.length - 1)),
+              CharacterSet.whitespacesAndNewlines.contains(scalar) {
+            range.length -= 1
+        }
+        return range.length > 0 ? range : nil
+    }
+
+    /// Resolves a tap location to the link stored at that character, if any.
     func linkURL(at point: CGPoint) -> URL? {
         guard let position = closestPosition(to: point) else { return nil }
         let index = offset(from: beginningOfDocument, to: position)

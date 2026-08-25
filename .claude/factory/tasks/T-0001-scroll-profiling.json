@@ -1,0 +1,14 @@
+{
+  "id": "T-0001", "title": "Profile the remaining reader scroll cost with Instruments",
+  "type": "spike", "status": "draft", "quarter": "Q1",
+  "roadmap_anchor": "Q1 > Debt > Finish the scroll investigation",
+  "depends_on": [],
+  "acceptance": [
+    "Time Profiler trace of 8 swipes in the reader, saved and summarised",
+    "The 3.8s of CPU is attributed to named call sites, not hypothesised",
+    "The .scrollPosition(id:) hypothesis is confirmed or disproved with evidence"
+  ],
+  "touches": [], "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Needs Instruments and a human reading a trace. Never dispatched.",
+  "history": []
+}

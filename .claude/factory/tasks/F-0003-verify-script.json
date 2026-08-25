@@ -1,0 +1,28 @@
+{
+  "id": "F-0003",
+  "title": "verify.sh — the gate",
+  "type": "chore",
+  "status": "todo",
+  "quarter": "bootstrap",
+  "roadmap_anchor": null,
+  "depends_on": [
+    "F-0001"
+  ],
+  "acceptance": [
+    "Runs xcodegen, builds app and share extension for the simulator with CODE_SIGNING_ALLOWED=NO, runs the unit suite, then invariants.sh",
+    "Fails fast with a non-zero exit and a readable reason at whichever stage fails",
+    "Uses a per-worktree derived data path so parallel runs cannot collide",
+    "Acquires the sim lock around anything needing a simulator, and releases it on exit including on failure",
+    "Resolves the main checkout via `git rev-parse --git-common-dir` and writes logs and locks there: state/ is gitignored and therefore absent inside a worktree",
+    "Writes its full log to state/runs/<task>/verify-<attempt>.log in the main checkout"
+  ],
+  "touches": [
+    ".claude/factory/bin/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Bootstrap. Constitution X3 forbids agents from editing this path, which is exactly why it cannot be factory work.",
+  "history": []
+}

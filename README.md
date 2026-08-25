@@ -27,14 +27,22 @@ the page, pulls out the article, downloads the images, and stores the lot.
 
 **Finding.** Full-text search across every archived article — titles, authors,
 tags, and body text. Filter by Unread, Starred, or Archived; group by tag or by
-site.
+site. The library draws as cards — cover, headline, opening lines — or as rows
+where you would rather see more of it at once.
 
 **Reading.** A reader built for long text: New York or SF, three themes, and
-adjustable size, leading, and column width. Select any passage to highlight it,
-with an optional note. Your position in each article is remembered.
+adjustable size, leading, and column width. A floating dock holds the four
+things you reach for without leaving the page, and full screen puts even that
+away. Your position in each article is remembered, and shown as a hairline
+rather than a percentage.
 
-**Syncing.** Posts, images, highlights, and reading position sync through your
-private CloudKit database. Reading preferences sync through iCloud key-value
+**Marking up.** Put the pen out and the dock becomes a tray: four highlight
+tints, three inks, notes, and an eraser. Tap a sentence to highlight it — no
+selection handles, no menu — or draw on the page freehand with Apple Pencil.
+Everything you add is anchored to the text, not to the pixels.
+
+**Syncing.** Posts, images, highlights, ink, and reading position sync through
+your private CloudKit database. Reading preferences sync through iCloud key-value
 storage. Nothing goes anywhere else.
 
 ## How it's put together
@@ -42,7 +50,7 @@ storage. Nothing goes anywhere else.
 ```
 Stacks/
   App/          Entry point and the CloudKit-backed ModelContainer
-  Models/       Post, StoredImage, Highlight  (SwiftData, CloudKit-compatible)
+  Models/       Post, StoredImage, Highlight, InkStroke  (SwiftData, CloudKit)
   Content/      HTML parser, article extractor, block model
   Services/     Fetching, image archiving, the share inbox, URL canonicalisation
   Design/       Palette, reader themes, typography, preferences
@@ -74,7 +82,7 @@ Extraction is checked against a spread of real sites — Wikipedia, Paul Graham'
 table-based HTML, lazy-loading image galleries, Substack-era blogs — and runs in
 tens of milliseconds off the main actor.
 
-### Highlights
+### Highlights and ink
 
 Highlights anchor to a **block index plus a character range within that block's
 plain text**, not to a pixel offset or a DOM path. That's what lets them survive
@@ -82,6 +90,17 @@ a font change, a theme change, a different device, and a re-extraction. Each
 prose block is its own `UITextView`, which is what makes the anchor natural —
 and is also the only way to learn what the reader selected, since SwiftUI's
 `Text` won't report a selection.
+
+A highlight can be made two ways. Dragging a selection and choosing **Highlight**
+takes exactly what you chose. In markup mode, a tap resolves to the sentence it
+landed in — the unit a reader actually decides about — and becomes the same kind
+of character range.
+
+Ink follows the same rule one level up: a stroke belongs to a block, and its
+points are stored in that block's own unit space rather than in screen
+coordinates. A line drawn at 19pt New York still sits over the same sentence at
+26pt SF Rounded. Strokes are captured from `coalescedTouches`, so a pencil moving
+faster than the display still draws a curve rather than a polygon.
 
 ### The share extension
 

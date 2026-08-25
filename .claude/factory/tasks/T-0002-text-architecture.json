@@ -1,0 +1,14 @@
+{
+  "id": "T-0002", "title": "Resolve the reader's text architecture",
+  "type": "decide", "status": "draft", "quarter": "Q1",
+  "roadmap_anchor": "Q1 > Debt > Resolve the reader's text architecture",
+  "depends_on": ["T-0001"],
+  "acceptance": [
+    "A written decision: keep one UITextView per block, or move to a single TextKit 2 view with viewport layout",
+    "The decision addresses long documents, VoiceOver reading order, Mac, and highlighting",
+    "Recorded in ROADMAP.md so it stops being a standing risk"
+  ],
+  "touches": [], "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "The roadmap's highest-leverage open question. Blocks accessibility and Mac. Decide before, not during.",
+  "history": []
+}

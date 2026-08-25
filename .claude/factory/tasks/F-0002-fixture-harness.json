@@ -1,0 +1,22 @@
+{
+  "id": "F-0002",
+  "title": "Fixture harness plus three seed fixtures",
+  "type": "chore",
+  "status": "todo",
+  "quarter": "bootstrap",
+  "roadmap_anchor": "Q1 > Extractor hardening",
+  "depends_on": ["F-0001"],
+  "acceptance": [
+    "A helper loads a frozen HTML fixture and its expected-result JSON from disk",
+    "Three fixtures land: a Wikipedia article, a Paul Graham table-era page, and a <br><br>-paragraph page",
+    "Each asserts title, word count, and block-type mix",
+    "Fixtures are checked in as static files with no network access at test time"
+  ],
+  "touches": ["StacksTests/**", "Tests/**", "Fixtures/**"],
+  "risk": "low",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Bootstrap slice. T-0006 scales this to ~30 fixtures and is factory work.",
+  "history": []
+}

@@ -14,6 +14,7 @@ final class ReadingPreferences {
         static let lineSpacing = "reader.lineSpacing"
         static let measure = "reader.measure"
         static let groupBySite = "library.groupBySite"
+        static let libraryStyle = "library.style"
     }
 
     static let bodySizeRange: ClosedRange<Double> = 15...30
@@ -26,6 +27,7 @@ final class ReadingPreferences {
     var lineSpacingRatio: Double = 0.55 { didSet { write(lineSpacingRatio, Key.lineSpacing) } }
     var measure: Double = Metrics.readingWidth { didSet { write(measure, Key.measure) } }
     var groupBySite: Bool = false { didSet { write(groupBySite, Key.groupBySite) } }
+    var libraryStyle: LibraryStyle = .cards { didSet { write(libraryStyle.rawValue, Key.libraryStyle) } }
 
     var typography: ReaderTypography {
         ReaderTypography(
@@ -80,6 +82,7 @@ final class ReadingPreferences {
             measure = value.clamped(to: Self.measureRange)
         }
         if let value = read(Key.groupBySite) as? Bool { groupBySite = value }
+        if let raw = read(Key.libraryStyle) as? String, let value = LibraryStyle(rawValue: raw) { libraryStyle = value }
     }
 
     private func read(_ key: String) -> Any? {

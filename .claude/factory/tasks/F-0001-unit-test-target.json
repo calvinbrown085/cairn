@@ -1,0 +1,22 @@
+{
+  "id": "F-0001",
+  "title": "Stand up the unit test target",
+  "type": "chore",
+  "status": "todo",
+  "quarter": "bootstrap",
+  "roadmap_anchor": null,
+  "depends_on": ["D-0001"],
+  "acceptance": [
+    "A unit test target exists and is wired into the Stacks scheme's test action",
+    "At least one real assertion runs against existing extractor code",
+    "The suite is runnable from one command and reports pass/fail via exit code",
+    "No existing target's build settings, bundle ids, or signing config are modified"
+  ],
+  "touches": ["project.yml", "StacksTests/**", "Package.swift", "Sources/**", "Tests/**"],
+  "risk": "medium",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Bootstrap: built in-session, not dispatched — the factory cannot verify the thing that makes verification possible. Shape depends on D-0001.",
+  "history": []
+}

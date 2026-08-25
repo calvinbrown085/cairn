@@ -1,0 +1,24 @@
+{
+  "id": "T-0011",
+  "title": "accessibilityLabel on every icon-only control",
+  "type": "implement",
+  "status": "draft",
+  "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Accessibility > accessibilityLabel on every icon-only control",
+  "depends_on": [],
+  "acceptance": [
+    "Every icon-only control has an accessibilityLabel: star, AA, ellipsis, plus, and the filter menu at minimum",
+    "Labels describe the action, not the glyph",
+    "Controls whose meaning toggles announce their current state",
+    "A grep for Image(systemName:) inside a Button with no label returns nothing"
+  ],
+  "touches": [
+    "Stacks/Views/**"
+  ],
+  "risk": "low",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Zero labels exist today. Additive, low-blast-radius, mechanically verifiable — second calibration candidate.",
+  "history": []
+}

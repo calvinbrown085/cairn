@@ -1,0 +1,26 @@
+{
+  "id": "T-0010",
+  "title": "PrivacyInfo.xcprivacy with the UserDefaults reason declared",
+  "type": "implement",
+  "status": "draft",
+  "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Ship a beta > PrivacyInfo.xcprivacy",
+  "depends_on": [],
+  "acceptance": [
+    "PrivacyInfo.xcprivacy exists in the app target and declares the UserDefaults required-reason API used by Stacks/Services/AppGroup.swift",
+    "The reason code declared is the app-group shared defaults one",
+    "Collected data types are declared as none, matching the Data Not Collected label",
+    "The file is bundled by the build, not merely present on disk"
+  ],
+  "touches": [
+    "Stacks/PrivacyInfo.xcprivacy",
+    "project.yml",
+    "Stacks/Resources/**"
+  ],
+  "risk": "low",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "App Store blocking, small, mechanical, objectively checkable. The best first calibration task for the factory.",
+  "history": []
+}

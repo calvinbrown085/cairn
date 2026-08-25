@@ -3,6 +3,8 @@ import SwiftData
 
 struct ReaderView: View {
     @Bindable var post: Post
+    /// Lets the split view get out of the way when the reader goes full screen.
+    var onImmersiveChange: (Bool) -> Void = { _ in }
 
     @Environment(ReadingPreferences.self) private var preferences
     @Environment(ArchiveService.self) private var archive
@@ -17,6 +19,16 @@ struct ReaderView: View {
     @State private var isShowingHighlights = false
     @State private var hasRestoredPosition = false
     @State private var progressWriter: Task<Void, Never>?
+
+    // Markup
+    @State private var isMarkingUp = false
+    @State private var tool: MarkupTool = .highlight
+    @State private var tint: HighlightTint = .butter
+    @State private var ink: InkColor = .graphite
+    @State private var hasUsedTool = false
+    @State private var noteTarget: Highlight?
+
+    @State private var isImmersive = false
 
     private var theme: ReaderTheme { preferences.theme }
     private var typography: ReaderTypography { preferences.typography }
@@ -64,8 +76,29 @@ struct ReaderView: View {
         }
         .background(theme.background.ignoresSafeArea())
         .preferredColorScheme(theme.forcedColorScheme)
-        .navigationTitle(post.state == .ready ? post.title : "")
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if post.state == .ready {
+                progressRule
+                    // Full screen has no navigation bar, so nothing stops the
+                    // text sliding up under the clock. The rule's own backing
+                    // extends over the status bar and hides it there.
+                    .background {
+                        if isImmersive {
+                            theme.background.ignoresSafeArea(edges: .top)
+                        }
+                    }
+            }
+        }
+        .overlay(alignment: .bottom) { dockStack }
+        .overlay(alignment: .leading) {
+            if isImmersive { immersiveGrabber }
+        }
+        .overlay(alignment: .topTrailing) {
+            if isImmersive { immersiveExit }
+        }
+        .navigationTitle(post.state == .ready ? post.host.uppercased() : "")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(isImmersive ? .hidden : .visible, for: .navigationBar)
         .toolbar { toolbar }
         .toolbarBackground(theme.background, for: .navigationBar)
         .sheet(isPresented: $isShowingTypography) {
@@ -81,6 +114,11 @@ struct ReaderView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(item: $noteTarget) { highlight in
+            NoteSheet(highlight: highlight)
+                .presentationDetents([.height(360)])
+                .presentationDragIndicator(.visible)
+        }
         .onChange(of: renderGeneration, initial: true) { _, generation in
             ReaderRenderCache.shared.prepare(generation: generation)
         }
@@ -91,8 +129,10 @@ struct ReaderView: View {
         .onDisappear {
             progressWriter?.cancel()
             persistProgress()
+            if isImmersive { onImmersiveChange(false) }
         }
         .onChange(of: topBlock) { _, _ in scheduleProgressWrite() }
+        .onChange(of: tool) { _, _ in hasUsedTool = false }
     }
 
     // MARK: - Article
@@ -101,6 +141,7 @@ struct ReaderView: View {
         // Grouped once per pass rather than filtered once per block, which was
         // O(blocks × highlights) on every scroll tick.
         let highlightsByBlock = Dictionary(grouping: post.highlights ?? [], by: \.blockIndex)
+        let strokesByBlock = Dictionary(grouping: post.inkStrokes ?? [], by: \.blockIndex)
 
         return ScrollViewReader { scroller in
             ScrollView {
@@ -118,6 +159,8 @@ struct ReaderView: View {
                             post: post,
                             builder: builder,
                             highlights: highlightsByBlock[entry.id] ?? [],
+                            strokes: strokesByBlock[entry.id] ?? [],
+                            markup: markupContext,
                             onHighlight: { range, text in
                                 addHighlight(blockIndex: entry.id, range: range, text: text)
                             },
@@ -128,6 +171,8 @@ struct ReaderView: View {
 
                     footer
                         .padding(.top, 30)
+                        // Room for the dock to float over paper rather than text.
+                        .padding(.bottom, 92)
                 }
                 .frame(maxWidth: typography.measure, alignment: .leading)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -136,14 +181,19 @@ struct ReaderView: View {
                 .scrollTargetLayout()
             }
             .scrollPosition(id: $topBlock, anchor: .top)
+            // A pen stroke and a scroll are the same gesture; the pen wins
+            // while it is out.
+            .scrollDisabled(isMarkingUp && tool == .pen)
             .onAppear { restorePosition(using: scroller, in: document) }
         }
     }
 
     /// Wide screens get roomier margins; the column itself is already capped by
-    /// the reader's measure setting.
+    /// the reader's measure setting. Full screen widens both.
     private var horizontalPadding: CGFloat {
-        sizeClass == .regular ? 40 : Metrics.gutter
+        let regular = sizeClass == .regular
+        if isImmersive { return regular ? 56 : 24 }
+        return regular ? 40 : Metrics.gutter
     }
 
     private var header: some View {
@@ -204,6 +254,106 @@ struct ReaderView: View {
         }
     }
 
+    // MARK: - Chrome
+
+    /// How far through the article you are, as a hairline. It replaces the
+    /// percentage that used to sit in the metadata: a reader wants to feel the
+    /// remaining distance, not read a number.
+    private var progressRule: some View {
+        ZStack(alignment: .leading) {
+            Rectangle().fill(theme.rule)
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(theme.accent.opacity(0.75))
+                    .frame(width: geometry.size.width * max(0.02, post.readProgress))
+            }
+        }
+        .frame(height: 2)
+        .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private var dockStack: some View {
+        if post.state == .ready, document != nil {
+            VStack(spacing: 10) {
+                if isMarkingUp, !hasUsedTool {
+                    PencilHint(text: tool.hint)
+                }
+
+                ReaderDock(
+                    theme: theme,
+                    isMarkingUp: isMarkingUp,
+                    tool: $tool,
+                    tint: $tint,
+                    ink: $ink,
+                    highlightCount: (post.highlights ?? []).count,
+                    isImmersive: isImmersive,
+                    beginMarkup: {
+                        withAnimation(.snappy) {
+                            isMarkingUp = true
+                            tool = .highlight
+                            hasUsedTool = false
+                        }
+                    },
+                    endMarkup: {
+                        withAnimation(.snappy) {
+                            isMarkingUp = false
+                            tool = .highlight
+                        }
+                    },
+                    openTypography: { isShowingTypography = true },
+                    openHighlights: { isShowingHighlights = true },
+                    toggleImmersive: { setImmersive(!isImmersive) }
+                )
+            }
+            .padding(.bottom, 22)
+            .animation(.snappy(duration: 0.2), value: hasUsedTool)
+        }
+    }
+
+    /// Full screen has to be leavable without remembering a gesture. The tab on
+    /// the leading edge is the same affordance a split view uses, and it points
+    /// back at what it will bring: the library.
+    private var immersiveGrabber: some View {
+        Button {
+            setImmersive(false)
+        } label: {
+            Capsule()
+                .fill(theme.inkSecondary.opacity(0.5))
+                .frame(width: 3, height: 34)
+                .frame(width: 22, height: 76)
+                .background(theme.background.opacity(0.92), in: .rect(cornerRadius: 13))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Leave full screen")
+    }
+
+    private var immersiveExit: some View {
+        Button {
+            setImmersive(false)
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: "arrow.down.right.and.arrow.up.left")
+                    .font(.system(size: 12))
+                Text(sizeClass == .regular ? "Show library" : "Show controls")
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(theme.inkSecondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.ultraThinMaterial, in: .capsule)
+            .overlay(Capsule().strokeBorder(theme.rule, lineWidth: 0.5))
+        }
+        .buttonStyle(.plain)
+        .padding(.trailing, 14)
+        .padding(.top, 10)
+    }
+
+    private func setImmersive(_ value: Bool) {
+        withAnimation(.snappy) { isImmersive = value }
+        onImmersiveChange(value)
+    }
+
     // MARK: - Toolbar
 
     @ToolbarContentBuilder
@@ -216,25 +366,18 @@ struct ReaderView: View {
                 Image(systemName: post.isStarred ? "star.fill" : "star")
                     .foregroundStyle(post.isStarred ? Palette.star : theme.inkSecondary)
             }
-
-            Button {
-                isShowingTypography = true
-            } label: {
-                Image(systemName: "textformat.size")
-            }
-            .accessibilityIdentifier("reader.typography")
-            .disabled(post.state != .ready)
+            .accessibilityIdentifier("reader.star")
+            .accessibilityLabel(post.isStarred ? "Unstar" : "Star")
 
             Menu {
                 Button { isShowingTags = true } label: {
                     Label("Tags…", systemImage: "tag")
                 }
 
-                if !post.sortedHighlights.isEmpty {
-                    Button { isShowingHighlights = true } label: {
-                        Label("Highlights (\(post.sortedHighlights.count))", systemImage: "highlighter")
-                    }
+                Button { isShowingHighlights = true } label: {
+                    Label("Highlights (\(post.sortedHighlights.count))", systemImage: "highlighter")
                 }
+                .disabled(post.sortedHighlights.isEmpty)
 
                 Button {
                     post.isArchived.toggle()
@@ -265,6 +408,75 @@ struct ReaderView: View {
         }
     }
 
+    // MARK: - Markup
+
+    private var markupContext: MarkupContext? {
+        guard isMarkingUp else { return nil }
+        return MarkupContext(
+            tool: tool,
+            ink: ink,
+            onSentenceTap: handleSentenceTap,
+            onDrawStroke: addStroke,
+            onEraseStroke: erase
+        )
+    }
+
+    /// A tap on a sentence, resolved against the current tool. Highlighting the
+    /// same sentence twice in the same tint takes it back off again — the
+    /// gesture is a toggle, because a mis-tap should undo the way it was made.
+    private func handleSentenceTap(blockIndex: Int, range: NSRange, text: String) {
+        hasUsedTool = true
+
+        switch tool {
+        case .highlight:
+            if let existing = highlight(blockIndex: blockIndex, overlapping: range) {
+                if existing.tint == tint, (existing.note ?? "").isEmpty {
+                    context.delete(existing)
+                } else {
+                    existing.tint = tint
+                }
+            } else {
+                addHighlight(blockIndex: blockIndex, range: range, text: text, tint: tint)
+            }
+            try? context.save()
+
+        case .note:
+            let mark = highlight(blockIndex: blockIndex, overlapping: range)
+                ?? addHighlight(blockIndex: blockIndex, range: range, text: text, tint: tint)
+            try? context.save()
+            noteTarget = mark
+
+        case .erase:
+            if let existing = highlight(blockIndex: blockIndex, overlapping: range) {
+                context.delete(existing)
+                try? context.save()
+            }
+
+        case .pen:
+            break
+        }
+    }
+
+    private func highlight(blockIndex: Int, overlapping range: NSRange) -> Highlight? {
+        (post.highlights ?? []).first {
+            $0.blockIndex == blockIndex && NSIntersectionRange($0.range, range).length > 0
+        }
+    }
+
+    private func addStroke(blockIndex: Int, points: [CGPoint]) {
+        hasUsedTool = true
+        let stroke = InkStroke(blockIndex: blockIndex, points: points, color: ink)
+        stroke.post = post
+        context.insert(stroke)
+        try? context.save()
+    }
+
+    private func erase(_ stroke: InkStroke) {
+        hasUsedTool = true
+        context.delete(stroke)
+        try? context.save()
+    }
+
     // MARK: - Behaviour
 
     /// Everything that changes what a block should look like. Highlights are
@@ -287,20 +499,24 @@ struct ReaderView: View {
         return hasher.finalize()
     }
 
-    private func highlights(forBlock index: Int) -> [Highlight] {
-        (post.highlights ?? []).filter { $0.blockIndex == index }
-    }
-
-    private func addHighlight(blockIndex: Int, range: NSRange, text: String) {
+    @discardableResult
+    private func addHighlight(
+        blockIndex: Int,
+        range: NSRange,
+        text: String,
+        tint: HighlightTint = .butter
+    ) -> Highlight {
         let highlight = Highlight(
             blockIndex: blockIndex,
             start: range.location,
             length: range.length,
-            text: text
+            text: text,
+            tint: tint
         )
         highlight.post = post
         context.insert(highlight)
         try? context.save()
+        return highlight
     }
 
     private func markOpened() {

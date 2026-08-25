@@ -1,0 +1,25 @@
+{
+  "id": "F-0004",
+  "title": "invariants.sh — mechanical constitution checks",
+  "type": "chore",
+  "status": "todo",
+  "quarter": "bootstrap",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "Fails if the `.system(size:` call-site count exceeds the config baseline of 33",
+    "Fails on any import outside the allowlist, or on a Package.resolved appearing",
+    "Fails on any banned identifier from config.json",
+    "Fails if the diff touches .claude/factory/**, .claude/skills/**, or .claude/agents/**",
+    "Fails if build output, xcuserdata, .xcresult, or the generated xcodeproj is staged",
+    "Fails if DEVELOPMENT_TEAM, bundle identifiers, the app group, or the CloudKit container changed",
+    "Each failure prints the rule id from CONSTITUTION.md and the offending lines"
+  ],
+  "touches": [".claude/factory/bin/**"],
+  "risk": "low",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Bootstrap. Deterministic only — no model judgement lives in this script.",
+  "history": []
+}
