@@ -21,7 +21,7 @@
   ],
   "risk": "medium",
   "factory_eligible": true,
-  "attempts": 1,
+  "attempts": 2,
   "branch": "factory/T-0015-search-snippets",
   "notes": "Retrieval before intelligence — this ships before any embedding work.",
   "history": [
@@ -39,6 +39,11 @@
       "ts": "2026-08-25T17:48:01Z",
       "event": "revise",
       "detail": "criterion 1 unmet in the default cards style; touches widened to include PostCard.swift (planning error, PostCard was omitted)"
+    },
+    {
+      "ts": "2026-08-25T17:53:44Z",
+      "event": "revise",
+      "detail": "code-review found the most-representative ranking is dead code (all scores tie on whole-phrase matches) — criterion 3 unmet; plus unsqueezed text vs squeezed phrase, and a stale-snippet frame in PostRow"
     }
   ],
   "agent": {
