@@ -70,7 +70,19 @@ git -C "$MAIN_ROOT" commit --quiet -m "$TYPE: $TITLE" -m "Task: $ID" \
 
 MERGED="$(git -C "$MAIN_ROOT" rev-parse --short HEAD)"
 say "merged as $MERGED"
-git -C "$MAIN_ROOT" push --quiet origin main 2>/dev/null && say "pushed" || say "push skipped or failed (merge stands locally)"
+# Report WHY a push failed. Swallowing stderr made two real failures — a
+# non-fast-forward because origin had moved — look like an incidental skip, and
+# the merge silently stopped reaching the remote.
+if push_err="$(git -C "$MAIN_ROOT" push origin main 2>&1)"; then
+  say "pushed"
+else
+  say "PUSH FAILED — the merge stands locally but origin does not have it:"
+  echo "$push_err" | sed 's/^/    /' | head -4
+  case "$push_err" in
+    *non-fast-forward*|*fetch\ first*|*behind*)
+      say "    cause: origin has commits this checkout does not. Rebase onto origin/main and push again." ;;
+  esac
+fi
 
 "$LEDGER" set "$ID" status '"merged"' >/dev/null
 "$LEDGER" log "$ID" merged "$MERGED"

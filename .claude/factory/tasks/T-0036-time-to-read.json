@@ -2,7 +2,7 @@
   "id": "T-0036",
   "title": "Time-to-read as a first-class filter and sort",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -33,6 +33,11 @@
       "ts": "2026-08-25T19:40:20Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T19:44:11Z",
+      "event": "merged",
+      "detail": "128c044"
     }
   ],
   "agent": {
