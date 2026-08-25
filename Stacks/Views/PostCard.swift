@@ -10,6 +10,14 @@ import SwiftUI
 struct PostCard: View {
     let post: Post
     var isSelected: Bool = false
+    /// The active search text, squeezed and empty when not searching — see
+    /// `PostRow`, which the same convention comes from.
+    var searchQuery: String = ""
+
+    /// Fetched on demand; see `loadSnippet()`.
+    @State private var snippet: SearchSnippet?
+
+    private var isSearching: Bool { !searchQuery.isEmpty }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -27,6 +35,19 @@ struct PostCard: View {
             radius: isSelected ? 10 : 3,
             y: isSelected ? 5 : 1
         )
+        .task(id: SnippetRequest(postID: post.id, query: searchQuery)) {
+            snippet = loadSnippet()
+        }
+    }
+
+    /// Only this call touches `post.searchText` — see `PostRow.loadSnippet()`,
+    /// which this mirrors. A card is still one `List` row under the hood (see
+    /// `PostList` in `LibraryView`), so the same on-screen-only guarantee
+    /// applies here: this runs once per card that is actually built, not once
+    /// per match.
+    private func loadSnippet() -> SearchSnippet? {
+        guard isSearching, post.state == .ready else { return nil }
+        return SearchSnippetBuilder.snippet(in: post.searchText, query: searchQuery)
     }
 
     // MARK: - Cover
@@ -89,7 +110,13 @@ struct PostCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            if !post.excerpt.isEmpty {
+            // A search snippet takes the excerpt's place rather than sitting
+            // alongside it — the same slot, the same two-line clamp, so a card
+            // never grows taller because a search is active. Query and result
+            // are both live per keystroke; the shape of the card stays fixed.
+            if isSearching, let snippet {
+                SearchSnippetText(snippet: snippet)
+            } else if !post.excerpt.isEmpty {
                 Text(post.excerpt)
                     .font(.system(size: 13))
                     .foregroundStyle(Palette.inkSecondary)

@@ -95,6 +95,7 @@ private struct PostList: View {
     private let groupBySite: Bool
     private let style: LibraryStyle
     private let isSearching: Bool
+    private let searchQuery: String
     @Binding private var selection: Post?
     @Binding private var isAddingURL: Bool
     @Binding private var clipboardOffer: URL?
@@ -118,13 +119,33 @@ private struct PostList: View {
         self.groupBySite = groupBySite
         self.style = style
         self.isSearching = !search.squeezed.isEmpty
+        self.searchQuery = search.squeezed
         self._selection = selection
         self._isAddingURL = isAddingURL
         self._clipboardOffer = clipboardOffer
-        self._posts = Query(
-            filter: filter.predicate(search: search),
-            sort: sort.descriptors
+        self._posts = Query(PostList.descriptor(filter: filter, search: search, sort: sort))
+    }
+
+    /// Neither `PostRow` nor `PostCard` shows a post's body — only its title,
+    /// its byline, and a search snippet built on demand for the cells
+    /// actually on screen (both are drawn as cells of the one `List` below,
+    /// whichever `style` is picked). Leaving `searchText` and `contentData`
+    /// out of `propertiesToFetch` means opening a filter with a thousand
+    /// matches doesn't pull a thousand articles' worth of text into memory
+    /// just to list their titles; each excluded property is faulted back in
+    /// individually, only for the one post that ends up needing it.
+    private static func descriptor(filter: LibraryFilter, search: String, sort: LibrarySort) -> FetchDescriptor<Post> {
+        var descriptor = FetchDescriptor<Post>(
+            predicate: filter.predicate(search: search),
+            sortBy: sort.descriptors
         )
+        descriptor.propertiesToFetch = [
+            \.id, \.urlString, \.canonicalURLString, \.title, \.author, \.siteName, \.host, \.excerpt,
+            \.publishedAt, \.publishedOffset, \.savedAt, \.openedAt, \.finishedAt,
+            \.wordCount, \.isStarred, \.isArchived, \.readProgress, \.lastBlockIndex,
+            \.stateRaw, \.failureReason, \.tagNames, \.leadImageID,
+        ]
+        return descriptor
     }
 
     var body: some View {
@@ -192,8 +213,8 @@ private struct PostList: View {
             selection = post
         } label: {
             switch style {
-            case .cards: PostCard(post: post, isSelected: isSelected)
-            case .rows: PostRow(post: post, isSelected: isSelected)
+            case .cards: PostCard(post: post, isSelected: isSelected, searchQuery: searchQuery)
+            case .rows: PostRow(post: post, isSelected: isSelected, searchQuery: searchQuery)
             }
         }
         .buttonStyle(.plain)
