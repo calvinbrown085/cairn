@@ -2,7 +2,7 @@
   "id": "T-0006",
   "title": "Freeze ~30 real pages as fixtures and assert against them",
   "type": "implement",
-  "status": "todo",
+  "status": "blocked",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [
@@ -20,15 +20,20 @@
     "Fixtures/**"
   ],
   "risk": "low",
-  "factory_eligible": true,
+  "factory_eligible": false,
   "attempts": 0,
   "branch": null,
-  "notes": "Prerequisite for public source and the first thing that can actually gate a PR. Ideal early factory work: mechanical, well-specified, self-verifying.",
+  "notes": "BLOCKED on human input, not on dependencies. The task says freeze ~30 REAL pages; implementer agents have no network access and can only hand-author reproductions. F-0002 already flagged that hand-authored markup misses idiosyncrasies of real production HTML that the extractor heuristics were tuned against. Thirty passing fake fixtures would be false confidence in exactly the place the roadmap wants repeatable truth. Needs either: (a) the human captures ~30 pages to Packages/SwiftReadability/Tests/SwiftReadabilityTests/Fixtures/ and the agent writes the expectations, or (b) the task is rescoped to shapes rather than real captures, and the roadmap wording changes with it.",
   "history": [
     {
       "ts": "2026-08-25T15:55:16Z",
       "event": "approved",
       "detail": "overseer standing authority; low/medium risk"
+    },
+    {
+      "ts": "2026-08-25T17:20:08Z",
+      "event": "blocked",
+      "detail": "no network access; cannot capture real pages"
     }
   ]
 }

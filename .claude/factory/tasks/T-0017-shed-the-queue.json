@@ -2,7 +2,7 @@
   "id": "T-0017",
   "title": "Shed the queue: rethink unread as a library concept, not an inbox",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Shed the queue",
   "depends_on": [],
@@ -22,13 +22,24 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0017-shed-the-queue",
   "notes": "Found by invariants.sh on its first run: the sidebar renders index.unreadCount beside all/starred/archived. Predates the constitution's P5 ban, which is why P5 is diff-scoped. This task retires the exemption.",
   "history": [
     {
       "ts": "2026-08-25T15:55:16Z",
       "event": "approved",
       "detail": "overseer standing authority; low/medium risk"
+    },
+    {
+      "ts": "2026-08-25T17:20:45Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a26aed6e8fe45b267",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T17:20:45Z"
+  }
 }
