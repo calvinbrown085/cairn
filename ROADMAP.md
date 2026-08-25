@@ -177,10 +177,10 @@ outstanding work, not speculation.
       position restore, highlighting, and typography are unverified against it.
 
 **Extractor hardening** *(prerequisite for public source)*
-- [ ] Freeze ~30 real pages as HTML fixtures — Wikipedia, Paul Graham's
+- [x] Freeze ~30 real pages as HTML fixtures — Wikipedia, Paul Graham's
       table-era markup, lazy-loaded galleries, `<br><br>` paragraphs,
       meta-refresh redirects, paywalls, 404s.
-- [ ] Assert titles, word counts, and block mixes against them. Extraction is
+- [x] Assert titles, word counts, and block mixes against them. Extraction is
       currently validated only against *live* sites, so the checks aren't
       repeatable and can't gate a pull request.
 
@@ -391,13 +391,13 @@ Written down now, while it's cheap to be honest.
   reader's *CPU cost* is still unprofiled (T-0001), and the decision carries a
   named failure condition — if VoiceOver reading order is bad across many small
   text views, revisit before the Mac app.
-- **The extractor silently truncates multi-section documents.** Measured
-  2026-08-25 against real captures: Project Gutenberg's *Frankenstein* is
-  ~75,085 words and the extractor keeps 8,239 — chapter 24 of 24, **89% lost at
-  save time, with nothing telling the reader anything is missing.** Six of
-  fourteen real pages are affected. This is the strongest argument yet for
-  storing the original HTML: until that lands, every long article saved is
-  permanently truncated and unrepairable. Tracked as T-0027.
+- ~~**The extractor silently truncates multi-section documents.**~~ **Fixed
+  2026-08-25** (T-0027, `e28d6c7`). *Frankenstein* went from 8,239 words back to
+  75,059 against a ~75,085-word source — essentially complete recovery. Six real
+  captures repaired, a synthetic sibling-sections case guards it, and every
+  article saved since T-0007 can be repaired in place by T-0009's re-extraction.
+  Articles saved *before* T-0007 have no stored source and stay truncated
+  permanently.
 - **CloudKit sync is provisioned but unobserved.** Everything assumes it works.
 - **`NLContextualEmbedding` document-level quality is unknown.** The Q3 bet rests
   on a spike that hasn't run.

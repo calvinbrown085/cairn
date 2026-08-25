@@ -2,7 +2,7 @@
   "id": "T-0027",
   "title": "Extractor silently discards most of multi-section documents",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [],
@@ -28,6 +28,11 @@
       "ts": "2026-08-25T18:29:17Z",
       "event": "dispatched",
       "detail": "attempt 1; highest-value defect — 89% of long articles lost at save time"
+    },
+    {
+      "ts": "2026-08-25T19:03:23Z",
+      "event": "merged",
+      "detail": "e28d6c7"
     }
   ],
   "agent": {
