@@ -18,6 +18,10 @@ let package = Package(
         .testTarget(
             name: "SwiftReadabilityTests",
             dependencies: ["SwiftReadability"],
+            // Frozen fixtures (HTML + expected-result JSON) copied verbatim so
+            // `swift test` can read them from the bundle with no network access
+            // and no simulator.
+            resources: [.copy("Fixtures")],
             swiftSettings: [.swiftLanguageMode(.v5)]
         )
     ]
