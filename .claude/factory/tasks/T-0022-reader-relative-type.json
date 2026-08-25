@@ -2,7 +2,7 @@
   "id": "T-0022",
   "title": "Reader typography: Dynamic Type base with the slider as a relative offset",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Dynamic Type as the base",
   "depends_on": [
@@ -32,6 +32,11 @@
       "ts": "2026-08-25T18:34:12Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T18:39:51Z",
+      "event": "merged",
+      "detail": "bb8a15a"
     }
   ],
   "agent": {

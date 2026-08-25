@@ -241,10 +241,10 @@ outstanding work, not speculation.
       *"this blog is gone — you still have it."*
 
 **Accessibility** *(now a shipping requirement, not a nicety)*
-- [ ] **Dynamic Type as the base, reader slider as a relative offset** — via
+- [x] **Dynamic Type as the base, reader slider as a relative offset** — via
       `UIFontMetrics` / `Font.custom(size:relativeTo:)`. Someone on Accessibility
       XL must open the reader at a size that already works, before touching any
-      control. Covers all 29 fixed-size call sites.
+      control. *(Done: T-0012 `144c1d8` converted 75 chrome sites, T-0022 `bb8a15a` the reader's two. `.system(size:)` is now 0 app-wide.)*
 - [x] `accessibilityLabel` on every icon-only control. *(T-0011, `0feb6c2`.)*
 - [ ] VoiceOver pass over the reader — the per-block text views need sensible
       rotor navigation and reading order. Depends on the Q1 architecture call.
