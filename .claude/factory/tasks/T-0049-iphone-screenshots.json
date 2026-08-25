@@ -28,6 +28,11 @@
       "ts": "2026-08-25T23:36:06Z",
       "event": "dispatched",
       "detail": "attempt 1; test the .failed-row hypothesis before touching RootView"
+    },
+    {
+      "ts": "2026-08-25T23:46:46Z",
+      "event": "challenged",
+      "detail": "edited RootView before showing evidence the post was .ready; asked for the observed state, and told an unverified navigation change is worse than an unfinished screenshot set"
     }
   ],
   "agent": {
