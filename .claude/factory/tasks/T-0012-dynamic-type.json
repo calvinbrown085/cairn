@@ -2,7 +2,7 @@
   "id": "T-0012",
   "title": "Dynamic Type across app chrome",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Dynamic Type as the base",
   "depends_on": [],
@@ -42,6 +42,11 @@
       "ts": "2026-08-25T18:12:17Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T18:30:25Z",
+      "event": "merged",
+      "detail": "144c1d8"
     }
   ],
   "agent": {
