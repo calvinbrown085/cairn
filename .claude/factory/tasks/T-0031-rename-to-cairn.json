@@ -2,7 +2,7 @@
   "id": "T-0031",
   "title": "Rename the app to Cairn",
   "type": "chore",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q1",
   "roadmap_anchor": null,
   "depends_on": [
@@ -25,13 +25,23 @@
   "risk": "high",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0031-rename-cairn",
   "notes": "EXCLUSIVE TASK — must run alone. It renames directories every other task edits, so a concurrent worktree would face unresolvable rebase conflicts. Do not dispatch until the fleet is empty. FULL rename decided 2026-08-25 after the owner confirmed nothing saved matters: the app group and CloudKit container are renamed too, so no legacy identifiers survive into the public repo. This orphans the existing on-device library and any synced records — accepted deliberately and explicitly, and cheap right now because the only data is the owner test data and T-0004 has never confirmed sync works at all. EXPLICIT CONSTITUTION EXCEPTION granted by the overseer: X7 forbids agents changing signing or identity. This task may change the three bundle identifiers, the app group identifier and the CloudKit container identifier. It may NOT change DEVELOPMENT_TEAM — that is the signing identity and has nothing to do with the rename. The repo directory itself (~/Documents/stacks) is NOT renamed: factory scripts, worktree paths and the settings allowlist all use absolute paths through it. Renaming the checkout is a separate later human operation.",
   "history": [
     {
       "ts": "2026-08-25T18:38:59Z",
       "event": "rescoped",
       "detail": "full rename including app group and CloudKit container; owner confirmed no saved data matters"
+    },
+    {
+      "ts": "2026-08-25T19:10:34Z",
+      "event": "dispatched",
+      "detail": "attempt 1; exclusive — fleet drained first"
     }
-  ]
+  ],
+  "agent": {
+    "id": "af3035196b90ab597",
+    "role": "implementer",
+    "spawned": "2026-08-25T19:10:33Z"
+  }
 }
