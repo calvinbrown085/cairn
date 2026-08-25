@@ -7,6 +7,12 @@ import SwiftUI
 /// erase — and the article underneath stays fully visible, which is the point
 /// of putting it here instead of in a toolbar.
 struct ReaderDock: View {
+    // `ReaderView` sets `.preferredColorScheme(theme.forcedColorScheme)` on
+    // itself, so this environment value already carries the appearance the
+    // reader is actually drawn in — the forced one for Sepia and Night, and
+    // whatever the system is set to for Paper, which has none.
+    @Environment(\.colorScheme) private var colorScheme
+
     let theme: ReaderTheme
     let isMarkingUp: Bool
     @Binding var tool: MarkupTool
@@ -165,10 +171,31 @@ struct ReaderDock: View {
         .buttonStyle(.plain)
     }
 
-    /// Night's accent is light enough that white-on-accent disappears.
+    /// The ink for the active toggle's capsule, picked from the accent this
+    /// appearance actually resolves to rather than from `theme` itself. Paper
+    /// is one theme with two appearances — light resolves `Palette.accent` to
+    /// a dark terracotta that wants light ink, dark resolves it to a pale
+    /// peach that wants the same dark ink Night needs. A `switch` over theme
+    /// cases can't see that; the resolved colour can.
     private var onAccentInk: Color {
-        theme == .night ? Color(uiColor: UIColor(hex: 0x14120F)) : Color(uiColor: UIColor(hex: 0xFFFDFA))
+        Self.onAccentInk(for: theme, style: colorScheme == .dark ? .dark : .light)
     }
+
+    /// Static so `ReaderContrastAudit` can measure the same pair the dock
+    /// actually draws, for every theme and appearance, without spinning up a
+    /// view.
+    static func onAccentInk(for theme: ReaderTheme, style: UIUserInterfaceStyle) -> Color {
+        let resolvedAccent = UIColor(theme.accent).resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
+        // The luminance at which black ink and white ink land on exactly the
+        // same WCAG ratio against a background: solving
+        // `(L + 0.05) / 0.05 == 1.05 / (L + 0.05)` for `L` gives L ≈ 0.1791.
+        // Above it, dark ink has the wider margin; below it, light ink does.
+        let crossover = 0.1791
+        return WCAGContrast.luminance(of: resolvedAccent) > crossover ? darkInk : lightInk
+    }
+
+    private static let darkInk = Color(uiColor: UIColor(hex: 0x14120F))
+    private static let lightInk = Color(uiColor: UIColor(hex: 0xFFFDFA))
 }
 
 /// The line of coaching under the dock while markup is on. It says what the

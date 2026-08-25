@@ -10,7 +10,10 @@ enum WCAGContrast {
         return c <= 0.03928 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4)
     }
 
-    private static func luminance(of color: UIColor) -> Double {
+    /// Not `private`: `ReaderDock` reads this directly to pick its active
+    /// toggle's ink from the accent that is actually resolved for the current
+    /// appearance, rather than from which theme case is selected.
+    static func luminance(of color: UIColor) -> Double {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         color.getRed(&r, green: &g, blue: &b, alpha: &a)
         return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b)
@@ -111,6 +114,18 @@ enum ReaderContrastAudit {
                 add("\(label): metadata & captions (secondary ink) on background", inkSecondary, background)
                 add("\(label): links & buttons (accent) on background", accent, background)
                 add("\(label): code block text (ink) on code background", ink, codeBackground)
+
+                // ReaderDock's active toggle fills its capsule with the
+                // theme's accent and picks white or near-black ink from
+                // whichever the resolved accent's luminance actually needs —
+                // see `ReaderDock.onAccentInk(for:style:)`. Paper is the case
+                // that matters here: light and dark appearance resolve to two
+                // very different accent colours from the same theme case.
+                add(
+                    "\(label): dock active toggle (onAccentInk) on accent",
+                    resolve(ReaderDock.onAccentInk(for: theme, style: style), style),
+                    accent
+                )
 
                 // ReaderView's "Archived <date>" footer is read content drawn
                 // at reduced opacity, not decoration — it has to clear AA too.
