@@ -131,8 +131,13 @@ final class ReadingFlowUITests: XCTestCase {
         (highlight.exists ? highlight : fallback).tap()
         capture("08-highlighted")
 
-        // The highlight should now be listed under the reader's overflow menu.
-        app.buttons["reader.overflow"].tap()
+        // The highlight should now be listed under the reader's overflow
+        // menu, which lives in the navigation bar — hidden by the full screen
+        // a freshly opened post starts in, so it has to come down first.
+        app.buttons["reader.fullscreen"].tap()
+        let overflow = app.buttons["reader.overflow"]
+        XCTAssertTrue(overflow.waitForExistence(timeout: 5), "Leaving full screen should bring back the overflow menu")
+        overflow.tap()
         let entry = app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Highlights'")).firstMatch
         XCTAssertTrue(entry.waitForExistence(timeout: 5), "The highlight should be recorded on the post")
         entry.tap()
@@ -212,31 +217,75 @@ final class ReadingFlowUITests: XCTestCase {
         capture("16-marked-up-card")
     }
 
-    /// Full screen takes the chrome away and has to hand it back without the
-    /// reader having to remember a gesture.
+    /// Opening a post goes straight to full screen — no tap on the full-screen
+    /// control needed — and the way back out is on screen from the first
+    /// frame, not just after some interaction.
     func testFullScreenReading() {
         openReader()
         XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 15))
-        XCTAssertTrue(app.buttons["reader.star"].waitForExistence(timeout: 5))
+
+        // Immersive from the moment the reader appears: the toolbar isn't
+        // there to find, and the exit affordance is, with no tap in between.
+        XCTAssertFalse(app.buttons["reader.star"].exists, "Opening a post should enter full screen immediately")
+        XCTAssertTrue(
+            app.buttons["reader.exitFullScreen"].waitForExistence(timeout: 5),
+            "The exit affordance should be reachable the instant the reader appears"
+        )
+        capture("13-full-screen-on-entry")
 
         let fullScreen = app.buttons["reader.fullscreen"]
-        XCTAssertTrue(fullScreen.waitForExistence(timeout: 5), "The dock should offer full screen")
+        XCTAssertTrue(fullScreen.waitForExistence(timeout: 5), "The dock should offer a way out of full screen")
         fullScreen.tap()
-        // Let the chrome finish animating out before looking.
+        // Let the chrome finish animating in before looking.
         _ = app.staticTexts["nothing"].waitForExistence(timeout: 1.5)
-        capture("13-full-screen")
-
-        XCTAssertFalse(app.buttons["reader.star"].exists, "Full screen should put the toolbar away")
-
-        // The dock stays: it is the way back out.
-        XCTAssertTrue(fullScreen.waitForExistence(timeout: 5))
-        fullScreen.tap()
+        capture("14-full-screen-exited")
 
         XCTAssertTrue(
             app.buttons["reader.star"].waitForExistence(timeout: 5),
             "Leaving full screen should bring the toolbar back"
         )
-        capture("14-full-screen-exited")
+
+        // The dock stays: it is the way back in, too.
+        XCTAssertTrue(fullScreen.waitForExistence(timeout: 5))
+        fullScreen.tap()
+        _ = app.staticTexts["nothing"].waitForExistence(timeout: 1.5)
+
+        XCTAssertFalse(app.buttons["reader.star"].exists, "The dock's toggle should re-enter full screen")
+        capture("15-full-screen-again")
+    }
+
+    /// Leaving full screen is not a preference: it applies to the post it
+    /// happened on and nothing else. Reopening — even the very same post —
+    /// starts immersive again, exactly as if it had never been left.
+    func testFullScreenEntryIsNotSticky() {
+        let target = firstPost(in: app)
+        let marker = String(target.label.prefix(40))
+        target.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["reader.star"].exists, "Opening a post should enter full screen immediately")
+
+        app.buttons["reader.fullscreen"].tap()
+        XCTAssertTrue(
+            app.buttons["reader.star"].waitForExistence(timeout: 5),
+            "Leaving full screen should bring the toolbar back"
+        )
+
+        app.returnToLibrary()
+        app.showEverything()
+
+        let row = app.descendants(matching: .any)
+            .matching(identifier: "post.row")
+            .matching(NSPredicate(format: "label BEGINSWITH %@", marker))
+            .firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "The post should still be in the library")
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 15))
+        XCTAssertFalse(
+            app.buttons["reader.star"].exists,
+            "Reopening the post should enter full screen again, not remember that it was left last time"
+        )
     }
 
     /// The two sheets that hang off the library: how it is ordered and drawn,

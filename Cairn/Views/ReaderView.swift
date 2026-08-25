@@ -37,7 +37,12 @@ struct ReaderView: View {
     @State private var hasUsedTool = false
     @State private var noteTarget: Highlight?
 
-    @State private var isImmersive = false
+    // Full screen is where every post starts — not a remembered preference,
+    // just this view's own initial state. RootView mounts a fresh `ReaderView`
+    // per post (and per reopen of the same post, via `.id(post.id)`), so this
+    // default is what makes leaving full screen apply only to the post it
+    // happened on: nothing here survives to the next post.
+    @State private var isImmersive = true
 
     private var theme: ReaderTheme { preferences.theme }
     private var typography: ReaderTypography { preferences.typography }
@@ -151,7 +156,13 @@ struct ReaderView: View {
         .task(id: post.id) {
             document = await ReaderDocument.load(postID: post.id, contentData: post.contentData)
         }
-        .onAppear(perform: markOpened)
+        .onAppear {
+            markOpened()
+            // `isImmersive` already starts `true`; this just tells the host
+            // (RootView's split view) so the library column steps aside the
+            // instant the reader appears, not only when the state changes.
+            onImmersiveChange(true)
+        }
         .onDisappear {
             progressWriter?.cancel()
             persistProgress()
@@ -373,6 +384,7 @@ struct ReaderView: View {
         .buttonStyle(.plain)
         .padding(.trailing, 14)
         .padding(.top, 10)
+        .accessibilityIdentifier("reader.exitFullScreen")
     }
 
     private func setImmersive(_ value: Bool) {

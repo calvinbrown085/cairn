@@ -12,12 +12,16 @@ extension XCUIApplication {
         descendants(matching: .any).matching(identifier: "post.row").firstMatch
     }
 
-    /// Returns to the library. On iPad it is a column that never went away, and
-    /// the navigation bar's first button is the sidebar toggle — tapping it
-    /// there hides the library rather than revealing it.
+    /// Returns to the library. A post opens straight into full screen, so the
+    /// navigation bar — on iPhone, the way back — isn't there to tap until
+    /// full screen is left first; on iPad, leaving full screen is itself what
+    /// brings the library column back, so there is nothing further to do.
     /// Each query snapshots the whole accessibility tree, and the reader's is
     /// 200+ text views on a long article — so this asks once, not twice.
     func returnToLibrary() {
+        let exit = buttons["reader.exitFullScreen"]
+        if exit.exists { exit.tap() }
+
         guard UIDevice.current.userInterfaceIdiom == .phone else { return }
         navigationBars.buttons.firstMatch.tap()
     }
