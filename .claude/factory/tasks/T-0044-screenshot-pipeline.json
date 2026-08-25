@@ -2,7 +2,7 @@
   "id": "T-0044",
   "title": "Screenshot pipeline for App Store submission",
   "type": "chore",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [
@@ -30,6 +30,11 @@
       "ts": "2026-08-25T20:25:03Z",
       "event": "dispatched",
       "detail": "attempt 1; warned about simulator contention by UDID"
+    },
+    {
+      "ts": "2026-08-25T23:34:26Z",
+      "event": "merged",
+      "detail": "a26d7ab"
     }
   ],
   "agent": {

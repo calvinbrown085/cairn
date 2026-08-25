@@ -148,6 +148,22 @@ extension so a link saved from another app arrives correctly.
 
 ---
 
+## Screenshots
+
+Run `Tools/screenshots.sh` from the repo root. Output lands in
+`screenshots/<device>/`, numbered in upload order:
+
+    screenshots/ipad-13/01-library.png
+    screenshots/ipad-13/02-full-screen-article.png
+    ...
+
+Both `screenshots/` and `.dd-screenshots/` are gitignored — they are build
+artefacts, and this repository is public.
+
+**iPad works today. iPhone is currently blocked** — see T-0049. Apple needs
+both a 6.9-inch iPhone and a 13-inch iPad set, so the iPhone half must be
+resolved before submission.
+
 ## Category
 
 Primary: **Productivity**. Secondary: **News**.
