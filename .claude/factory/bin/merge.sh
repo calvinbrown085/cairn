@@ -60,6 +60,8 @@ git -C "$MAIN_ROOT" push --quiet origin main 2>/dev/null && say "pushed" || say 
 
 "$LEDGER" set "$ID" status '"merged"' >/dev/null
 "$LEDGER" log "$ID" merged "$MERGED"
-git -C "$MAIN_ROOT" branch -D "$BRANCH" >/dev/null 2>&1 || true
+# Order matters: the branch is checked out in the worktree, so it cannot be
+# deleted until the worktree is gone.
 "$FACTORY_BIN/worktree.sh" destroy "$ID" --force >/dev/null 2>&1 || true
+git -C "$MAIN_ROOT" branch -D "$BRANCH" >/dev/null 2>&1 || true
 say "worktree destroyed; $ID complete"

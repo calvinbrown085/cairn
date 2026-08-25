@@ -209,7 +209,7 @@ outstanding work, not speculation.
 - [ ] Contrast audit of the warm palette in all three reader themes.
 
 **Ship a beta**
-- [ ] `PrivacyInfo.xcprivacy` with the `UserDefaults` reason declared.
+- [x] `PrivacyInfo.xcprivacy` with the `UserDefaults` reason declared.
 - [ ] Privacy policy page — GitHub Pages off the public repo, zero cost. Apple
       requires a URL even when the answer is "nothing is collected".
 - [ ] App Privacy nutrition label: **Data Not Collected.**

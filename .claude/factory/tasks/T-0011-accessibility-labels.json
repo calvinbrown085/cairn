@@ -2,7 +2,7 @@
   "id": "T-0011",
   "title": "accessibilityLabel on every icon-only control",
   "type": "implement",
-  "status": "in_progress",
+  "status": "in_review",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > accessibilityLabel on every icon-only control",
   "depends_on": [],
@@ -30,6 +30,11 @@
       "ts": "2026-08-25T15:51:58Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T16:00:01Z",
+      "event": "gate-passed",
+      "detail": "verify.sh green; 4 files, +4 lines; independent audit found no unlabeled icon-only controls"
     }
   ],
   "agent": {

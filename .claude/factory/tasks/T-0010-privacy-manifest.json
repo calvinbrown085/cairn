@@ -2,7 +2,7 @@
   "id": "T-0010",
   "title": "PrivacyInfo.xcprivacy with the UserDefaults reason declared",
   "type": "implement",
-  "status": "verifying",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Ship a beta > PrivacyInfo.xcprivacy",
   "depends_on": [],
@@ -42,6 +42,11 @@
       "ts": "2026-08-25T15:56:54Z",
       "event": "land-instructed",
       "detail": "overseer approved; low risk, no signoff required"
+    },
+    {
+      "ts": "2026-08-25T15:59:57Z",
+      "event": "merged",
+      "detail": "5d716ac"
     }
   ],
   "agent": {
