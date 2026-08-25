@@ -37,6 +37,11 @@
       "ts": "2026-08-25T19:10:34Z",
       "event": "dispatched",
       "detail": "attempt 1; exclusive — fleet drained first"
+    },
+    {
+      "ts": "2026-08-25T19:20:21Z",
+      "event": "gate-exception",
+      "detail": "X7 split into signing (never waivable) and product identity (ALLOW_IDENTITY_CHANGE=1); prose exception could not be honoured by a grep"
     }
   ],
   "agent": {
