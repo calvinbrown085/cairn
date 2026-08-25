@@ -1,6 +1,6 @@
 {
   "id": "T-0032",
-  "title": "Rename the GitHub repo and the local checkout to cairn",
+  "title": "Move the local checkout to cairn and repoint the factory",
   "type": "chore",
   "status": "todo",
   "quarter": "Q1",
@@ -9,7 +9,6 @@
     "T-0031"
   ],
   "acceptance": [
-    "The GitHub repository is renamed from stacks to cairn and origin points at the new URL",
     "The local checkout is ~/Documents/cairn and git worktree metadata is consistent",
     "The worktree root is ~/Documents/cairn-worktrees and config.json worktree_root agrees",
     ".claude/settings.json permission allowlist points at the new absolute path",
@@ -29,6 +28,11 @@
       "ts": "2026-08-25T19:10:34Z",
       "event": "scoped",
       "detail": "added ledger touches rewrite — the rename makes every Stacks/ glob stale, which is the same drift that bit T-0006 and T-0007"
+    },
+    {
+      "ts": "2026-08-25T19:12:29Z",
+      "event": "rescoped",
+      "detail": "GitHub repo already renamed by the owner; origin repointed to the canonical URL. Remaining scope is the local checkout, the worktree root, the settings allowlist and the stale ledger globs."
     }
   ]
 }
