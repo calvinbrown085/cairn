@@ -1,15 +1,44 @@
 {
-  "id": "T-0039", "title": "Failed saves are visible and retryable",
-  "type": "implement", "status": "todo", "quarter": "next",
-  "roadmap_anchor": null, "depends_on": [],
+  "id": "T-0039",
+  "title": "Failed saves are visible and retryable",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
   "acceptance": [
     "A post whose fetch or extraction failed is visibly distinguishable in the library, not silently present and empty",
     "The reason is stated in plain language — paywall, unreachable, no readable content",
     "Retry is one tap and re-runs the real pipeline",
     "A failed save still keeps its URL and its original HTML if any was fetched"
   ],
-  "touches": ["Cairn/Views/**", "Cairn/Services/**"],
-  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Cairn/Views/PostRow.swift",
+    "Cairn/Views/PostCard.swift",
+    "Cairn/Views/LibraryView.swift",
+    "Cairn/Services/ArchiveService.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0039",
   "notes": "ArchiveService already marks posts .failed for paywalls and JS-only pages. If that state is invisible the owner believes something was saved when it was not — the worst possible bug for an app whose primary action is saving. Pairs with T-0027's finding that saves were being truncated silently.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T19:45:52Z",
+      "event": "touches-narrowed",
+      "detail": "was Cairn/Views/** plus Cairn/Services/**, which collided with the three in flight; narrowed to the four files a failed-save affordance needs"
+    },
+    {
+      "ts": "2026-08-25T19:46:25Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "a7a1ca15fed372c72",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T19:46:25Z"
+  }
 }
