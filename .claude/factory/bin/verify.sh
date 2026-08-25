@@ -52,8 +52,15 @@ if [ "$QUICK" -eq 0 ]; then
   (cd "$WORK_ROOT" && xcodegen generate) >>"$LOG" 2>&1 || die "xcodegen"
 
   stage "app: build"
+  # Discover the project rather than hardcoding its name: the app is being
+  # renamed, and a gate that only builds a project called Stacks would fail the
+  # moment the rename lands — in a task that is forbidden from editing the gate.
+  XCPROJ="$(cd "$WORK_ROOT" && ls -d *.xcodeproj 2>/dev/null | head -1)"
+  [ -n "$XCPROJ" ] || die "no .xcodeproj found in $WORK_ROOT"
+  SCHEME="${XCPROJ%.xcodeproj}"
+  echo "  project: $XCPROJ  scheme: $SCHEME" | tee -a "$LOG"
   if ! (cd "$WORK_ROOT" && xcodebuild \
-        -project Stacks.xcodeproj -scheme Stacks \
+        -project "$XCPROJ" -scheme "$SCHEME" \
         -destination 'generic/platform=iOS Simulator' \
         -derivedDataPath "$WORK_ROOT/$(cfg '.derived_data_dir')" \
         CODE_SIGNING_ALLOWED=NO build) >>"$LOG" 2>&1; then

@@ -1,0 +1,16 @@
+{
+  "id": "T-0034",
+  "title": "Markup mode: a tap sometimes places a caret instead of highlighting",
+  "type": "implement", "status": "todo", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Reading experience",
+  "depends_on": [],
+  "acceptance": [
+    "In markup mode a plain tap always fires the sentence-tap handler and never places a text-selection caret",
+    "Outside markup mode, selection and link taps behave exactly as they do today",
+    "testMarkingUpASentence passes reliably across repeated runs, not intermittently"
+  ],
+  "touches": ["Stacks/Views/SelectableTextView.swift"],
+  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "Found by T-0005 while repairing the UI suite, and it is a real user-facing defect rather than a test problem: roughly half of markup-mode taps place a caret instead of highlighting the sentence. Root cause named by that agent: SelectableTextView.makeUIView sets tap.cancelsTouchesInView = false, so UITextView's own tap recognizer races the custom one and sometimes wins. The agent left the test failing rather than weakening it — correctly, since the test is reporting a genuine bug. Note the fix must not break ordinary selection or link tapping, which is why cancelsTouchesInView was false in the first place; the likely answer is a gesture dependency or gating on markupTool rather than flipping the flag outright.",
+  "history": []
+}

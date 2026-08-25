@@ -2,7 +2,7 @@
   "id": "T-0005",
   "title": "Re-run and extend the functional UI suite",
   "type": "debt",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Re-run and extend the functional UI suite",
   "depends_on": [
@@ -36,6 +36,11 @@
       "ts": "2026-08-25T18:12:17Z",
       "event": "resumed",
       "detail": "session limit reset; uncommitted UI test edits intact"
+    },
+    {
+      "ts": "2026-08-25T19:07:20Z",
+      "event": "merged",
+      "detail": "9880198"
     }
   ],
   "agent": {

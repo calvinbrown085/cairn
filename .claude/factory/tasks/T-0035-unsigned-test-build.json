@@ -1,0 +1,16 @@
+{
+  "id": "T-0035",
+  "title": "The app traps on launch when built without code signing",
+  "type": "implement", "status": "draft", "quarter": "Q2",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "An unsigned build launches and runs without trapping, falling back to a local store when the CloudKit entitlement is absent",
+    "A signed build still uses the CloudKit private database exactly as it does now",
+    "The UI suite can run under CODE_SIGNING_ALLOWED=NO"
+  ],
+  "touches": ["Stacks/App/StacksApp.swift", "Stacks/Services/AppGroup.swift"],
+  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Found by T-0005. With CODE_SIGNING_ALLOWED=NO the App Group and iCloud entitlements are stripped, AppGroup.containerURL falls back to the documents directory, and NSPersistentCloudKitContainer traps in PFCloudKitContainerProvider the first time anything calls context.save(). Only the one test that never writes survives. StacksApp.swift already has a local-store fallback path; it evidently is not reached in this configuration. Worth noting this is the same capability the Q2 roadmap wants anyway — promote the local-store fallback to a documented first-class mode so a contributor with a free Apple account gets a working app. Left as draft because it is infrastructure, not a feature a reader can feel, and the current cut favours the latter.",
+  "history": []
+}
