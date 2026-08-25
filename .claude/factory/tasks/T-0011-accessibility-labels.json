@@ -2,7 +2,7 @@
   "id": "T-0011",
   "title": "accessibilityLabel on every icon-only control",
   "type": "implement",
-  "status": "in_review",
+  "status": "verifying",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > accessibilityLabel on every icon-only control",
   "depends_on": [],

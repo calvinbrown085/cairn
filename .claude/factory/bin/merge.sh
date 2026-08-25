@@ -45,8 +45,22 @@ if ! (cd "$WT" && "$FACTORY_BIN/verify.sh" --task "$ID" --attempt rebase); then
 fi
 
 say "squash-merging into main"
-[ -z "$(git -C "$MAIN_ROOT" status --porcelain)" ] || {
-  say "primary checkout is dirty; refusing to merge"; exit 6; }
+# Ledger writes land on tracked files in the primary checkout, so orchestrator
+# bookkeeping dirties it constantly. That is expected and is never part of the
+# merge; anything else is a human's work in progress and must block.
+dirty="$(git -C "$MAIN_ROOT" status --porcelain | cut -c4-)"
+if [ -n "$dirty" ]; then
+  outside="$(echo "$dirty" | grep -v '^\.claude/factory/' || true)"
+  if [ -n "$outside" ]; then
+    say "primary checkout has uncommitted work outside factory bookkeeping; refusing to merge:"
+    echo "$outside" | sed 's/^/    /'
+    exit 6
+  fi
+  say "committing factory bookkeeping first"
+  git -C "$MAIN_ROOT" add .claude/factory >/dev/null 2>&1
+  git -C "$MAIN_ROOT" commit --quiet -m "factory: ledger bookkeeping" \
+    -m "Task state recorded by the orchestrator." >/dev/null 2>&1 || true
+fi
 git -C "$MAIN_ROOT" checkout --quiet main
 git -C "$MAIN_ROOT" merge --squash "$BRANCH" >/dev/null 2>&1 || {
   say "squash merge failed"; git -C "$MAIN_ROOT" merge --abort 2>/dev/null || true; exit 6; }
