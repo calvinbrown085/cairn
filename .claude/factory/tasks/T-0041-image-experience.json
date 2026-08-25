@@ -1,14 +1,41 @@
 {
-  "id": "T-0041", "title": "Images behave: zoom, captions, galleries",
-  "type": "implement", "status": "todo", "quarter": "next",
-  "roadmap_anchor": null, "depends_on": ["T-0028"],
+  "id": "T-0041",
+  "title": "Images behave: zoom, captions, galleries",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
   "acceptance": [
-    "Tapping an image opens it full screen with pinch to zoom and swipe to dismiss",
-    "Captions render as captions rather than as body prose",
-    "Lazy-loaded gallery images are captured at save time rather than lost"
+    "Tapping an image in an article opens it full screen with pinch to zoom and swipe to dismiss",
+    "Captions render as captions — visually distinct from body prose, not another paragraph",
+    "The viewer works in immersive reading without leaving it",
+    "Images with no caption still open cleanly"
   ],
-  "touches": ["Cairn/Views/**", "Packages/SwiftReadability/Sources/**"],
-  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Cairn/Views/ArticleBlockView.swift",
+    "Cairn/Views/ImageViewer.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0041",
   "notes": "Part of 'reading is unpleasant'. The gallery half overlaps T-0028, which already covers img-inside-li extraction; this task owns the reading-side behaviour.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T20:21:26Z",
+      "event": "rescoped",
+      "detail": "gallery-image capture landed with T-0028 (7b3c84e); this task is now the reader-side viewer only, narrowed off Cairn/Views/** so it does not wait on T-0024"
+    },
+    {
+      "ts": "2026-08-25T20:22:05Z",
+      "event": "dispatched",
+      "detail": "attempt 1; narrowed to the reader-side viewer after T-0028 landed the gallery capture"
+    }
+  ],
+  "agent": {
+    "id": "a051a55b77a3fcfd0",
+    "role": "implementer",
+    "spawned": "2026-08-25T20:22:05Z"
+  }
 }
