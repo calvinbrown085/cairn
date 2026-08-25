@@ -1,8 +1,7 @@
 # Cairn — Roadmap
 
 *Rewritten 2026-08-25, replacing the version written the day before. The display
-name is still being settled; the bundle id, repo and code stay `Cairn` either
-way.*
+name is Cairnfield; the bundle id, repo and code stay `Cairn` either way.*
 
 ---
 

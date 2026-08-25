@@ -568,7 +568,7 @@ struct EmptyLibraryView: View {
                         Image(systemName: "square.and.arrow.up")
                             .font(.scaled(13, relativeTo: .footnote))
                             .foregroundStyle(Palette.accent)
-                        Text("Or share from Safari — Cairn appears in the share sheet")
+                        Text("Or share from Safari — Cairnfield appears in the share sheet")
                             .font(.scaled(12.5, relativeTo: .caption))
                             .foregroundStyle(Palette.inkSecondary)
                             .fixedSize(horizontal: false, vertical: true)

@@ -4,6 +4,9 @@ A native iOS and iPadOS app for saving blog posts and keeping them — the full
 article text and images, extracted from the page, stored on device, and synced
 across your devices with iCloud.
 
+The app's display name is **Cairnfield** — what shows on the home screen and
+in the App Store. The bundle identifier, repository, and code stay `Cairn`.
+
 Built entirely in Swift: SwiftUI, SwiftData, and CloudKit, with no third-party
 dependencies. The HTML parser and article extractor are part of the app.
 

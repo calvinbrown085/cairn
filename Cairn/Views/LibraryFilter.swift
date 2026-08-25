@@ -46,7 +46,7 @@ enum LibraryFilter: Hashable, Codable {
     var emptyDetail: String {
         switch self {
         case .unread: "Nothing waiting to be read. Share a link from Safari, or tap + to paste one."
-        case .all: "Share a link from Safari, or tap + to paste a URL. Cairn pulls the article down and keeps it for good."
+        case .all: "Share a link from Safari, or tap + to paste a URL. Cairnfield pulls the article down and keeps it for good."
         case .starred: "Star a post while reading and it will show up here."
         case .archived: "Posts you archive are kept out of the way but stay searchable."
         case .tag: "Add this tag to a post and it will appear here."
