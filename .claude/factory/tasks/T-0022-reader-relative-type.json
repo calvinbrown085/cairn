@@ -1,0 +1,18 @@
+{
+  "id": "T-0022",
+  "title": "Reader typography: Dynamic Type base with the slider as a relative offset",
+  "type": "implement", "status": "todo", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Accessibility > Dynamic Type as the base",
+  "depends_on": ["T-0012"],
+  "acceptance": [
+    "The reader's size slider becomes a relative offset via UIFontMetrics or Font.custom(size:relativeTo:), not an absolute size",
+    "adjustsFontForContentSizeCategory is true in SelectableTextView",
+    "The reader opens at a readable size on Accessibility XL before the slider is touched",
+    "Stored reading preferences keep working; an existing offset is not silently reinterpreted as a new absolute size",
+    "invariants.sh reports a .system(size: count of 0"
+  ],
+  "touches": ["Stacks/Views/ArticleBlockView.swift", "Stacks/Views/SelectableTextView.swift", "Stacks/Views/AttributedTextBuilder.swift", "Stacks/Design/ReaderTheme.swift", "Stacks/Design/ReadingPreferences.swift"],
+  "risk": "high", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "Split from T-0012. This is the half that genuinely touches the reader text stack and the persisted ReadingPreferences offset — it is where the migration risk lives, and it is small and focused instead of buried in 77 chrome edits.",
+  "history": []
+}

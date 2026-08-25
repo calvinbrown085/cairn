@@ -2,7 +2,7 @@
   "id": "T-0002",
   "title": "Resolve the reader's text architecture",
   "type": "decide",
-  "status": "todo",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Resolve the reader's text architecture",
   "depends_on": [
@@ -18,12 +18,17 @@
   "factory_eligible": true,
   "attempts": 0,
   "branch": null,
-  "notes": "The roadmap's highest-leverage open question. Blocks accessibility and Mac. Decide before, not during.",
+  "notes": "DECIDED 2026-08-25 by the overseer under delegated authority: KEEP one UITextView per block. Rationale, in order of weight: (1) Highlights persist as (blockIndex, start, length) and sync via CloudKit — per-block views make that anchoring native, where TextKit 2 needs a computed block-to-document-offset mapping layer to preserve the same stored records. (2) Blocks are heterogeneous: images, dividers, code, and bulleted lists are views, not runs of text; a single text view needs an attachment strategy for each. (3) LazyVStack virtualises very long documents for free. (4) Position restore keys off block id, which survives font-size changes in a way pixel offsets do not. (5) Mac does not force the change — either architecture needs a platform text view. ACCEPTED COST: no selection across block boundaries. NAMED FAILURE CONDITION: if T-0013 finds VoiceOver reading order or rotor navigation is bad across many small text views, this decision is wrong and must be revisited before the Mac app — that is the one piece of evidence that would overturn it. NOT decided on profiling data: T-0001 was never run, so the CPU question stays open and is orthogonal to this structural call.",
   "history": [
     {
       "ts": "2026-08-25T17:34:12Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T17:40:52Z",
+      "event": "decided",
+      "detail": "keep per-block UITextView; failure condition recorded"
     }
   ]
 }

@@ -1,25 +1,23 @@
 {
   "id": "T-0012",
-  "title": "Dynamic Type as the base, reader slider as a relative offset",
+  "title": "Dynamic Type across app chrome",
   "type": "implement",
   "status": "todo",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Dynamic Type as the base",
-  "depends_on": [
-    "T-0002"
-  ],
+  "depends_on": [],
   "acceptance": [
-    "Every .system(size:) call site in Stacks and StacksShareExtension is replaced with a Dynamic Type equivalent",
-    "The reader's slider becomes a relative offset via UIFontMetrics or Font.custom(size:relativeTo:)",
-    "adjustsFontForContentSizeCategory is true in SelectableTextView",
-    "The reader is usable at Accessibility XL before any control is touched",
-    "invariants.sh reports a .system(size: count of 0"
+    "Every .system(size:) call site outside the reader text stack is replaced with a Dynamic Type equivalent",
+    "Layouts hold at Accessibility XL without clipping or truncation in the library, sheets, cards, sidebar, and share extension",
+    "The two reader text-stack sites (ArticleBlockView, ReaderTheme) are deliberately left alone and remain for T-0022",
+    "invariants.sh reports a .system(size: count of 2 or fewer"
   ],
   "touches": [
     "Stacks/Views/**",
-    "Stacks/Design/**"
+    "StacksShareExtension/**",
+    "Stacks/Design/ReadingPreferences.swift"
   ],
-  "risk": "high",
+  "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
   "branch": null,
@@ -29,6 +27,11 @@
       "ts": "2026-08-25T17:34:13Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T17:40:52Z",
+      "event": "rescoped",
+      "detail": "decoupled from T-0002: only 2 of 77 call sites are in the reader text stack. Chrome work needs no architecture decision."
     }
   ]
 }

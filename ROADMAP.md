@@ -154,12 +154,20 @@ outstanding work, not speculation.
       one hypothesis (attributed-string/height caching) was tested and disproved.
       Use Instruments' Time Profiler. Prime suspect: `.scrollPosition(id:)`
       forcing a full body re-evaluation per block crossing.
-- [ ] **Resolve the reader's text architecture.** One `UITextView` per block is
-      load-bearing for highlighting but unproven for Mac, very long documents,
-      and VoiceOver. The alternative — a single TextKit 2 view with viewport
-      layout — is better for performance and selection, harder for code blocks
-      and quote rules. **Decide before the Mac app and before the accessibility
-      work, not during either.**
+- [x] **Resolve the reader's text architecture.** **Decided 2026-08-25: keep one
+      `UITextView` per block.** Highlights persist as `(blockIndex, start,
+      length)` and sync through CloudKit, so per-block views make that anchoring
+      native; blocks are heterogeneous (images, dividers, code, bulleted lists
+      are views, not text); `LazyVStack` virtualises long documents for free;
+      and position restore keys off block id, which survives font-size changes
+      where pixel offsets do not. Mac does not force the change — either
+      architecture needs a platform text view.
+      **Accepted cost:** no selection across block boundaries (T-0023).
+      **This decision is wrong if** the VoiceOver pass finds reading order or
+      rotor navigation is bad across many small text views — that is the one
+      piece of evidence that overturns it, and it must be checked before the
+      Mac app. Decided on structure, not on profiling: T-0001 was never run, so
+      the CPU question stays open and is orthogonal.
 - [ ] Revert `ReaderRenderCache` unless profiling vindicates it — it bought
       nothing measurable and is currently unearned complexity.
 - [ ] **Verify CloudKit sync on two real devices.** Entitlements and provisioning
@@ -330,9 +338,11 @@ Written down now, while it's cheap to be honest.
 
 ## Standing risks
 
-- **The reader's text architecture is unresolved** and now blocks three things:
-  performance, accessibility, and Mac. Highest-leverage open question in the
-  codebase.
+- ~~**The reader's text architecture is unresolved.**~~ **Resolved 2026-08-25**
+  in favour of per-block `UITextView`s. What remains open is narrower: the
+  reader's *CPU cost* is still unprofiled (T-0001), and the decision carries a
+  named failure condition — if VoiceOver reading order is bad across many small
+  text views, revisit before the Mac app.
 - **CloudKit sync is provisioned but unobserved.** Everything assumes it works.
 - **`NLContextualEmbedding` document-level quality is unknown.** The Q3 bet rests
   on a spike that hasn't run.

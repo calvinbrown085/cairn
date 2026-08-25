@@ -2,17 +2,16 @@
   "id": "T-0006",
   "title": "Freeze ~30 real pages as fixtures and assert against them",
   "type": "implement",
-  "status": "blocked",
+  "status": "todo",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
-  "depends_on": [
-    "F-0002"
-  ],
+  "depends_on": [],
   "acceptance": [
-    "About 30 frozen HTML fixtures covering Wikipedia, table-era markup, lazy-loaded galleries, <br><br> paragraphs, meta-refresh redirects, paywalls, and 404s",
-    "Each asserts title, word count, and block-type mix",
-    "The whole suite runs offline with no live site access",
-    "A regression in ArticleExtractor or HTMLParser fails at least one fixture"
+    "Every real capture in Fixtures/ has an expectation JSON asserting title, word count, and block-type mix",
+    "The suite runs offline via swift test with no network and no simulator",
+    "Hand-authored shapes are added only for mechanical edge cases the real corpus does not cover: meta-refresh redirect, malformed nesting, paywall interstitial",
+    "A regression in ArticleExtractor or HTMLParser fails at least one fixture",
+    "Any real page the extractor handles badly is reported as a finding, not papered over by writing the bad output into the expectation"
   ],
   "touches": [
     "StacksTests/**",
@@ -20,7 +19,7 @@
     "Fixtures/**"
   ],
   "risk": "low",
-  "factory_eligible": false,
+  "factory_eligible": true,
   "attempts": 0,
   "branch": null,
   "notes": "BLOCKED on human input, not on dependencies. The task says freeze ~30 REAL pages; implementer agents have no network access and can only hand-author reproductions. F-0002 already flagged that hand-authored markup misses idiosyncrasies of real production HTML that the extractor heuristics were tuned against. Thirty passing fake fixtures would be false confidence in exactly the place the roadmap wants repeatable truth. Needs either: (a) the human captures ~30 pages to Packages/SwiftReadability/Tests/SwiftReadabilityTests/Fixtures/ and the agent writes the expectations, or (b) the task is rescoped to shapes rather than real captures, and the roadmap wording changes with it.",
@@ -34,6 +33,11 @@
       "ts": "2026-08-25T17:20:08Z",
       "event": "blocked",
       "detail": "no network access; cannot capture real pages"
+    },
+    {
+      "ts": "2026-08-25T17:39:11Z",
+      "event": "unblocked",
+      "detail": "overseer captured 14 real pages from permissive sources; agent now writes expectations"
     }
   ]
 }

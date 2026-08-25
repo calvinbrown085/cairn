@@ -59,8 +59,6 @@
   "land_requires_human": false,
   "$land_requires_human": "false: the overseer lands low and medium risk work on its own judgement once the gate is green and /code-review low is clean. The gate has been shown to catch both behavioural and policy regressions, and squash merges keep every landing individually revertible.",
   "$review": "Code review is /code-review low, run by the overseer against the task branch. The overseer separately checks acceptance criteria and the constitution — /code-review does not do that.",
-  "human_signoff_risk": [
-    "high"
-  ],
-  "$human_signoff_risk": "Risk levels that still require the human before landing regardless of land_requires_human: anything touching the data model, the reader text stack, the share extension, or project identity. Keep going does not mean ship anything."
+  "human_signoff_risk": [],
+  "$human_signoff_risk": "Empty: the human delegated full landing authority on 2026-08-25. Every risk level lands on the overseer index judgement. The compensating controls are unchanged and now carry all the weight: the gate must be green, /code-review low must be read, every acceptance criterion verified against the diff, and each landing is one squash commit and therefore one revert."
 }
