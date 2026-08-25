@@ -1,0 +1,21 @@
+{
+  "id": "D-0002",
+  "title": "Decide how app-target logic gets tested at all",
+  "type": "decide",
+  "status": "todo",
+  "quarter": "Q1",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "A decision on where tests for app-target code live: an iOS unit test target, a second local SPM package for pure app logic, or an accepted permanent gap",
+    "If a test target: the cost to the gate is measured, since an iOS test target needs a booted simulator and D-0001 chose SPM precisely to avoid that",
+    "ReaderContrastAudit is wired into whatever is chosen, so the palette cannot regress silently"
+  ],
+  "touches": [],
+  "risk": "high",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Surfaced by /code-review on T-0014: ReaderContrastAudit is unreferenced dead code because there is nowhere in the app target to run it from. D-0001 solved testing for the extractor by moving it to Packages/SwiftReadability, and that was right for the gate — but it left every app-target type (Palette, ReaderTheme, LibraryFilter, LibraryIndex, Post) with zero test coverage and no way to acquire any. The factory will keep hitting this: any task whose acceptance says 'and it cannot regress' is currently unsatisfiable for app code. Note the tension — an iOS test target reintroduces the simulator dependency that makes the gate slow and serial, which is exactly what D-0001 escaped.",
+  "history": []
+}
