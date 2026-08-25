@@ -1,0 +1,29 @@
+{
+  "id": "T-0044",
+  "title": "Screenshot pipeline for App Store submission",
+  "type": "chore",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [
+    "T-0024"
+  ],
+  "acceptance": [
+    "One command produces App Store screenshots for the required device sizes",
+    "Shots cover the library, an article in full screen, search with a highlighted snippet, and highlights or markup",
+    "Output lands in a gitignored directory, named so the device size and order are obvious at upload time",
+    "The run seeds its own content and needs no manual setup",
+    "Screenshots are regenerated, not hand-edited: re-running replaces them"
+  ],
+  "touches": [
+    "CairnUITests/**",
+    "Tools/**",
+    ".gitignore"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "The UI suite already navigates library to reader to highlights and calls XCTAttachment on both device classes, so most of this exists - the job is turning attachments into named files at the right sizes rather than writing new navigation. Apple currently requires 6.9-inch iPhone and 13-inch iPad shots; other sizes are derived. Note T-0005 found the suite needs a signed local build because CloudKit traps under CODE_SIGNING_ALLOWED=NO, so the script must not force signing off. Output is gitignored: screenshots are build artefacts, not source, and a 5MB PNG in git history is permanent.",
+  "history": []
+}

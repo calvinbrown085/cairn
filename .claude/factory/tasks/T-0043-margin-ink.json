@@ -1,0 +1,31 @@
+{
+  "id": "T-0043",
+  "title": "Draw anywhere in the reader, including the margins",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": "Reading experience",
+  "depends_on": [
+    "T-0024"
+  ],
+  "acceptance": [
+    "With the markup tool active, a stroke can be drawn anywhere over the page - across blocks, in the left and right margins, and in the space between blocks",
+    "Drawing works in full screen; entering markup does not require leaving immersive reading",
+    "Ink still anchors to the document, not the screen: a mark drawn at one text size sits in the same place at another, and survives a re-render",
+    "Existing strokes drawn under the old per-block canvas render unchanged, with no migration",
+    "While the markup tool is inactive, scrolling and text selection behave exactly as they do today"
+  ],
+  "touches": [
+    "Cairn/Views/ReaderView.swift",
+    "Cairn/Views/ArticleBlockView.swift",
+    "Cairn/Views/InkCanvas.swift",
+    "Cairn/Models/InkStroke.swift",
+    "Cairn/Design/Markup.swift"
+  ],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "User request: mark up anywhere in full screen, and write in the margins. WHY IT CANNOT WORK TODAY: InkCanvas mounts inside ArticleBlockView, which sits inside ReaderView's .frame(maxWidth: typography.measure) column. The margins are the padding OUTSIDE that column, so a per-block canvas can never reach them. The fix is a document-level ink layer in ReaderView spanning the full width. THE ANCHORING MODEL IS ALREADY RIGHT AND MUST NOT BE REPLACED: InkStroke stores blockIndex plus points in that block's unit space, which is why a stroke drawn at 19pt New York still sits over the same sentence at 26pt SF Rounded. Its own doc comment already anticipates out-of-range values - a stroke running past the bottom of its block keeps a y above 1. Margins are the same idea on the x axis: anchor to the nearest block and let x fall below 0 or above 1. That keeps every existing stroke valid with no migration, which is criterion 4. Do not invent a second coordinate system.",
+  "history": []
+}

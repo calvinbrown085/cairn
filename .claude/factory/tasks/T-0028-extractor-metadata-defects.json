@@ -2,7 +2,7 @@
   "id": "T-0028",
   "title": "Three metadata defects: gallery images, title suffixes, missing-title fallback",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [],
@@ -31,6 +31,11 @@
       "ts": "2026-08-25T20:13:58Z",
       "event": "re-dispatched",
       "detail": "prior agent stopped by user and not resumable; fresh agent took over the surviving worktree"
+    },
+    {
+      "ts": "2026-08-25T20:19:37Z",
+      "event": "merged",
+      "detail": "7b3c84e"
     }
   ],
   "agent": {
