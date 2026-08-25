@@ -93,7 +93,8 @@ if [ -n "$CHANGED" ]; then
 fi
 
 # --- X6: no build output or user state committed ---------------------------
-junk="$(git ls-files | grep -E '^(build|build-device)/|\.xcresult|xcuserdata|^\.dd/|\.build/|\.DS_Store|Stacks\.xcodeproj/' || true)"
+# Any generated .xcodeproj, not one named for the app: the app is being renamed.
+junk="$(git ls-files | grep -E '^(build|build-device)/|\.xcresult|xcuserdata|^\.dd/|\.build/|\.DS_Store|\.xcodeproj/' || true)"
 if [ -n "$junk" ]; then
   flag "X6  build output or user state is tracked: $(echo "$junk" | head -3 | tr '\n' ' ')"
 else
