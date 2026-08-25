@@ -105,7 +105,11 @@ case "$cmd" in
       globs="$("$0" get "$id" | jq -r '.touches[]?' || true)"
       while IFS= read -r f; do
         [ -n "$f" ] || continue
-        case "$f" in .dd/*|.dd-signed/*|*.xcodeproj/*|*.xcuserstate) continue;; esac
+        # Ask git what is ignored rather than keeping a hardcoded list here —
+        # build artefacts change names (.dd, .dd-signed, .dd-screenshots) and a
+        # stale list makes the check cry wolf about output nobody tracks.
+        git -C "$p" check-ignore -q "$f" 2>/dev/null && continue
+        case "$f" in *.xcodeproj/*|*.xcuserstate) continue;; esac
         covered=0
         while IFS= read -r g; do
           [ -n "$g" ] || continue
