@@ -1,15 +1,33 @@
 {
-  "id": "T-0038", "title": "Capture from anywhere: Shortcuts, widget, Action Button",
-  "type": "implement", "status": "todo", "quarter": "next",
-  "roadmap_anchor": null, "depends_on": [],
+  "id": "T-0038",
+  "title": "Save from Shortcuts and the Action Button",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
   "acceptance": [
-    "A Shortcuts action saves a URL to the library, usable from the Action Button and automations",
-    "A home-screen widget saves whatever is on the clipboard, or opens straight to save",
-    "Both paths go through the same inbox the share extension uses; no second save path exists",
-    "Saving from any path confirms visibly and fast"
+    "An App Intent saves a URL to the library, usable from Shortcuts, the Action Button and automations",
+    "It goes through the same inbox the share extension writes to — no second save path exists",
+    "Saving succeeds whether or not the app is running",
+    "The intent reports success or failure back to Shortcuts rather than failing silently",
+    "It appears in Shortcuts with a sensible name and parameter summary"
   ],
-  "touches": ["Cairn/**", "CairnShareExtension/**", "project.yml"],
-  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Cairn/Intents/**",
+    "Cairn/Services/SharedInbox.swift",
+    "project.yml"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Owner says capture is awkward. The share sheet is currently the only path and it is the slow one. Critically: one inbox, one pipeline — a second save path is how archives get inconsistent.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T20:39:28Z",
+      "event": "split",
+      "detail": "widget deferred to T-0047; App Intents is the high-value low-risk half and needs no new target"
+    }
+  ]
 }

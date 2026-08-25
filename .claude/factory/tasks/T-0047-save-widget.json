@@ -1,0 +1,27 @@
+{
+  "id": "T-0047",
+  "title": "Home-screen widget for saving a link",
+  "type": "implement",
+  "status": "draft",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [
+    "T-0038"
+  ],
+  "acceptance": [
+    "A home-screen widget saves whatever is on the clipboard, or opens straight to the save sheet",
+    "It uses the same inbox as every other save path",
+    "The widget target does not pull the whole app in, and does not break the Data Not Collected label"
+  ],
+  "touches": [
+    "CairnWidget/**",
+    "project.yml",
+    "Cairn/Services/SharedInbox.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Split from T-0038. A widget needs a whole new app-extension target with its own entitlements and app group membership, which is materially more setup than an App Intent and touches project identity-adjacent config. Deliberately deferred: App Intents alone already give Shortcuts, the Action Button and automations, which is most of the value of 'capture from anywhere'. Left as draft until the owner says a widget is worth a second extension target.",
+  "history": []
+}

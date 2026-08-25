@@ -2,7 +2,7 @@
   "id": "T-0041",
   "title": "Image viewer: a zoomable full-screen presentation",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -47,6 +47,11 @@
       "ts": "2026-08-25T20:30:48Z",
       "event": "dispatched",
       "detail": "attempt 1 of the split; standalone viewer only"
+    },
+    {
+      "ts": "2026-08-25T20:38:23Z",
+      "event": "merged",
+      "detail": "165329f"
     }
   ],
   "agent": {
