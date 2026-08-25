@@ -2,7 +2,7 @@
   "id": "T-0042",
   "title": "The user-visible name is Cairnfield",
   "type": "chore",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -39,6 +39,11 @@
       "ts": "2026-08-25T20:13:58Z",
       "event": "re-dispatched",
       "detail": "prior agent stopped by user and not resumable; fresh agent took over the surviving worktree"
+    },
+    {
+      "ts": "2026-08-25T20:15:43Z",
+      "event": "merged",
+      "detail": "68adf82"
     }
   ],
   "agent": {
