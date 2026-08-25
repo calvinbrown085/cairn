@@ -2,7 +2,7 @@
   "id": "T-0043",
   "title": "Draw anywhere in the reader, including the margins",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": "Reading experience",
   "depends_on": [
@@ -25,7 +25,18 @@
   "risk": "high",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0043",
   "notes": "User request: mark up anywhere in full screen, and write in the margins. WHY IT CANNOT WORK TODAY: InkCanvas mounts inside ArticleBlockView, which sits inside ReaderView's .frame(maxWidth: typography.measure) column. The margins are the padding OUTSIDE that column, so a per-block canvas can never reach them. The fix is a document-level ink layer in ReaderView spanning the full width. THE ANCHORING MODEL IS ALREADY RIGHT AND MUST NOT BE REPLACED: InkStroke stores blockIndex plus points in that block's unit space, which is why a stroke drawn at 19pt New York still sits over the same sentence at 26pt SF Rounded. Its own doc comment already anticipates out-of-range values - a stroke running past the bottom of its block keeps a y above 1. Margins are the same idea on the x axis: anchor to the nearest block and let x fall below 0 or above 1. That keeps every existing stroke valid with no migration, which is criterion 4. Do not invent a second coordinate system.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T20:30:48Z",
+      "event": "dispatched",
+      "detail": "attempt 1; document-level ink layer, user's twice-asked request"
+    }
+  ],
+  "agent": {
+    "id": "ad0fa217e3d5cb150",
+    "role": "implementer",
+    "spawned": "2026-08-25T20:30:47Z"
+  }
 }

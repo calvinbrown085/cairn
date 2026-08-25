@@ -1,25 +1,26 @@
 {
   "id": "T-0041",
-  "title": "Images behave: zoom, captions, galleries",
+  "title": "Image viewer: a zoomable full-screen presentation",
   "type": "implement",
   "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
   "acceptance": [
-    "Tapping an image in an article opens it full screen with pinch to zoom and swipe to dismiss",
-    "Captions render as captions — visually distinct from body prose, not another paragraph",
-    "The viewer works in immersive reading without leaving it",
-    "Images with no caption still open cleanly"
+    "A self-contained ImageViewer view presents an archived image full screen",
+    "Pinch to zoom, pan while zoomed, double-tap to toggle fit and fill",
+    "Swipe down dismisses it",
+    "A caption renders beneath, visually secondary to body prose; no caption still looks right",
+    "It takes an already-archived image and never fetches from the network",
+    "It compiles and is previewable on its own, with no dependency on how the reader mounts it"
   ],
   "touches": [
-    "Cairn/Views/ArticleBlockView.swift",
     "Cairn/Views/ImageViewer.swift"
   ],
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": "factory/T-0041",
+  "branch": "factory/T-0041b",
   "notes": "Part of 'reading is unpleasant'. The gallery half overlaps T-0028, which already covers img-inside-li extraction; this task owns the reading-side behaviour.",
   "history": [
     {
@@ -31,11 +32,26 @@
       "ts": "2026-08-25T20:22:05Z",
       "event": "dispatched",
       "detail": "attempt 1; narrowed to the reader-side viewer after T-0028 landed the gallery capture"
+    },
+    {
+      "ts": "2026-08-25T20:29:01Z",
+      "event": "preempted",
+      "detail": "stopped early (1 file, no commits) so T-0043 could take ArticleBlockView; user asked twice for margin ink"
+    },
+    {
+      "ts": "2026-08-25T20:30:07Z",
+      "event": "split",
+      "detail": "phase 1 is the standalone viewer in its own file so it can run in parallel with T-0043; the one-line mount in ArticleBlockView becomes T-0046 once ink lands"
+    },
+    {
+      "ts": "2026-08-25T20:30:48Z",
+      "event": "dispatched",
+      "detail": "attempt 1 of the split; standalone viewer only"
     }
   ],
   "agent": {
-    "id": "a051a55b77a3fcfd0",
+    "id": "acd389dc98bd6e8ef",
     "role": "implementer",
-    "spawned": "2026-08-25T20:22:05Z"
+    "spawned": "2026-08-25T20:30:47Z"
   }
 }
