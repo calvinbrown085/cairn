@@ -88,17 +88,17 @@ of real captured pages.
 - [x] **A zoomable image viewer.** *(T-0041, `165329f`.)*
 
 - [x] **Opening an article goes straight to full screen.** *(T-0024, `1b0f846`.)* Reading is the point; asking for it every time is friction the app imposes on its own primary action.
-- [ ] **Markup taps land.** A tap in markup mode places a text caret instead of highlighting roughly half the time — `UITextView`'s own recogniser races the custom one.
+- [x] **Markup taps land.** *(T-0034, `ebb15bb`.)* A tap in markup mode places a text caret instead of highlighting roughly half the time — `UITextView`'s own recogniser races the custom one.
 - [ ] **A scroll indicator that means something.** `LazyVStack` means only realised blocks count toward content height, so the bar measures a document that appears to grow as you scroll.
 - [ ] **Profile the scroll cost.** 3.8s of CPU for 8 swipes, still unexplained. Cut once as "nobody is complaining" — reinstated, because *reading is unpleasant* is the complaint.
-- [ ] **Images behave.** Tap to zoom, captions as captions, and galleries that currently yield nothing.
+- [x] **Images behave.** *(T-0041/T-0046, `165329f`/`f2f645b`.)* Tap to zoom, captions as captions, and galleries that currently yield nothing.
 - [ ] **Reference lists are not prose.** Wikipedia backmatter is 40% of some pages and reads as article text.
 - [ ] **VoiceOver through the reader.** Also the evidence that would overturn the per-block text architecture, if reading order turns out bad.
 
 ### Capture — the other stated pain
 
 - [ ] **Failed saves are visible and retryable.** A paywalled save currently looks like a good one. For an app whose primary verb is *save*, silent failure is the worst possible bug.
-- [ ] **Capture from anywhere.** Shortcuts and the Action Button first, through the one existing inbox; a widget only if a second extension target earns its keep. One pipeline, never two.
+- [x] **Capture from anywhere.** *(T-0038, `c8997fe` — Shortcuts and the Action Button; widget deferred.)* Shortcuts and the Action Button first, through the one existing inbox; a widget only if a second extension target earns its keep. One pipeline, never two.
 - [ ] **Import PDFs.** Papers and documents cannot get in at all. The largest hole, and now the largest build.
 - [ ] **Titles and galleries.** Site suffixes left on titles, gallery images dropped, pages with no `<title>` falling back to the host.
 
