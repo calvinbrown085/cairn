@@ -2,7 +2,7 @@
   "id": "T-0017",
   "title": "Shed the queue: rethink unread as a library concept, not an inbox",
   "type": "implement",
-  "status": "in_progress",
+  "status": "in_review",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Shed the queue",
   "depends_on": [],
@@ -10,7 +10,6 @@
     "The sidebar no longer displays a numeric unread count",
     "unreadCount is removed from LibraryIndex and its call sites",
     "\"Never opened\" survives as a filter, not as an accusation with a number attached",
-    "The backlog can be stated plainly on request rather than shown as a standing tally",
     "invariants.sh reports 0 pre-existing unreadCount sites"
   ],
   "touches": [
@@ -34,6 +33,11 @@
       "ts": "2026-08-25T17:20:45Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T17:25:41Z",
+      "event": "rescoped",
+      "detail": "criterion 4 (backlog stated plainly on request) split to T-0020: it is a separate roadmap bullet needing UI outside this task's touches. Planning error, not an implementation failure."
     }
   ],
   "agent": {
