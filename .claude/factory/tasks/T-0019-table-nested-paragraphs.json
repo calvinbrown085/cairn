@@ -2,7 +2,7 @@
   "id": "T-0019",
   "title": "BlockBuilder collapses <p> nested inside single-row layout tables",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [
@@ -20,13 +20,24 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0019-table-paragraphs",
   "notes": "Found by the F-0002 agent while authoring the table-era fixture. <td>/<tr> are not in blockProducers, so a single-row table falls through to descend() over the table's own children (<tr> only) rather than recursing into cell content at block granularity — every <p> inside collapses into one inline-flattened paragraph. The agent did not fix it (outside its touches) and restructured its fixture to the historically accurate <br><br> form instead. Real 2000s pages that used <p> inside layout tables will hit this, so T-0006 is likely to surface it again.",
   "history": [
     {
       "ts": "2026-08-25T17:34:13Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T17:35:32Z",
+      "event": "dispatched",
+      "detail": "attempt 1; first task authorised to land itself"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a06446dbb50c756b4",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T17:35:32Z"
+  }
 }
