@@ -3,9 +3,10 @@ import Testing
 @testable import SwiftReadability
 
 /// Runs every fixture under `Fixtures/` through the extractor and checks the
-/// result against its frozen expectation. These are hand-authored
-/// reproductions of real-world page shapes, not captures of live pages — see
-/// the fixture HTML files for the shape each one stands in for.
+/// result against its frozen expectation. Most fixtures are frozen captures
+/// of real pages (see `Fixtures/PROVENANCE.md`); a few are hand-authored
+/// shapes for mechanical edge cases the real corpus doesn't cover (see
+/// `Fixtures/README.md`).
 ///
 /// A regression in `ArticleExtractor` or `HTMLParser` that shifts the title,
 /// the word count, or the mix of block types on any fixture fails here.
@@ -16,7 +17,7 @@ struct FixtureTests {
     func matchesFrozenExpectation(name: String) {
         let expectation = FixtureLoader.expectation(name)
         let html = FixtureLoader.html(name)
-        let article = ArticleExtractor.extract(html: html, url: URL(string: "https://example.com/\(name)")!)
+        let article = ArticleExtractor.extract(html: html, url: FixtureLoader.sourceURL(name))
 
         #expect(article.title == expectation.title, "title changed for fixture '\(name)'")
         #expect(article.content.wordCount == expectation.wordCount, "word count changed for fixture '\(name)'")

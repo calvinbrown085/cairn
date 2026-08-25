@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>A Page With Broken Markup</title>
+</head>
+<body>
+<article>
+<h1>A Page With Broken Markup</h1>
+<p>Several tags below are nested or closed incorrectly, which used to be
+common enough in hand-written HTML that a parser has to keep going instead
+of giving up.</p>
+<ul>
+<li>First item, never closed
+<li>Second item, also never closed
+<li>Third item, which finally is closed</li>
+</ul>
+<p>This paragraph opens a <div>block element inside it, which is not
+legal HTML, before the paragraph itself is closed.</div>
+<p>The bold and italic tags below overlap instead of nesting cleanly:
+<b>bold text that <i>turns italic</b> before the bold tag closes</i> and
+then the sentence continues in plain text.</p>
+</article>
+</body>
+</html>

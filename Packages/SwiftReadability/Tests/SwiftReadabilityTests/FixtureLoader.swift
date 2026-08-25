@@ -1,4 +1,5 @@
 import Foundation
+@testable import SwiftReadability
 
 /// The frozen shape an extraction is expected to land in. One JSON file per
 /// fixture, named identically to its `.html` counterpart.
@@ -48,6 +49,30 @@ enum FixtureLoader {
             fatalError("Missing or invalid fixture expectation for '\(name)' — expected Fixtures/\(name).json")
         }
         return decoded
+    }
+
+    /// The URL extraction should treat a fixture as having come from.
+    ///
+    /// A real capture carries its own origin in `<link rel="canonical">` or
+    /// `<meta property="og:url">` — reading that back out of the frozen HTML
+    /// (never fetched, just parsed) matters because `ArticleMetadata` strips a
+    /// page's title suffix by matching it against the request URL's host. Every
+    /// fixture handed the same placeholder host would make that matching fail
+    /// for every real page, and the fixture would then be "wrong" for a reason
+    /// that has nothing to do with the extractor. Hand-authored shapes have no
+    /// real origin, so they keep the placeholder.
+    static func sourceURL(_ name: String) -> URL {
+        let document = HTMLParser.parse(html(name))
+        let canonical = document.elements(tagged: ["link"])
+            .first { $0.attributes["rel"]?.lowercased() == "canonical" }?
+            .attributes["href"]
+        let ogURL = document.elements(tagged: ["meta"])
+            .first { $0.attributes["property"]?.lowercased() == "og:url" }?
+            .attributes["content"]
+        if let raw = canonical ?? ogURL, let url = URL(string: raw) {
+            return url
+        }
+        return URL(string: "https://example.com/\(name)")!
     }
 
     private static var fixturesDirectory: URL? {
