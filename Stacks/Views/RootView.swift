@@ -82,10 +82,10 @@ private struct ReaderPlaceholder: View {
             Palette.paper.ignoresSafeArea()
             VStack(spacing: 14) {
                 Image(systemName: "books.vertical")
-                    .font(.system(size: 40, weight: .light))
+                    .font(.scaled(40, weight: .light, relativeTo: .largeTitle))
                     .foregroundStyle(Palette.inkTertiary)
                 Text("Pick something to read")
-                    .font(.system(size: 19, design: .serif))
+                    .font(.scaled(19, design: .serif, relativeTo: .title3))
                     .foregroundStyle(Palette.inkSecondary)
             }
         }

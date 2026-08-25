@@ -101,3 +101,68 @@ extension Comparable {
         min(max(self, range.lowerBound), range.upperBound)
     }
 }
+
+// MARK: - Chrome type scale
+
+/// The app's chrome (library, sheets, sidebar, dock, share extension) used
+/// fixed system-font point sizes throughout, which never respond to the
+/// system's Dynamic Type setting. `Font.scaled` is a drop-in replacement: it
+/// resolves the exact same system font at today's default text size, so
+/// nothing visibly changes for anyone on the default setting, but it scales
+/// like a semantic style (`.footnote`, `.body`, ...) as the user's preferred
+/// size grows. `relativeTo` picks which style's growth curve to follow — a
+/// small caption need not grow at the same rate as a headline.
+///
+/// The reader's own text stack (`ArticleBlockView`, `ReaderTheme`) keeps
+/// its fixed-size system font on purpose: its size slider becomes a relative
+/// offset over Dynamic Type in T-0022, not before.
+extension Font {
+    static func scaled(
+        _ size: CGFloat,
+        weight: Font.Weight = .regular,
+        design: Font.Design = .default,
+        relativeTo textStyle: Font.TextStyle = .body
+    ) -> Font {
+        var uiFont = UIFont.systemFont(ofSize: size, weight: weight.uiFontWeight)
+        if let systemDesign = design.uiFontDescriptorDesign,
+           let descriptor = uiFont.fontDescriptor.withDesign(systemDesign) {
+            uiFont = UIFont(descriptor: descriptor, size: size)
+        }
+        // A custom font keyed by the system font's own PostScript name reads
+        // back as the identical glyphs at the identical size, but unlike a
+        // fixed-size system font, `Font.custom(_:size:relativeTo:)` scales
+        // with `UIFontMetrics` the same way the built-in text styles do.
+        return Font.custom(uiFont.fontName, size: size, relativeTo: textStyle)
+    }
+}
+
+private extension Font.Weight {
+    /// SwiftUI has no accessor to read a `Font.Weight` back out, so this
+    /// mirrors the fixed set of `UIFont.Weight` cases it's built from.
+    var uiFontWeight: UIFont.Weight {
+        switch self {
+        case .ultraLight: .ultraLight
+        case .thin: .thin
+        case .light: .light
+        case .regular: .regular
+        case .medium: .medium
+        case .semibold: .semibold
+        case .bold: .bold
+        case .heavy: .heavy
+        case .black: .black
+        default: .regular
+        }
+    }
+}
+
+private extension Font.Design {
+    var uiFontDescriptorDesign: UIFontDescriptor.SystemDesign? {
+        switch self {
+        case .default: nil
+        case .serif: .serif
+        case .rounded: .rounded
+        case .monospaced: .monospaced
+        @unknown default: nil
+        }
+    }
+}

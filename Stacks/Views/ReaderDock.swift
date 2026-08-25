@@ -131,15 +131,17 @@ struct ReaderDock: View {
             HStack(spacing: 5) {
                 if let systemImage {
                     Image(systemName: systemImage)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.scaled(13, weight: .medium, relativeTo: .footnote))
                 }
                 if !title.isEmpty {
                     Text(title)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.scaled(13, weight: .semibold, relativeTo: .footnote))
                 }
             }
             .foregroundStyle(isOn ? onAccentInk : theme.inkSecondary)
-            .frame(height: 30)
+            // A floor, not a fixed height: at accessibility sizes the label
+            // grows taller than 30pt, and a fixed frame would clip it.
+            .frame(minHeight: 30)
             .padding(.horizontal, 11)
             .background(isOn ? theme.accent : .clear, in: .capsule)
         }
@@ -178,9 +180,9 @@ struct PencilHint: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "pencil.tip")
-                .font(.system(size: 12))
+                .font(.scaled(12, relativeTo: .caption))
             Text(text)
-                .font(.system(size: 11.5, weight: .medium))
+                .font(.scaled(11.5, weight: .medium, relativeTo: .caption2))
         }
         .foregroundStyle(Color(uiColor: UIColor(hex: 0xF3EBE1)))
         .padding(.horizontal, 13)

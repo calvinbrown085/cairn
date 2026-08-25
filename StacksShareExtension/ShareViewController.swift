@@ -116,18 +116,23 @@ private struct ConfirmationCard: View {
 
     let state: State
 
+    // Frames the icon; scaled with it so a large accessibility size doesn't
+    // clip the glyph inside what used to be a fixed 34pt box.
+    @ScaledMetric(relativeTo: .title2) private var iconHeight: CGFloat = 34
+
     var body: some View {
         VStack(spacing: 12) {
             icon
-                .frame(height: 34)
+                .frame(height: iconHeight)
 
             Text(headline)
-                .font(.system(size: 17, weight: .semibold, design: .serif))
+                .font(.scaled(17, weight: .semibold, design: .serif, relativeTo: .headline))
                 .foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center)
 
             if let detail {
                 Text(detail)
-                    .font(.system(size: 12.5))
+                    .font(.scaled(12.5, relativeTo: .caption))
                     .foregroundStyle(Palette.inkSecondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -147,12 +152,12 @@ private struct ConfirmationCard: View {
             ProgressView().controlSize(.large)
         case .saved:
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 30))
+                .font(.scaled(30, relativeTo: .title2))
                 .foregroundStyle(Palette.accent)
                 .transition(.scale.combined(with: .opacity))
         case .failed:
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 28))
+                .font(.scaled(28, relativeTo: .title2))
                 .foregroundStyle(Palette.accent)
         }
     }

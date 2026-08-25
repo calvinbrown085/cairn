@@ -38,7 +38,7 @@ struct AddURLSheet: View {
                 VStack(alignment: .leading, spacing: 20) {
                     field("Link") {
                         TextField("https://…", text: $raw, axis: .vertical)
-                            .font(.system(size: 16))
+                            .font(.scaled(16, relativeTo: .callout))
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.URL)
@@ -48,19 +48,19 @@ struct AddURLSheet: View {
                             .onSubmit(commit)
                     } hint: {
                         Text(hintText)
-                            .font(.system(size: 12.5))
+                            .font(.scaled(12.5, relativeTo: .caption))
                             .foregroundStyle(showsProblem ? Palette.accent : Palette.inkTertiary)
                     }
 
                     field("Tags") {
                         TextField("reading, research…", text: $tags)
-                            .font(.system(size: 16))
+                            .font(.scaled(16, relativeTo: .callout))
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                     } hint: {
                         if suggestions.isEmpty {
                             Text("Comma separated. Optional.")
-                                .font(.system(size: 12.5))
+                                .font(.scaled(12.5, relativeTo: .caption))
                                 .foregroundStyle(Palette.inkTertiary)
                         } else {
                             chips
@@ -115,7 +115,7 @@ struct AddURLSheet: View {
                     tags = tags.squeezed.isEmpty ? tag : tags.squeezed + ", " + tag
                 } label: {
                     Text("#\(tag)")
-                        .font(.system(size: 12.5, weight: .medium))
+                        .font(.scaled(12.5, weight: .medium, relativeTo: .caption))
                         .foregroundStyle(Palette.inkSecondary)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
@@ -133,7 +133,7 @@ struct AddURLSheet: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 7) {
             Text(title)
-                .font(.system(size: 11.5, weight: .semibold))
+                .font(.scaled(11.5, weight: .semibold, relativeTo: .caption2))
                 .textCase(.uppercase)
                 .tracking(0.8)
                 .foregroundStyle(Palette.inkTertiary)

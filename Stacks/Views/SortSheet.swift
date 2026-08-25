@@ -22,12 +22,12 @@ struct SortSheet: View {
                             } label: {
                                 HStack {
                                     Text(option.label)
-                                        .font(.system(size: 15))
+                                        .font(.scaled(15, relativeTo: .subheadline))
                                         .foregroundStyle(Palette.ink)
                                     Spacer()
                                     if sort == option {
                                         Image(systemName: "checkmark")
-                                            .font(.system(size: 13, weight: .semibold))
+                                            .font(.scaled(13, weight: .semibold, relativeTo: .footnote))
                                             .foregroundStyle(Palette.accent)
                                     }
                                 }
@@ -54,7 +54,7 @@ struct SortSheet: View {
 
                         Toggle(isOn: $preferences.groupBySite) {
                             Text("Group by site")
-                                .font(.system(size: 15))
+                                .font(.scaled(15, relativeTo: .subheadline))
                                 .foregroundStyle(Palette.ink)
                         }
                         .tint(Palette.accent)
@@ -63,7 +63,7 @@ struct SortSheet: View {
                     }
 
                     Text("Cards lead with a cover and the article's opening lines. Rows fit more of the library on screen at once.")
-                        .font(.system(size: 12.5))
+                        .font(.scaled(12.5, relativeTo: .caption))
                         .foregroundStyle(Palette.inkTertiary)
                         .lineSpacing(2)
                         .padding(.horizontal, 4)
@@ -87,7 +87,7 @@ struct SortSheet: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.system(size: 11.5, weight: .semibold))
+                .font(.scaled(11.5, weight: .semibold, relativeTo: .caption2))
                 .textCase(.uppercase)
                 .tracking(0.8)
                 .foregroundStyle(Palette.inkTertiary)

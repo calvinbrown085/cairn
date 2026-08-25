@@ -11,6 +11,7 @@ struct ReaderView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.openURL) private var openURL
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var document: ReaderDocument?
     @State private var topBlock: Int?
@@ -217,11 +218,11 @@ struct ReaderView: View {
                 Text("·")
                 Text("\(post.readingMinutes) min")
             }
-            .font(.system(size: 11.5, weight: .medium))
+            .font(.scaled(11.5, weight: .medium, relativeTo: .caption2))
             .textCase(.uppercase)
             .tracking(0.7)
             .foregroundStyle(theme.inkSecondary)
-            .lineLimit(2)
+            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
 
             Rectangle()
                 .fill(theme.rule)
@@ -241,13 +242,13 @@ struct ReaderView: View {
                     openURL(url)
                 } label: {
                     Label("View the original", systemImage: "safari")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.scaled(13, weight: .medium, relativeTo: .footnote))
                 }
                 .tint(theme.accent)
             }
 
             Text("Archived \(post.savedAt, format: .dateTime.month(.wide).day().year())")
-                .font(.system(size: 11.5, weight: .medium))
+                .font(.scaled(11.5, weight: .medium, relativeTo: .caption2))
                 .textCase(.uppercase)
                 .tracking(0.7)
                 .foregroundStyle(theme.inkSecondary.opacity(0.8))
@@ -334,9 +335,9 @@ struct ReaderView: View {
         } label: {
             HStack(spacing: 7) {
                 Image(systemName: "arrow.down.right.and.arrow.up.left")
-                    .font(.system(size: 12))
+                    .font(.scaled(12, relativeTo: .caption))
                 Text(sizeClass == .regular ? "Show library" : "Show controls")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.scaled(12, weight: .semibold, relativeTo: .caption))
             }
             .foregroundStyle(theme.inkSecondary)
             .padding(.horizontal, 12)
@@ -579,6 +580,8 @@ struct ReaderStatusView<Actions: View>: View {
     let isBusy: Bool
     @ViewBuilder var actions: () -> Actions
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     init(
         symbol: String,
         headline: String,
@@ -599,19 +602,20 @@ struct ReaderStatusView<Actions: View>: View {
                 ProgressView().controlSize(.large)
             } else {
                 Image(systemName: symbol)
-                    .font(.system(size: 34, weight: .light))
+                    .font(.scaled(34, weight: .light, relativeTo: .largeTitle))
                     .foregroundStyle(Palette.inkTertiary)
             }
 
             Text(headline)
-                .font(.system(size: 20, weight: .medium, design: .serif))
+                .font(.scaled(20, weight: .medium, design: .serif, relativeTo: .title3))
                 .foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center)
 
             Text(detail)
-                .font(.system(size: 14))
+                .font(.scaled(14, relativeTo: .subheadline))
                 .foregroundStyle(Palette.inkSecondary)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: 340)
+                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 340)
                 .lineSpacing(3)
 
             HStack(spacing: 10) { actions() }

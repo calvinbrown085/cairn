@@ -66,7 +66,7 @@ struct PostCard: View {
                         .overlay(Hatching())
                         .overlay(
                             Text(initial)
-                                .font(.system(size: 34, design: .serif))
+                                .font(.scaled(34, design: .serif, relativeTo: .largeTitle))
                                 .foregroundStyle(Palette.ink.opacity(0.17))
                         )
                 }
@@ -75,7 +75,7 @@ struct PostCard: View {
             .overlay(alignment: .topTrailing) {
                 if post.isStarred {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 12))
+                        .font(.scaled(12, relativeTo: .caption))
                         .foregroundStyle(Palette.star)
                         .padding(9)
                         .shadow(color: .black.opacity(0.25), radius: 2)
@@ -101,7 +101,7 @@ struct PostCard: View {
                 }
 
                 Text(post.title)
-                    .font(.system(size: 18, weight: .medium, design: .serif))
+                    .font(.scaled(18, weight: .medium, design: .serif, relativeTo: .headline))
                     .foregroundStyle(Palette.ink)
                     .lineSpacing(2)
                     .lineLimit(3)
@@ -118,7 +118,7 @@ struct PostCard: View {
                 SearchSnippetText(snippet: snippet)
             } else if !post.excerpt.isEmpty {
                 Text(post.excerpt)
-                    .font(.system(size: 13))
+                    .font(.scaled(13, relativeTo: .footnote))
                     .foregroundStyle(Palette.inkSecondary)
                     .lineSpacing(2)
                     .lineLimit(2)
@@ -145,6 +145,8 @@ struct PostCard: View {
 struct PostMetaLine: View {
     let post: Post
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         switch post.state {
         case .pending, .fetching:
@@ -155,36 +157,61 @@ struct PostMetaLine: View {
             }
 
         case .failed:
-            HStack(spacing: 5) {
+            HStack(alignment: .top, spacing: 5) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 9))
+                    .font(.scaled(9, relativeTo: .caption2))
                 Text(post.failureReason ?? "Couldn't be saved")
                     .lineLimit(2)
             }
-            .font(.system(size: 11, weight: .medium))
+            .font(.scaled(11, weight: .medium, relativeTo: .caption))
             .foregroundStyle(Palette.accent)
 
         case .ready:
-            HStack(spacing: 7) {
-                Text(post.host)
-                    .modifier(MetaStyle())
-                    .lineLimit(1)
+            // A long host name plus "X min" plus the markup glyph can outgrow
+            // a card's width at accessibility sizes; drop the icon to its own
+            // line rather than let the row run off the edge.
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 7) {
+                        Text(post.host)
+                            .modifier(MetaStyle())
+                            .lineLimit(1)
+                        Circle()
+                            .fill(Palette.ruleStrong)
+                            .frame(width: 2.5, height: 2.5)
+                        Text("\(post.readingMinutes) min")
+                            .modifier(MetaStyle())
+                            .fixedSize()
+                    }
+                    if post.hasMarkup {
+                        Image(systemName: "highlighter")
+                            .font(.scaled(10, relativeTo: .caption2))
+                            .foregroundStyle(Palette.inkTertiary)
+                            .accessibilityLabel("Marked up")
+                    }
+                }
+            } else {
+                HStack(spacing: 7) {
+                    Text(post.host)
+                        .modifier(MetaStyle())
+                        .lineLimit(1)
 
-                Circle()
-                    .fill(Palette.ruleStrong)
-                    .frame(width: 2.5, height: 2.5)
+                    Circle()
+                        .fill(Palette.ruleStrong)
+                        .frame(width: 2.5, height: 2.5)
 
-                Text("\(post.readingMinutes) min")
-                    .modifier(MetaStyle())
-                    .fixedSize()
+                    Text("\(post.readingMinutes) min")
+                        .modifier(MetaStyle())
+                        .fixedSize()
 
-                Spacer(minLength: 4)
+                    Spacer(minLength: 4)
 
-                if post.hasMarkup {
-                    Image(systemName: "highlighter")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Palette.inkTertiary)
-                        .accessibilityLabel("Marked up")
+                    if post.hasMarkup {
+                        Image(systemName: "highlighter")
+                            .font(.scaled(10, relativeTo: .caption2))
+                            .foregroundStyle(Palette.inkTertiary)
+                            .accessibilityLabel("Marked up")
+                    }
                 }
             }
         }
@@ -233,7 +260,7 @@ struct Hatching: View {
 struct MetaStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .font(.system(size: 10.5, weight: .semibold))
+            .font(.scaled(10.5, weight: .semibold, relativeTo: .caption2))
             .textCase(.uppercase)
             .tracking(0.7)
             .foregroundStyle(Palette.inkTertiary)

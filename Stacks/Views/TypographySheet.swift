@@ -6,6 +6,11 @@ struct TypographySheet: View {
     @Environment(ReadingPreferences.self) private var preferences
     @Environment(\.dismiss) private var dismiss
 
+    // The +/- nudge buttons hold a font glyph at a fixed size; scale the box
+    // along with it so accessibility text doesn't outgrow its button.
+    @ScaledMetric(relativeTo: .footnote) private var nudgeWidth: CGFloat = 38
+    @ScaledMetric(relativeTo: .footnote) private var nudgeHeight: CGFloat = 30
+
     var body: some View {
         @Bindable var preferences = preferences
 
@@ -22,7 +27,7 @@ struct TypographySheet: View {
                     Picker("Typeface", selection: $preferences.family) {
                         ForEach(ReaderFontFamily.allCases) { family in
                             Text(family.label)
-                                .font(.system(size: 15, design: family.design))
+                                .font(.scaled(15, design: family.design, relativeTo: .subheadline))
                                 .tag(family)
                         }
                     }
@@ -55,7 +60,7 @@ struct TypographySheet: View {
                         hairline
 
                         Text("A narrower column is easier to track line to line. Changes apply live and sync to your other device.")
-                            .font(.system(size: 12.5))
+                            .font(.scaled(12.5, relativeTo: .caption))
                             .foregroundStyle(Palette.inkTertiary)
                             .lineSpacing(2)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -73,7 +78,7 @@ struct TypographySheet: View {
                     Button("Reset to defaults") {
                         withAnimation { preferences.resetToDefaults() }
                     }
-                    .font(.system(size: 15))
+                    .font(.scaled(15, relativeTo: .subheadline))
                     .foregroundStyle(Palette.accent)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
@@ -111,13 +116,13 @@ struct TypographySheet: View {
     ) -> some View {
         HStack(spacing: 10) {
             Text(title)
-                .font(.system(size: 15))
+                .font(.scaled(15, relativeTo: .subheadline))
                 .foregroundStyle(Palette.ink)
 
             Spacer(minLength: 4)
 
             Text(format(value.wrappedValue))
-                .font(.system(size: 13, weight: .medium).monospacedDigit())
+                .font(.scaled(13, weight: .medium, relativeTo: .footnote).monospacedDigit())
                 .foregroundStyle(Palette.inkTertiary)
                 .frame(minWidth: 44, alignment: .trailing)
 
@@ -125,7 +130,7 @@ struct TypographySheet: View {
                 nudge("minus", enabled: value.wrappedValue > range.lowerBound) {
                     value.wrappedValue = (value.wrappedValue - step).clamped(to: range)
                 }
-                Rectangle().fill(Palette.rule).frame(width: 0.5, height: 30)
+                Rectangle().fill(Palette.rule).frame(width: 0.5, height: nudgeHeight)
                 nudge("plus", enabled: value.wrappedValue < range.upperBound) {
                     value.wrappedValue = (value.wrappedValue + step).clamped(to: range)
                 }
@@ -142,9 +147,9 @@ struct TypographySheet: View {
     private func nudge(_ symbol: String, enabled: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 13, weight: .medium))
+                .font(.scaled(13, weight: .medium, relativeTo: .footnote))
                 .foregroundStyle(enabled ? Palette.ink : Palette.inkTertiary.opacity(0.5))
-                .frame(width: 38, height: 30)
+                .frame(width: nudgeWidth, height: nudgeHeight)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)

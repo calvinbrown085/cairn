@@ -43,7 +43,7 @@ struct TagSheet: View {
                         ForEach(tags, id: \.self) { tag in
                             HStack {
                                 Image(systemName: "tag.fill")
-                                    .font(.system(size: 11))
+                                    .font(.scaled(11, relativeTo: .caption2))
                                     .foregroundStyle(Palette.accent)
                                 Text(tag)
                                 Spacer()

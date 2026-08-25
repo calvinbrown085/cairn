@@ -5,6 +5,7 @@ struct SidebarView: View {
     @Binding var filter: LibraryFilter
 
     @Environment(\.modelContext) private var context
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var index = LibraryIndex()
 
     var body: some View {
@@ -56,7 +57,7 @@ struct SidebarView: View {
 
     private func header(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 11, weight: .semibold))
+            .font(.scaled(11, weight: .semibold, relativeTo: .caption2))
             .textCase(.uppercase)
             .tracking(0.8)
             .foregroundStyle(Palette.inkTertiary)
@@ -67,20 +68,22 @@ struct SidebarView: View {
 
         return HStack(spacing: 11) {
             Image(systemName: target.symbol)
-                .font(.system(size: 14))
+                .font(.scaled(14, relativeTo: .callout))
                 .foregroundStyle(isSelected ? Palette.accent : Palette.inkTertiary)
                 .frame(width: 20)
 
             Text(target.title)
-                .font(.system(size: 15, weight: .medium))
+                .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
                 .foregroundStyle(isSelected ? Palette.ink : Palette.inkSecondary)
-                .lineLimit(1)
+                // A larger accessibility size can outgrow one line for a long
+                // tag or site name; wrapping to two beats an ellipsis.
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
 
             Spacer(minLength: 6)
 
             if let count, count > 0 {
                 Text("\(count)")
-                    .font(.system(size: 12, weight: .medium).monospacedDigit())
+                    .font(.scaled(12, weight: .medium, relativeTo: .caption).monospacedDigit())
                     .foregroundStyle(Palette.inkTertiary)
             }
         }

@@ -9,6 +9,7 @@ struct HighlightsSheet: View {
 
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var editingNote: Highlight?
 
     private var highlights: [Highlight] { post.sortedHighlights }
@@ -48,7 +49,7 @@ struct HighlightsSheet: View {
     private func card(_ highlight: Highlight) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(highlight.text)
-                .font(.system(size: 15, design: .serif))
+                .font(.scaled(15, design: .serif, relativeTo: .subheadline))
                 .foregroundStyle(Palette.ink)
                 .lineSpacing(4)
                 .multilineTextAlignment(.leading)
@@ -59,36 +60,13 @@ struct HighlightsSheet: View {
 
             if let note = highlight.note, !note.isEmpty {
                 Text(note)
-                    .font(.system(size: 13))
+                    .font(.scaled(13, relativeTo: .footnote))
                     .foregroundStyle(Palette.inkSecondary)
                     .italic()
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            HStack(spacing: 8) {
-                Text(highlight.createdAt, format: .relative(presentation: .named))
-                    .font(.system(size: 10.5, weight: .semibold))
-                    .textCase(.uppercase)
-                    .tracking(0.7)
-                    .foregroundStyle(Palette.inkTertiary)
-
-                Spacer(minLength: 0)
-
-                Button(highlight.note == nil ? "Note" : "Edit note") {
-                    editingNote = highlight
-                }
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Palette.inkSecondary)
-                .buttonStyle(.plain)
-
-                Button("Delete") {
-                    context.delete(highlight)
-                    try? context.save()
-                }
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Palette.accent)
-                .buttonStyle(.plain)
-            }
+            cardFooter(highlight)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 13)
@@ -124,21 +102,71 @@ struct HighlightsSheet: View {
         }
     }
 
+    /// Date, note button, and delete button. At accessibility sizes the three
+    /// no longer share a row without crowding, so the date moves above the
+    /// actions instead of squeezing next to them.
+    @ViewBuilder
+    private func cardFooter(_ highlight: Highlight) -> some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 6) {
+                dateLabel(highlight)
+                HStack(spacing: 14) {
+                    noteButton(highlight)
+                    deleteButton(highlight)
+                }
+            }
+        } else {
+            HStack(spacing: 8) {
+                dateLabel(highlight)
+                Spacer(minLength: 0)
+                noteButton(highlight)
+                deleteButton(highlight)
+            }
+        }
+    }
+
+    private func dateLabel(_ highlight: Highlight) -> some View {
+        Text(highlight.createdAt, format: .relative(presentation: .named))
+            .font(.scaled(10.5, weight: .semibold, relativeTo: .caption2))
+            .textCase(.uppercase)
+            .tracking(0.7)
+            .foregroundStyle(Palette.inkTertiary)
+    }
+
+    private func noteButton(_ highlight: Highlight) -> some View {
+        Button(highlight.note == nil ? "Note" : "Edit note") {
+            editingNote = highlight
+        }
+        .font(.scaled(12, weight: .medium, relativeTo: .caption))
+        .foregroundStyle(Palette.inkSecondary)
+        .buttonStyle(.plain)
+    }
+
+    private func deleteButton(_ highlight: Highlight) -> some View {
+        Button("Delete") {
+            context.delete(highlight)
+            try? context.save()
+        }
+        .font(.scaled(12, weight: .medium, relativeTo: .caption))
+        .foregroundStyle(Palette.accent)
+        .buttonStyle(.plain)
+    }
+
     private var empty: some View {
         VStack(spacing: 9) {
             Image(systemName: "highlighter")
-                .font(.system(size: 24, weight: .light))
+                .font(.scaled(24, weight: .light, relativeTo: .title2))
                 .foregroundStyle(Palette.inkTertiary)
 
             Text("Nothing marked yet")
-                .font(.system(size: 18, weight: .semibold, design: .serif))
+                .font(.scaled(18, weight: .semibold, design: .serif, relativeTo: .title3))
                 .foregroundStyle(Palette.ink)
 
             Text("Tap Markup in the reader, then tap a sentence — or draw on it with Apple Pencil.")
-                .font(.system(size: 13.5))
+                .font(.scaled(13.5, relativeTo: .footnote))
                 .foregroundStyle(Palette.inkSecondary)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: 270)
+                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 270)
                 .lineSpacing(3)
         }
         .padding(.horizontal, 20)

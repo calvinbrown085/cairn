@@ -15,7 +15,7 @@ struct NoteSheet: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 14) {
                 Text(highlight.text)
-                    .font(.system(size: 16, design: .serif))
+                    .font(.scaled(16, design: .serif, relativeTo: .callout))
                     .foregroundStyle(Palette.ink)
                     .lineSpacing(4)
                     .lineLimit(4)
@@ -24,7 +24,7 @@ struct NoteSheet: View {
                     .background(Palette.highlight(highlight.tint), in: .rect(cornerRadius: 4))
 
                 TextField("What struck you about this?", text: $text, axis: .vertical)
-                    .font(.system(size: 16))
+                    .font(.scaled(16, relativeTo: .callout))
                     .lineLimit(2...5)
                     .focused($isFocused)
                     .padding(.horizontal, 14)
@@ -58,7 +58,7 @@ struct NoteSheet: View {
                 }
 
                 Text("Notes and ink sync with the highlight through iCloud, anchored to the sentence — not to a pixel — so they survive a font or theme change.")
-                    .font(.system(size: 12.5))
+                    .font(.scaled(12.5, relativeTo: .caption))
                     .foregroundStyle(Palette.inkTertiary)
                     .lineSpacing(2)
 

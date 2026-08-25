@@ -14,6 +14,10 @@ struct PostRow: View {
     /// `loadSnippet()`.
     @State private var snippet: SearchSnippet?
 
+    // Scales with the initial-letter placeholder it frames, so the thumbnail
+    // grows with the glyph instead of clipping it at accessibility sizes.
+    @ScaledMetric(relativeTo: .title3) private var thumbnailSize: CGFloat = 52
+
     private var isSearching: Bool { !searchQuery.isEmpty }
 
     var body: some View {
@@ -28,7 +32,7 @@ struct PostRow: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(post.title)
-                    .font(.system(size: 17, weight: .medium, design: .serif))
+                    .font(.scaled(17, weight: .medium, design: .serif, relativeTo: .body))
                     .foregroundStyle(Palette.ink)
                     .lineSpacing(2)
                     .lineLimit(3)
@@ -83,12 +87,12 @@ struct PostRow: View {
                     .overlay(Hatching(spacing: 7))
                     .overlay(
                         Text(Post.initial(for: post.host))
-                            .font(.system(size: 20, design: .serif))
+                            .font(.scaled(20, design: .serif, relativeTo: .title3))
                             .foregroundStyle(Palette.ink.opacity(0.18))
                     )
             }
         }
-        .frame(width: 52, height: 52)
+        .frame(width: thumbnailSize, height: thumbnailSize)
         .clipShape(.rect(cornerRadius: 8))
         .overlay(
             RoundedRectangle(cornerRadius: 8)
@@ -97,7 +101,7 @@ struct PostRow: View {
         .overlay(alignment: .topTrailing) {
             if post.isStarred {
                 Image(systemName: "star.fill")
-                    .font(.system(size: 9))
+                    .font(.scaled(9, relativeTo: .caption2))
                     .foregroundStyle(Palette.star)
                     .padding(4)
             }

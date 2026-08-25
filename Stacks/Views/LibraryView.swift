@@ -73,7 +73,7 @@ struct LibraryView: View {
     private func chip(_ label: String, isOn: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 12.5, weight: .medium))
+                .font(.scaled(12.5, weight: .medium, relativeTo: .caption))
                 .foregroundStyle(isOn ? Color.white : Palette.inkSecondary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -187,7 +187,7 @@ private struct PostList: View {
                         ForEach(group.posts) { row($0) }
                     } header: {
                         Text(group.host)
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.scaled(11, weight: .semibold, relativeTo: .caption2))
                             .textCase(.uppercase)
                             .tracking(0.8)
                             .foregroundStyle(Palette.inkTertiary)
@@ -326,52 +326,92 @@ struct ClipboardCard: View {
     let save: () -> Void
     let dismiss: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
-        HStack(spacing: 11) {
-            Image(systemName: "doc.on.clipboard")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(Palette.accent)
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text("Save from clipboard")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Palette.ink)
-                Text(Post.displayHost(for: url) + url.path())
-                    .font(.system(size: 12))
-                    .foregroundStyle(Palette.inkSecondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+        // A wide accessibility font leaves no room for icon + text + two
+        // buttons on one line; stack the actions under the text instead of
+        // letting them get pressed together or clipped.
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 11) {
+                    Image(systemName: "doc.on.clipboard")
+                        .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
+                        .foregroundStyle(Palette.accent)
+                    labels
+                    Spacer(minLength: 0)
+                    dismissButton
+                }
+                saveButton
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .padding(.horizontal, 13)
+            .padding(.vertical, 11)
+            .background(Palette.card, in: .rect(cornerRadius: 13))
+            .overlay(
+                RoundedRectangle(cornerRadius: 13)
+                    .strokeBorder(Palette.rule, lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.08), radius: 9, y: 4)
+        } else {
+            HStack(spacing: 11) {
+                Image(systemName: "doc.on.clipboard")
+                    .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
+                    .foregroundStyle(Palette.accent)
 
-            Spacer(minLength: 8)
+                labels
 
-            Button("Save", action: save)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 13)
-                .padding(.vertical, 6)
-                .background(Palette.accent, in: .capsule)
-                .buttonStyle(.plain)
+                Spacer(minLength: 8)
 
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Palette.inkTertiary)
-                    .padding(4)
+                saveButton
+
+                dismissButton
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Dismiss")
+            .padding(.horizontal, 13)
+            .padding(.vertical, 11)
+            .background(Palette.card, in: .rect(cornerRadius: 13))
+            .overlay(
+                RoundedRectangle(cornerRadius: 13)
+                    .strokeBorder(Palette.rule, lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.08), radius: 9, y: 4)
         }
-        .padding(.horizontal, 13)
-        .padding(.vertical, 11)
-        .background(Palette.card, in: .rect(cornerRadius: 13))
-        .overlay(
-            RoundedRectangle(cornerRadius: 13)
-                .strokeBorder(Palette.rule, lineWidth: 0.5)
-        )
-        .shadow(color: .black.opacity(0.08), radius: 9, y: 4)
+    }
+
+    private var labels: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text("Save from clipboard")
+                .font(.scaled(13, weight: .semibold, relativeTo: .footnote))
+                .foregroundStyle(Palette.ink)
+            Text(Post.displayHost(for: url) + url.path())
+                .font(.scaled(12, relativeTo: .caption))
+                .foregroundStyle(Palette.inkSecondary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+        }
+    }
+
+    private var saveButton: some View {
+        Button("Save", action: save)
+            .font(.scaled(13, weight: .semibold, relativeTo: .footnote))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 13)
+            .padding(.vertical, 6)
+            .background(Palette.accent, in: .capsule)
+            .buttonStyle(.plain)
+    }
+
+    private var dismissButton: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.scaled(12, weight: .bold, relativeTo: .caption))
+                .foregroundStyle(Palette.inkTertiary)
+                .padding(4)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Dismiss")
     }
 }
 
@@ -380,6 +420,12 @@ struct EmptyLibraryView: View {
     let isSearching: Bool
     let add: () -> Void
 
+    // Scales in step with the icon it frames, so a large accessibility size
+    // grows the badge along with the glyph instead of clipping it inside a
+    // box that stayed 54pt.
+    @ScaledMetric(relativeTo: .title2) private var badgeSize: CGFloat = 54
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     private var showsActions: Bool {
         !isSearching && (filter == .unread || filter == .all)
     }
@@ -387,9 +433,9 @@ struct EmptyLibraryView: View {
     var body: some View {
         VStack(spacing: 11) {
             Image(systemName: isSearching ? "magnifyingglass" : filter.symbol)
-                .font(.system(size: 22, weight: .light))
+                .font(.scaled(22, weight: .light, relativeTo: .title2))
                 .foregroundStyle(Palette.inkTertiary)
-                .frame(width: 54, height: 54)
+                .frame(width: badgeSize, height: badgeSize)
                 .background(Palette.recessed, in: .rect(cornerRadius: 16))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
@@ -398,23 +444,28 @@ struct EmptyLibraryView: View {
                 .padding(.bottom, 4)
 
             Text(isSearching ? "No matches" : filter.emptyHeadline)
-                .font(.system(size: 21, weight: .semibold, design: .serif))
+                .font(.scaled(21, weight: .semibold, design: .serif, relativeTo: .title2))
                 .foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center)
 
             Text(isSearching
                  ? "Search covers titles, authors, tags, and the full text of everything you've archived."
                  : filter.emptyDetail)
-                .font(.system(size: 14))
+                .font(.scaled(14, relativeTo: .subheadline))
                 .foregroundStyle(Palette.inkSecondary)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: 300)
+                // A fixed 300pt cap reads fine at the default size; at
+                // accessibility sizes it would force many more line breaks
+                // than the available width needs, so let it use the width
+                // the empty state already has instead.
+                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 300)
                 .lineSpacing(3)
 
             if showsActions {
                 VStack(spacing: 9) {
                     Button(action: add) {
                         Text("Paste a link")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.scaled(15, weight: .semibold, relativeTo: .subheadline))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 11)
@@ -422,12 +473,12 @@ struct EmptyLibraryView: View {
                     }
                     .buttonStyle(.plain)
 
-                    HStack(spacing: 9) {
+                    HStack(alignment: .top, spacing: 9) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 13))
+                            .font(.scaled(13, relativeTo: .footnote))
                             .foregroundStyle(Palette.accent)
                         Text("Or share from Safari — Stacks appears in the share sheet")
-                            .font(.system(size: 12.5))
+                            .font(.scaled(12.5, relativeTo: .caption))
                             .foregroundStyle(Palette.inkSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -440,7 +491,10 @@ struct EmptyLibraryView: View {
                             .strokeBorder(Palette.rule, lineWidth: 0.5)
                     )
                 }
-                .frame(width: 250)
+                // 250pt was tuned for the default text size; wider accessibility
+                // text needs the full width to avoid squeezing every line.
+                .frame(width: dynamicTypeSize.isAccessibilitySize ? nil : 250)
+                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil)
                 .padding(.top, 10)
             }
         }
