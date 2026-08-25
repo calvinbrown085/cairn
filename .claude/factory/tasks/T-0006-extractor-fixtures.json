@@ -46,6 +46,11 @@
       "ts": "2026-08-25T18:01:15Z",
       "event": "touches-corrected",
       "detail": "were stale pre-SPM paths (StacksTests/**, Tests/**, Fixtures/**) left over from the iOS-target era; corrected to the package path the agent is actually working in"
+    },
+    {
+      "ts": "2026-08-25T18:12:17Z",
+      "event": "resumed",
+      "detail": "session limit reset; asked to delete DebugProbe scaffolding before committing"
     }
   ],
   "agent": {

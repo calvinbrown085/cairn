@@ -2,7 +2,7 @@
   "id": "T-0012",
   "title": "Dynamic Type across app chrome",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Dynamic Type as the base",
   "depends_on": [],
@@ -20,7 +20,7 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0012-dynamic-type-chrome",
   "notes": "Close to disqualifying for low-vision users today. Touches nearly every view — will monopolise the touches lock, so schedule it alone.",
   "history": [
     {
@@ -37,6 +37,17 @@
       "ts": "2026-08-25T18:01:15Z",
       "event": "worktree-staged",
       "detail": "worktree created at ../stacks-worktrees/T-0012, no agent dispatched (usage checkpoint); status remains todo"
+    },
+    {
+      "ts": "2026-08-25T18:12:17Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a12e99fb3a0489b05",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T18:12:17Z"
+  }
 }

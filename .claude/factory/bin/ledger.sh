@@ -79,6 +79,34 @@ case "$cmd" in
     jq --arg ts "$(date -u +%FT%TZ)" --arg e "$2" --arg d "${3:-}" \
        '.history += [{ts: $ts, event: $e, detail: $d}]' "$f" > "$tmp" && mv "$tmp" "$f"
     ;;
+  drift)
+    # A task's `touches` is its lease on the tree, and selection trusts it. If an
+    # agent is editing files the lease does not cover, two things are wrong at
+    # once: the reviewer's X1 check has the wrong yardstick, and another task can
+    # be dispatched onto the same files. T-0006 ran its whole first attempt with
+    # stale pre-SPM globs and nothing noticed.
+    fail=0
+    for id in $("$0" inflight | jq -r '.[].id' || true); do
+      wt="$(jq -r '.worktree_root' "$CONFIG")"
+      case "$wt" in /*) root="$wt";; *) root="$MAIN_ROOT/$wt";; esac
+      p="$root/$id"
+      [ -d "$p" ] || continue
+      changed="$( { git -C "$p" diff --name-only main...HEAD 2>/dev/null || true; git -C "$p" status --porcelain 2>/dev/null | cut -c4- || true; } | sort -u | grep -v '^$' || true )"
+      [ -n "$changed" ] || continue
+      globs="$("$0" get "$id" | jq -r '.touches[]?')"
+      for f in $changed; do
+        case "$f" in .dd/*|.dd-signed/*|*.xcodeproj/*) continue;; esac
+        covered=0
+        for g in $globs; do
+          base="${g%/\*\*}"; base="${base%/\*}"
+          case "$f" in $base|$base/*) covered=1; break;; esac
+        done
+        [ "$covered" -eq 1 ] || { echo "$id: OUTSIDE touches -> $f"; fail=1; }
+      done
+    done
+    [ $fail -eq 0 ] && echo "no drift: every in-flight change is inside its declared touches"
+    exit $fail
+    ;;
   validate)
     fail=0
     for f in "$TASKS"/*.json; do

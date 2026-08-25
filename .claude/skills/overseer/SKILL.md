@@ -47,6 +47,7 @@ remembered:
 ```bash
 .claude/factory/bin/ledger.sh summary
 .claude/factory/bin/ledger.sh inflight
+.claude/factory/bin/ledger.sh drift
 .claude/factory/bin/ledger.sh dispatchable
 ls .claude/factory/state/blocked/ 2>/dev/null
 git -C . log --oneline -5
@@ -100,7 +101,7 @@ cannot see the agent's output.
 Per cycle, in order:
 
 1. **Health** — `bin/main-health.sh`. Red means halt everything and report. Never dispatch onto a broken base.
-2. **Reap** — resolve finished agents, advance their tasks, reconcile against `ListAgents`. An agent that died mid-task (rate limit, crash) leaves uncommitted work in its worktree: inspect it before deciding. Resuming the dead agent by name is usually right — it still holds the measurements and reasoning that produced those edits, and a fresh agent would repeat that work from scratch.
+2. **Reap** — resolve finished agents, advance their tasks, reconcile against `ListAgents`. Then run `bin/ledger.sh drift`: a task's `touches` is its lease on the tree and selection trusts it, so an agent editing outside its lease means the reviewer has the wrong yardstick *and* another task can be dispatched onto the same files. T-0006 ran a whole attempt on stale pre-SPM globs and nothing noticed. An agent that died mid-task (rate limit, crash) leaves uncommitted work in its worktree: inspect it before deciding. Resuming the dead agent by name is usually right — it still holds the measurements and reasoning that produced those edits, and a fresh agent would repeat that work from scratch.
 3. **Select** — `bin/ledger.sh dispatchable` already enforces eligibility, type, dependencies, and `touches` disjointness. Take up to `max_parallel`. Prefer work that unblocks other work.
 4. **Dispatch** — `bin/worktree.sh create`, set status, spawn `factory-implementer`, record its identity.
 5. **Review** — see below. Two parts, and both are yours.

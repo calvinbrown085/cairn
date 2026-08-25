@@ -31,6 +31,11 @@
       "ts": "2026-08-25T17:29:06Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T18:12:17Z",
+      "event": "resumed",
+      "detail": "session limit reset; uncommitted UI test edits intact"
     }
   ],
   "agent": {
