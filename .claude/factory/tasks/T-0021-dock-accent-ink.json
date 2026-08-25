@@ -2,7 +2,7 @@
   "id": "T-0021",
   "title": "ReaderDock picks white-on-accent in Paper dark mode, where accent is light",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Contrast audit",
   "depends_on": [
@@ -20,13 +20,23 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0021-dock-accent",
   "notes": "Found by the T-0014 agent while auditing contrast. ReaderDock.onAccentInk selects white-on-accent for every theme except .night, but Paper in DARK appearance also resolves accent to the light peachy value — so the active toggle likely renders white text on a light fill. The bug is that the choice keys off the theme case rather than the resolved colour's luminance. Outside T-0014's touches (Stacks/Design/** only), so correctly left alone.",
   "history": [
     {
       "ts": "2026-08-25T17:34:14Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T18:41:51Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a5d99c2fc97bdf53f",
+    "role": "implementer",
+    "spawned": "2026-08-25T18:41:50Z"
+  }
 }
