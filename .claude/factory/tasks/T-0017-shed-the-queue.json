@@ -1,0 +1,18 @@
+{
+  "id": "T-0017",
+  "title": "Shed the queue: rethink unread as a library concept, not an inbox",
+  "type": "implement", "status": "draft", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Shed the queue",
+  "depends_on": [],
+  "acceptance": [
+    "The sidebar no longer displays a numeric unread count",
+    "unreadCount is removed from LibraryIndex and its call sites",
+    "\"Never opened\" survives as a filter, not as an accusation with a number attached",
+    "The backlog can be stated plainly on request rather than shown as a standing tally",
+    "invariants.sh reports 0 pre-existing unreadCount sites"
+  ],
+  "touches": ["Stacks/Views/LibraryIndex.swift", "Stacks/Views/SidebarView.swift", "Stacks/Views/LibraryFilter.swift", "Stacks/Views/RootView.swift"],
+  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Found by invariants.sh on its first run: the sidebar renders index.unreadCount beside all/starred/archived. Predates the constitution's P5 ban, which is why P5 is diff-scoped. This task retires the exemption.",
+  "history": []
+}

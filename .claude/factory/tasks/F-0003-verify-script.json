@@ -2,7 +2,7 @@
   "id": "F-0003",
   "title": "verify.sh — the gate",
   "type": "chore",
-  "status": "todo",
+  "status": "merged",
   "quarter": "bootstrap",
   "roadmap_anchor": null,
   "depends_on": [
@@ -24,5 +24,11 @@
   "attempts": 0,
   "branch": null,
   "notes": "Bootstrap. Constitution X3 forbids agents from editing this path, which is exactly why it cannot be factory work.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:41:29Z",
+      "event": "completed",
+      "detail": "gate passes in 21s with no simulator (generic/platform=iOS Simulator needs no booted device)"
+    }
+  ]
 }

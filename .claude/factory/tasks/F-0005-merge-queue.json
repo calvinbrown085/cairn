@@ -2,10 +2,12 @@
   "id": "F-0005",
   "title": "merge.sh and main-health.sh",
   "type": "chore",
-  "status": "todo",
+  "status": "merged",
   "quarter": "bootstrap",
   "roadmap_anchor": null,
-  "depends_on": ["F-0003"],
+  "depends_on": [
+    "F-0003"
+  ],
   "acceptance": [
     "merge.sh acquires the merge lock, rebases the branch onto main, re-runs verify.sh, squash-merges, pushes, and releases the lock on every exit path",
     "A failed post-rebase verify aborts the merge and returns the task to the implementer rather than merging",
@@ -13,11 +15,19 @@
     "main-health.sh runs verify.sh against a clean checkout of main and reports a single exit code",
     "Locks are atomic, record a pid, and are reclaimable after a configurable stale timeout"
   ],
-  "touches": [".claude/factory/bin/**"],
+  "touches": [
+    ".claude/factory/bin/**"
+  ],
   "risk": "medium",
   "factory_eligible": false,
   "attempts": 0,
   "branch": null,
   "notes": "Bootstrap.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:41:29Z",
+      "event": "completed",
+      "detail": "merge lock, rebase, post-rebase re-verify, PR path when auto_merge is off; health cached by main SHA"
+    }
+  ]
 }

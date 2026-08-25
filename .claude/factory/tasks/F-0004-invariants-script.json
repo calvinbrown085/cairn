@@ -2,7 +2,7 @@
   "id": "F-0004",
   "title": "invariants.sh — mechanical constitution checks",
   "type": "chore",
-  "status": "todo",
+  "status": "merged",
   "quarter": "bootstrap",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -15,11 +15,19 @@
     "Fails if DEVELOPMENT_TEAM, bundle identifiers, the app group, or the CloudKit container changed",
     "Each failure prints the rule id from CONSTITUTION.md and the offending lines"
   ],
-  "touches": [".claude/factory/bin/**"],
+  "touches": [
+    ".claude/factory/bin/**"
+  ],
   "risk": "low",
   "factory_eligible": false,
   "attempts": 0,
   "branch": null,
   "notes": "Bootstrap. Deterministic only — no model judgement lives in this script.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:41:29Z",
+      "event": "completed",
+      "detail": "diff-scoped P5/P6/X7/X8, repo-scoped P2/X6; caught pre-existing unreadCount on first run"
+    }
+  ]
 }
