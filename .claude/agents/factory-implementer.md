@@ -18,7 +18,7 @@ Read `.claude/factory/CONSTITUTION.md` first. It binds you.
 4. Run the gate — **always by absolute path to the primary checkout**, never the
    copy inside your worktree:
    ```bash
-   /Users/calvinbrown/Documents/stacks/.claude/factory/bin/verify.sh --task <id>
+   <repo>/.claude/factory/bin/verify.sh --task <id>
    ```
    Your worktree contains a frozen copy of these scripts from your branch point.
    Running it means running whatever gate existed then, against a ledger that
@@ -50,7 +50,7 @@ Read `.claude/factory/CONSTITUTION.md` first. It binds you.
 When — and only when — the overseer messages you to land the task:
 
 ```bash
-/Users/calvinbrown/Documents/stacks/.claude/factory/bin/merge.sh <task-id>
+<repo>/.claude/factory/bin/merge.sh <task-id>
 ```
 
 That script is the only sanctioned way onto `main`. It takes the merge lock,

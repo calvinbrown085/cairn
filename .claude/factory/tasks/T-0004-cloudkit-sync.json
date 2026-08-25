@@ -2,7 +2,7 @@
   "id": "T-0004",
   "title": "Verify CloudKit sync on two real devices",
   "type": "spike",
-  "status": "todo",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Verify CloudKit sync on two real devices",
   "depends_on": [],
@@ -16,12 +16,17 @@
   "factory_eligible": true,
   "attempts": 0,
   "branch": null,
-  "notes": "Physical hardware. A load-bearing unverified assumption under the whole product; kill criterion 3 hangs off it.",
+  "notes": "VERIFIED 2026-08-25 by the owner on real hardware: sync observed working between iPad and iPhone. This closes the roadmap standing risk and kill criterion 3, both of which rested on sync being provisioned and entitled but never once watched to succeed.",
   "history": [
     {
       "ts": "2026-08-25T17:34:12Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T20:07:00Z",
+      "event": "verified",
+      "detail": "owner confirmed on iPad and iPhone hardware"
     }
   ]
 }

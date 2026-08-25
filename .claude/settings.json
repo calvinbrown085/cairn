@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(.claude/factory/bin/*)",
-      "Bash(/Users/calvinbrown/Documents/cairn/.claude/factory/bin/*)"
+      "Bash(.claude/factory/bin/*)"
     ]
   }
 }

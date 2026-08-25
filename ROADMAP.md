@@ -107,7 +107,7 @@ of real captured pages.
 
 ### Not a feature, but required
 
-- [ ] **Watch sync work across two devices.** Never once observed. Everything assumes it.
+- [x] **Watch sync work across two devices.** *(Verified 2026-08-25 on iPad and iPhone hardware. Closes kill criterion 3.)*
 
 ---
 
@@ -137,8 +137,7 @@ of real captured pages.
 
 ## Standing risks
 
-- **CloudKit sync has never been observed working.** Provisioned, entitled, assumed. Kill criterion 3 hangs off it.
 - **Anything saved before the original-HTML change is permanently truncated.** No stored source means no repair. The damage stopped; it was not undone.
 - **Scroll cost is unprofiled.** The prime suspect for reading feeling unpleasant.
 - **The per-block text architecture is unproven for VoiceOver.** Decided on structure, not measurement, with a named failure condition.
-- **The display name is unresolved.** Two candidates were already taken at reservation despite looking free in store search.
+- **The display name is Cairnfield**, decided 2026-08-25 after Stacks, Cairn and Pilcrow were all taken at reservation. The bundle id, repo and code stay `Cairn`; only the user-visible name changes.
