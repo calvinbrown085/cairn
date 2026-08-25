@@ -33,6 +33,11 @@
       "ts": "2026-08-25T23:46:46Z",
       "event": "challenged",
       "detail": "edited RootView before showing evidence the post was .ready; asked for the observed state, and told an unverified navigation change is worse than an unfinished screenshot set"
+    },
+    {
+      "ts": "2026-08-25T23:50:37Z",
+      "event": "nudged",
+      "detail": "no live process and no edits for 20 minutes; told to conclude and land"
     }
   ],
   "agent": {

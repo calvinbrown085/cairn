@@ -1,15 +1,34 @@
 {
-  "id": "T-0037", "title": "Import PDFs",
-  "type": "implement", "status": "todo", "quarter": "next",
-  "roadmap_anchor": null, "depends_on": [],
+  "id": "T-0037",
+  "title": "Import PDFs",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
   "acceptance": [
     "A PDF shared to the app is saved and readable",
     "Its text is extracted so search finds it",
     "Highlighting works, or the limitation is stated plainly rather than failing silently",
     "The original file is retained the way original HTML is for web articles"
   ],
-  "touches": ["Cairn/Services/**", "Cairn/Models/Post.swift", "Cairn/Views/**", "CairnShareExtension/**"],
-  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Cairn/Services/**",
+    "Cairn/Models/Post.swift",
+    "Cairn/Views/ArticleBlockView.swift",
+    "CairnShareExtension/**",
+    "project.yml"
+  ],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Named by the owner as the largest hole in capture: papers and documents currently cannot get in at all. High risk because it touches the data model and the reader's rendering assumptions — Post currently assumes extracted HTML blocks. PDFKit is on the import allowlist. Held as draft-equivalent until the reading-quality work lands, since it is the biggest build now that Listen is cut.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T23:50:37Z",
+      "event": "approved",
+      "detail": "reading-quality work it was held behind has landed (full screen, margins, images, Dynamic Type, contrast); touches narrowed off Cairn/Views/** so it can actually be scheduled"
+    }
+  ]
 }

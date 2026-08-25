@@ -34,6 +34,11 @@
       "ts": "2026-08-25T20:13:58Z",
       "event": "re-dispatched",
       "detail": "prior agent stopped by user and not resumable; fresh agent took over the surviving worktree"
+    },
+    {
+      "ts": "2026-08-25T23:50:37Z",
+      "event": "nudged",
+      "detail": "no live process and no edits for 20 minutes; told to conclude and land"
     }
   ],
   "agent": {
