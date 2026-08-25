@@ -16,8 +16,7 @@
   ],
   "touches": [
     "Stacks/Models/Post.swift",
-    "Stacks/Services/**",
-    "Stacks/Content/**"
+    "Stacks/Services/**"
   ],
   "risk": "high",
   "factory_eligible": true,
@@ -29,6 +28,16 @@
       "ts": "2026-08-25T17:34:12Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T18:24:12Z",
+      "event": "touches-corrected",
+      "detail": "removed Stacks/Content/** — that path moved to Packages/SwiftReadability at D-0001"
+    },
+    {
+      "ts": "2026-08-25T18:24:45Z",
+      "event": "touches-narrowed",
+      "detail": "dropped StacksShareExtension/** — the extension only queues URLs into the inbox; ArchiveService does the fetch and store, and the overlap would have blocked on T-0012's lease"
     }
   ]
 }

@@ -351,6 +351,13 @@ Written down now, while it's cheap to be honest.
   reader's *CPU cost* is still unprofiled (T-0001), and the decision carries a
   named failure condition — if VoiceOver reading order is bad across many small
   text views, revisit before the Mac app.
+- **The extractor silently truncates multi-section documents.** Measured
+  2026-08-25 against real captures: Project Gutenberg's *Frankenstein* is
+  ~75,085 words and the extractor keeps 8,239 — chapter 24 of 24, **89% lost at
+  save time, with nothing telling the reader anything is missing.** Six of
+  fourteen real pages are affected. This is the strongest argument yet for
+  storing the original HTML: until that lands, every long article saved is
+  permanently truncated and unrepairable. Tracked as T-0027.
 - **CloudKit sync is provisioned but unobserved.** Everything assumes it works.
 - **`NLContextualEmbedding` document-level quality is unknown.** The Q3 bet rests
   on a spike that hasn't run.

@@ -2,7 +2,7 @@
   "id": "T-0006",
   "title": "Freeze ~30 real pages as fixtures and assert against them",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [],
@@ -51,6 +51,11 @@
       "ts": "2026-08-25T18:12:17Z",
       "event": "resumed",
       "detail": "session limit reset; asked to delete DebugProbe scaffolding before committing"
+    },
+    {
+      "ts": "2026-08-25T18:22:22Z",
+      "event": "merged",
+      "detail": "855c658"
     }
   ],
   "agent": {

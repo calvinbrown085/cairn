@@ -1,0 +1,16 @@
+{
+  "id": "T-0029",
+  "title": "An unclosed <h1> swallows the rest of the document",
+  "type": "implement", "status": "draft", "quarter": "Q1",
+  "roadmap_anchor": "Q1 > Extractor hardening",
+  "depends_on": [],
+  "acceptance": [
+    "An unclosed heading tag does not absorb subsequent elements as descendants",
+    "A page with an unclosed <h1> still extracts its prose",
+    "A fixture covers it"
+  ],
+  "touches": ["Packages/SwiftReadability/Sources/**", "Packages/SwiftReadability/Tests/**"],
+  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Bonus finding from T-0006, hit while authoring malformed_nesting.html. HTMLParser's implicit-closing table has no heading entry, so an unclosed <h1> takes every following element as a descendant. Combined with the polish step that drops a leading heading repeating the title, this zeroed out an entire page. The agent kept its fixture's <h1> closed so the fixture tests what it is named for, and documented this separately rather than silently encoding it.",
+  "history": []
+}
