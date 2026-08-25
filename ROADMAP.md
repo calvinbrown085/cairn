@@ -84,6 +84,9 @@ of real captured pages.
 
 ### Reading — the stated pain
 
+- [x] **Write anywhere, including the margins.** *(T-0043, `b775068`. One document-level ink layer over the full column; strokes still anchor to a block in unit space, so margins are simply x outside 0–1 and no existing mark needed migrating.)*
+- [x] **A zoomable image viewer.** *(T-0041, `165329f`.)*
+
 - [x] **Opening an article goes straight to full screen.** *(T-0024, `1b0f846`.)* Reading is the point; asking for it every time is friction the app imposes on its own primary action.
 - [ ] **Markup taps land.** A tap in markup mode places a text caret instead of highlighting roughly half the time — `UITextView`'s own recogniser races the custom one.
 - [ ] **A scroll indicator that means something.** `LazyVStack` means only realised blocks count toward content height, so the bar measures a document that appears to grow as you scroll.
