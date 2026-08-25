@@ -2,8 +2,8 @@ import Foundation
 
 /// Identifiers shared between the app and its share extension.
 enum AppGroup {
-    static let identifier = "group.com.calvinbrown.Stacks"
-    static let cloudKitContainer = "iCloud.com.calvinbrown.Stacks"
+    static let identifier = "group.com.calvinbrown.Cairn"
+    static let cloudKitContainer = "iCloud.com.calvinbrown.Cairn"
 
     /// The shared container both processes can write to. Falls back to the
     /// process-local documents directory if the group is unavailable, which keeps
@@ -25,6 +25,6 @@ enum AppGroup {
     /// The SwiftData store, kept in the shared container so both targets agree
     /// on its location.
     static var storeURL: URL {
-        containerURL.appending(path: "Stacks.store", directoryHint: .notDirectory)
+        containerURL.appending(path: "Cairn.store", directoryHint: .notDirectory)
     }
 }

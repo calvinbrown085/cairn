@@ -8,7 +8,7 @@ struct AttributedTextBuilder {
     let theme: ReaderTheme
 
     /// Marks a link's destination so taps can be resolved back to a URL.
-    static let linkAttribute = NSAttributedString.Key("stacks.link")
+    static let linkAttribute = NSAttributedString.Key("cairn.link")
 
     /// Changes whenever anything that affects rendering changes, which is what
     /// tells `ReaderRenderCache` to start over.

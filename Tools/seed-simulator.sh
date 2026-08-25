@@ -1,15 +1,15 @@
 #!/bin/bash
-# Re-seeds a simulator's Stacks archive through the real share-inbox path.
+# Re-seeds a simulator's Cairn archive through the real share-inbox path.
 # Usage: Tools/seed-simulator.sh "<device name>" [url ...]
 set -e
 DEVICE="${1:?device name required}"; shift
-BUNDLE=com.calvinbrown.Stacks
+BUNDLE=com.calvinbrown.Cairn
 
 G=$(xcrun simctl get_app_container "$DEVICE" $BUNDLE groups 2>/dev/null | awk '{print $2}')
 [ -n "$G" ] || { echo "app not installed on $DEVICE"; exit 1; }
 
 xcrun simctl terminate "$DEVICE" $BUNDLE 2>/dev/null || true
-rm -f "$G"/Stacks.store*; rm -rf "$G"/.Stacks_SUPPORT; mkdir -p "$G/Inbox"
+rm -f "$G"/Cairn.store*; rm -rf "$G"/.Cairn_SUPPORT; mkdir -p "$G/Inbox"
 
 i=0
 for u in "$@"; do

@@ -4,7 +4,7 @@ import SwiftUI
 /// included) that keeps today's exact rendered size at the default Dynamic
 /// Type setting but lets accessibility sizes grow it, the way a semantic
 /// style (`.footnote`, `.body`, ...) already does. See
-/// `Stacks/Design/ReadingPreferences.swift`, which defines the identical
+/// `Cairn/Design/ReadingPreferences.swift`, which defines the identical
 /// helper for the app target — the share extension is a separate module with
 /// its own binary, so it can't import that file and needs its own copy. See
 /// T-0012.

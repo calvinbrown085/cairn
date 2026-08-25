@@ -65,7 +65,7 @@ struct SidebarView: View {
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
         .background(Palette.recessed)
-        .navigationTitle("Stacks")
+        .navigationTitle("Cairn")
         .onAppear { index.refresh(context: context) }
         // Any save — a new post, a tag edit, a sync from another device —
         // changes what the sidebar should show.

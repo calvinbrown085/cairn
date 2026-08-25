@@ -2,17 +2,17 @@ import SwiftUI
 import SwiftData
 
 @main
-struct StacksApp: App {
+struct CairnApp: App {
     private let container: ModelContainer
     @State private var archive: ArchiveService
     @State private var preferences = ReadingPreferences.shared
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
-        let container = StacksApp.makeContainer()
+        let container = CairnApp.makeContainer()
         self.container = container
         _archive = State(initialValue: ArchiveService(context: container.mainContext))
-        StacksApp.applyNavigationBarAppearance()
+        CairnApp.applyNavigationBarAppearance()
     }
 
     var body: some Scene {

@@ -4,7 +4,7 @@ import ImageIO
 import UniformTypeIdentifiers
 import AppKit
 
-/// Renders the Stacks app icon: cream sheets stacked on warm terracotta.
+/// Renders the Cairn app icon: cream sheets stacked on warm terracotta.
 /// Run with: swift Tools/MakeIcon.swift <output.png>
 
 let size = 1024.0

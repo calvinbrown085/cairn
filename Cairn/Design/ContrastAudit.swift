@@ -58,10 +58,10 @@ enum WCAGContrast {
 /// ratios on every run.
 ///
 /// This is not wired into `verify.sh`: the app has no unit test target today
-/// (only `StacksUITests`, a UI-testing bundle, and `verify.sh` only builds
+/// (only `CairnUITests`, a UI-testing bundle, and `verify.sh` only builds
 /// the app — it never runs `xcodebuild test` against it), and adding one
 /// means editing `project.yml`, which sits outside this task's `touches`
-/// glob (`Stacks/Design/**`). Once a unit test target exists, a single test
+/// glob (`Cairn/Design/**`). Once a unit test target exists, a single test
 /// asserting `ReaderContrastAudit.failures.isEmpty` is the whole job.
 enum ReaderContrastAudit {
     /// One measured pair.

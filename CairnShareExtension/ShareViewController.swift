@@ -165,7 +165,7 @@ private struct ConfirmationCard: View {
     private var headline: String {
         switch state {
         case .working: "Saving…"
-        case .saved: "Saved to Stacks"
+        case .saved: "Saved to Cairn"
         case .failed: "Couldn't save that"
         }
     }

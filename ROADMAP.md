@@ -1,4 +1,4 @@
-# Stacks — Roadmap
+# Cairn — Roadmap
 
 *Written 2026-08-24. Covers the twelve months to August 2027.*
 
@@ -13,7 +13,7 @@ the archive becomes a landfill and people delete the app. Pocket, Omnivore,
 Readability and Matter are all dead or gone. The survivors — GoodLinks, Readwise
 Reader — survive by being good at *reading*, not at *remembering*.
 
-Stacks bets the other way: that the thing worth building is a **personal library
+Cairn bets the other way: that the thing worth building is a **personal library
 whose retrieval is good enough that a five-year-old archive is genuinely
 searchable**, and that on-device intelligence now makes that possible without a
 server, a subscription, or handing your reading history to anyone.
@@ -72,7 +72,7 @@ is not. The model ranks, relates, and finds — it never edits the record.
 
 ## What actually differentiates this
 
-**GoodLinks** (£10 once, local-first, excellent) already does everything Stacks
+**GoodLinks** (£10 once, local-first, excellent) already does everything Cairn
 does *today*: share sheet, full-text search, tags, offline reading, good
 typography. Shipping what exists now differentiates on nothing.
 
@@ -125,7 +125,7 @@ is worth using at all given "AI never writes" (probably not this year).
 ### Audited gaps, App Store blocking
 
 - **`PrivacyInfo.xcprivacy` is missing.** Required. `UserDefaults` in
-  `Stacks/Services/AppGroup.swift` is a "required reason" API and must declare
+  `Cairn/Services/AppGroup.swift` is a "required reason" API and must declare
   one (app-group shared defaults).
 - **Zero Dynamic Type support.** **77** hardcoded `.system(size:)` call sites
   across **16** files, plus `adjustsFontForContentSizeCategory = false` in
@@ -218,7 +218,7 @@ outstanding work, not speculation.
       and the lazy rendering it depends on is not negotiable — an 80,000-word
       article has to stay usable. Needs an estimated total height or a
       purpose-built reading-progress indicator.
-- [ ] **The app needs a new name.** *Stacks* is unavailable in App Store Connect.
+- [ ] **The app needs a new name.** The old name is unavailable in App Store Connect.
       Must be decided and executed **before TestFlight**: the CloudKit container
       is named for the app, and container identity is what synced records hang
       off. Today the only data at risk is the owner's. After beta testers exist,

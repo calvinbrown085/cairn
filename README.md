@@ -1,4 +1,4 @@
-# Stacks
+# Cairn
 
 A native iOS and iPadOS app for saving blog posts and keeping them — the full
 article text and images, extracted from the page, stored on device, and synced
@@ -14,7 +14,7 @@ The Xcode project is generated from `project.yml`, so it isn't checked in:
 ```sh
 brew install xcodegen     # once
 xcodegen generate
-open Stacks.xcodeproj
+open Cairn.xcodeproj
 ```
 
 Then build and run. Signing is already configured for team `ZM4J56DC3Q`.
@@ -22,7 +22,7 @@ Then build and run. Signing is already configured for team `ZM4J56DC3Q`.
 ## What it does
 
 **Saving.** Share a link from Safari (or anywhere), paste one with the **+**
-button, or let the app offer a URL it finds on your clipboard. Stacks fetches
+button, or let the app offer a URL it finds on your clipboard. Cairn fetches
 the page, pulls out the article, downloads the images, and stores the lot.
 
 **Finding.** Full-text search across every archived article — titles, authors,
@@ -48,20 +48,20 @@ storage. Nothing goes anywhere else.
 ## How it's put together
 
 ```
-Stacks/
+Cairn/
   App/          Entry point and the CloudKit-backed ModelContainer
   Models/       Post, StoredImage, Highlight, InkStroke  (SwiftData, CloudKit)
   Content/      HTML parser, article extractor, block model
   Services/     Fetching, image archiving, the share inbox, URL canonicalisation
   Design/       Palette, reader themes, typography, preferences
   Views/        Library, reader, sheets
-StacksShareExtension/   The share sheet target
-StacksUITests/          Launch-to-read smoke tests
+CairnShareExtension/   The share sheet target
+CairnUITests/          Launch-to-read smoke tests
 ```
 
 ### Extraction
 
-`Stacks/Content` is the interesting part. A page arrives as HTML and leaves as a
+`Cairn/Content` is the interesting part. A page arrives as HTML and leaves as a
 flat list of typed blocks — headings, paragraphs, quotes, code, lists, images —
 which the reader renders in whatever typography you've chosen.
 
@@ -121,11 +121,11 @@ failing to launch.
 ## Tests
 
 ```sh
-xcodebuild test -project Stacks.xcodeproj -scheme Stacks \
+xcodebuild test -project Cairn.xcodeproj -scheme Cairn \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 ```
 
-`StacksUITests` drives the real flows — open the library, read a post, change
+`CairnUITests` drives the real flows — open the library, read a post, change
 the typography, highlight a passage — and attaches screenshots to the result
 bundle so a visual change can be reviewed, not just its exit code.
 
@@ -133,9 +133,9 @@ bundle so a visual change can be reviewed, not just its exit code.
 
 | | |
 |---|---|
-| Bundle ID | `com.calvinbrown.Stacks` |
-| Share extension | `com.calvinbrown.Stacks.ShareExtension` |
-| App group | `group.com.calvinbrown.Stacks` |
-| CloudKit container | `iCloud.com.calvinbrown.Stacks` |
+| Bundle ID | `com.calvinbrown.Cairn` |
+| Share extension | `com.calvinbrown.Cairn.ShareExtension` |
+| App group | `group.com.calvinbrown.Cairn` |
+| CloudKit container | `iCloud.com.calvinbrown.Cairn` |
 | Team | `ZM4J56DC3Q` |
 | Minimum OS | iOS / iPadOS 18 |
