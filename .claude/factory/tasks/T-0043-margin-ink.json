@@ -2,7 +2,7 @@
   "id": "T-0043",
   "title": "Draw anywhere in the reader, including the margins",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": "Reading experience",
   "depends_on": [
@@ -32,6 +32,11 @@
       "ts": "2026-08-25T20:30:48Z",
       "event": "dispatched",
       "detail": "attempt 1; document-level ink layer, user's twice-asked request"
+    },
+    {
+      "ts": "2026-08-25T20:39:47Z",
+      "event": "merged",
+      "detail": "b775068"
     }
   ],
   "agent": {

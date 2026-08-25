@@ -95,7 +95,7 @@ of real captured pages.
 ### Capture — the other stated pain
 
 - [ ] **Failed saves are visible and retryable.** A paywalled save currently looks like a good one. For an app whose primary verb is *save*, silent failure is the worst possible bug.
-- [ ] **Capture from anywhere.** Shortcuts, a widget, the Action Button — all through the one existing inbox. One pipeline, never two.
+- [ ] **Capture from anywhere.** Shortcuts and the Action Button first, through the one existing inbox; a widget only if a second extension target earns its keep. One pipeline, never two.
 - [ ] **Import PDFs.** Papers and documents cannot get in at all. The largest hole, and now the largest build.
 - [ ] **Titles and galleries.** Site suffixes left on titles, gallery images dropped, pages with no `<title>` falling back to the host.
 
