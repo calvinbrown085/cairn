@@ -5,7 +5,12 @@ import SwiftUI
 extension Palette {
     static func highlight(_ tint: HighlightTint) -> Color {
         switch tint {
-        case .butter: dynamic(light: 0xFCEBA8, dark: 0x5C4A16)
+        // Dark value darkened from 0x5C4A16 (same hue and saturation): a
+        // link's accent colour set as foreground text over this tint only
+        // reached 3.26:1 against the old value — short of WCAG AA's 4.5:1.
+        // See `ReaderContrastAudit` and `Palette.accent`'s dark value, which
+        // was nudged lighter to close most of the same gap for every tint.
+        case .butter: dynamic(light: 0xFCEBA8, dark: 0x4C3D12)
         case .rose:   dynamic(light: 0xF8D8D4, dark: 0x5E2E2A)
         case .sky:    dynamic(light: 0xD6E6F5, dark: 0x25415C)
         case .sage:   dynamic(light: 0xD9E8D2, dark: 0x2C4526)

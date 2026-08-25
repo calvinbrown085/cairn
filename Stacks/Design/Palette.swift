@@ -18,14 +18,24 @@ enum Palette {
     static let recessed = dynamic(light: 0xF3EDE2, dark: 0x100E0C)
 
     static let ink = dynamic(light: 0x1F1B16, dark: 0xF3EBE1)
-    static let inkSecondary = dynamic(light: 0x6B6055, dark: 0xA89A8B)
+    // Light value darkened from 0x6B6055 (same hue and saturation, just
+    // deeper). This is also `ReaderTheme.paper`'s secondary ink, and at the
+    // 80%-opacity callers draw it for metadata captions the old value fell to
+    // 3.72:1 against `paper` — short of WCAG AA's 4.5:1 for normal text. See
+    // `ReaderContrastAudit`. The dark value already cleared AA at that weight.
+    static let inkSecondary = dynamic(light: 0x564D45, dark: 0xA89A8B)
     static let inkTertiary = dynamic(light: 0x998C7C, dark: 0x7A6E61)
 
     static let rule = dynamic(light: 0xE6DCCC, dark: 0x2E2822)
     static let ruleStrong = dynamic(light: 0xD4C6B0, dark: 0x3D352C)
 
     /// Terracotta — used sparingly, for the one thing that matters on screen.
-    static let accent = dynamic(light: 0xA0472B, dark: 0xE08A63)
+    // Dark value lightened from 0xE08A63 (same hue and saturation): a link
+    // rendered inside a highlighted passage sets this as the foreground over
+    // the highlight's background colour, and against the darkest highlight
+    // tint (butter) that combination only reached 3.26:1 — short of WCAG
+    // AA's 4.5:1. See `ReaderContrastAudit` and `Palette+Highlights.swift`.
+    static let accent = dynamic(light: 0xA0472B, dark: 0xE49876)
     static let accentSoft = dynamic(light: 0xF0E2DA, dark: 0x3A2620)
 
     static let star = dynamic(light: 0xB8862B, dark: 0xE0B054)

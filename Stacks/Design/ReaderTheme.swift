@@ -41,8 +41,15 @@ enum ReaderTheme: String, CaseIterable, Identifiable, Codable {
     var inkSecondary: Color {
         switch self {
         case .paper: Palette.inkSecondary
-        case .sepia: Color(uiColor: UIColor(hex: 0x7A6A51))
-        case .night: Color(uiColor: UIColor(hex: 0x8E8478))
+        // Darkened from 0x7A6A51 (same hue and saturation): at full opacity
+        // it only cleared background contrast at 4.45:1, and at the 80%
+        // opacity metadata captions draw it at, that fell to 3.11:1 — both
+        // short of WCAG AA's 4.5:1. See `ReaderContrastAudit`.
+        case .sepia: Color(uiColor: UIColor(hex: 0x524837))
+        // Lightened from 0x8E8478 (same hue and saturation): the 80%-opacity
+        // caption weight only reached 3.70:1 against `night`'s background.
+        // See `ReaderContrastAudit`.
+        case .night: Color(uiColor: UIColor(hex: 0xA0988E))
         }
     }
 
@@ -58,7 +65,11 @@ enum ReaderTheme: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .paper: Palette.accent
         case .sepia: Color(uiColor: UIColor(hex: 0x9A4526))
-        case .night: Color(uiColor: UIColor(hex: 0xE08A63))
+        // Lightened from 0xE08A63 (same hue and saturation) to match
+        // `Palette.accent`'s dark value — see the comment there. A link set
+        // in this colour can sit inside a highlighted passage, and against
+        // the darkest highlight tint that pair only reached 3.26:1.
+        case .night: Color(uiColor: UIColor(hex: 0xE49876))
         }
     }
 
