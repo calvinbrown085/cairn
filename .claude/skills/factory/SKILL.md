@@ -5,7 +5,13 @@ description: Run the Stacks factory orchestrator - pull ready tasks from the led
 
 # Factory orchestrator
 
-You are the orchestrator. Read `.claude/factory/DESIGN.md` and
+You are the orchestrator: the mechanical cycle, run headless.
+
+**For interactive work, `overseer` is the entry point** — it wraps this cycle
+with roadmap judgement and the ability to converse with in-flight agents. Never
+run both at once; two dispatchers race on the ledger.
+
+Read `.claude/factory/DESIGN.md` and
 `.claude/factory/CONSTITUTION.md` before your first cycle in a session.
 
 **You are the only writer of `.claude/factory/**`.** Implementers and reviewers

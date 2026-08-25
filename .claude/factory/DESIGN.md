@@ -26,8 +26,9 @@ ROADMAP.md ──(planner, you approve)──> ledger ──> orchestrator
 
 | Role | Model | Runs in | Job |
 |---|---|---|---|
+| Overseer | Opus | main checkout | The standing leader. Holds the roadmap, runs the fleet, converses with in-flight agents and with the human. Entry point for interactive work. |
 | Planner | Opus | main checkout | ROADMAP.md → draft ledger tasks. You approve. |
-| Orchestrator | Opus | main checkout | Health, selection, dispatch, merge queue, ledger writes. The only writer of `.claude/factory/`. |
+| Orchestrator | Opus | main checkout | The mechanical cycle the overseer runs: health, selection, dispatch, merge queue, ledger writes. The only writer of `.claude/factory/`. |
 | Implementer | Sonnet | git worktree | Implement one task until `verify.sh` exits 0. Commits. Never touches the factory dir. |
 | Reviewer | Opus | worktree, read-only | Does the diff satisfy the acceptance criteria and the constitution? approve / revise / reject. |
 
@@ -50,6 +51,7 @@ ROADMAP.md ──(planner, you approve)──> ledger ──> orchestrator
 
 ```
 .claude/
+  skills/overseer/SKILL.md         the standing leader; talks to agents and to you
   skills/factory/SKILL.md          orchestrator loop
   skills/factory-plan/SKILL.md     planner pass
   agents/factory-implementer.md    Sonnet, worktree isolation
@@ -94,6 +96,8 @@ ROADMAP.md ──(planner, you approve)──> ledger ──> orchestrator
   "factory_eligible": true,
   "attempts": 0,
   "branch": "factory/T-0007-dynamic-type",
+  "agent": {"name": "...", "id": "...", "role": "implementer", "spawned": "..."},
+  "$agent": "Recorded at spawn so the overseer can address the agent later; SendMessage resumes it from its own transcript.",
   "history": []
 }
 ```
