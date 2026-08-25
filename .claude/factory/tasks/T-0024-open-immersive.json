@@ -41,6 +41,11 @@
       "ts": "2026-08-25T19:40:19Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T19:51:02Z",
+      "event": "resumed",
+      "detail": "agent was waiting on a killed self-referential pgrep loop; work intact, 81 insertions uncommitted"
     }
   ],
   "agent": {
