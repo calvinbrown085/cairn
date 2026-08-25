@@ -225,7 +225,7 @@ outstanding work, not speculation.
       `UIFontMetrics` / `Font.custom(size:relativeTo:)`. Someone on Accessibility
       XL must open the reader at a size that already works, before touching any
       control. Covers all 29 fixed-size call sites.
-- [ ] `accessibilityLabel` on every icon-only control.
+- [x] `accessibilityLabel` on every icon-only control. *(T-0011, `0feb6c2`.)*
 - [ ] VoiceOver pass over the reader — the per-block text views need sensible
       rotor navigation and reading order. Depends on the Q1 architecture call.
 - [x] Contrast audit of the warm palette in all three reader themes.
@@ -246,7 +246,8 @@ outstanding work, not speculation.
 
 **Open source**
 - [ ] Extract `SwiftReadability` as an SPM package, with the Q1 fixtures as its
-      test suite.
+      test suite. *(Package extracted early, `34f9bfd` — it was a prerequisite
+      for a simulator-free test gate. The fixture suite half is in progress.)*
 - [ ] `Tools/configure.sh` — rewrite team ID, bundle prefix, app group, and
       CloudKit container in one command, so contributors aren't blocked.
 - [ ] Promote the existing local-store fallback to a documented first-class mode
