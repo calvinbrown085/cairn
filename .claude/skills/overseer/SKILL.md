@@ -1,6 +1,6 @@
 ---
 name: overseer
-description: The standing leader of the Stacks factory - holds the roadmap, runs the fleet, and talks to in-flight implementer and reviewer agents to steer them. Use for "/overseer", "what should we work on", "how is the factory doing", "ask the agent working on X", "triage what's blocked", or any roadmap-level conversation about what ships next.
+description: The standing leader of the Stacks factory - holds the roadmap, runs the fleet, talks to in-flight implementer agents to steer them, and decides when work lands on main. Use for "/overseer", "what should we work on", "how is the factory doing", "ask the agent working on X", "triage what's blocked", or any roadmap-level conversation about what ships next.
 ---
 
 # Overseer
@@ -35,6 +35,7 @@ cycle alongside yourself, or two dispatchers will race on the ledger.
 | `/overseer tell <id> <instruction>` | Redirect an in-flight agent. |
 | `/overseer triage` | Walk `state/blocked/`, one task at a time, with a recommendation each. |
 | `/overseer plan` | Hand off to `factory-plan`, then bring its drafts back for approval. |
+| `/overseer land <id>` | Review, then instruct that task's agent to land it on main. |
 | `/overseer stop <id>` | Stop that task's agent, park the task, keep the worktree. |
 | `/overseer roadmap` | Roadmap-level review: drift, deadlocks, starvation, kill criteria. |
 
@@ -102,9 +103,54 @@ Per cycle, in order:
 2. **Reap** — resolve finished agents, advance their tasks, reconcile against `ListAgents`.
 3. **Select** — `bin/ledger.sh dispatchable` already enforces eligibility, type, dependencies, and `touches` disjointness. Take up to `max_parallel`. Prefer work that unblocks other work.
 4. **Dispatch** — `bin/worktree.sh create`, set status, spawn `factory-implementer`, record its identity.
-5. **Review** — on completion, spawn `factory-reviewer` against the worktree. `approve` / `revise` / `reject`.
-6. **Iterate or park** — `revise` returns to the implementer with the notes verbatim; at `max_attempts`, one rescue attempt at the stronger model, then park with a written reason.
-7. **Merge** — `bin/merge.sh <id>` holds the lock, rebases, **re-verifies**, then squash-merges or opens a PR depending on `auto_merge`. Tick the ROADMAP box only on a real merge.
+5. **Review** — see below. Two parts, and both are yours.
+6. **Iterate or park** — send findings back to the implementer verbatim; at `max_attempts`, one rescue attempt at the stronger model, then park with a written reason.
+7. **Land** — when you are satisfied, *tell the agent to land it*. You do not run the merge yourself.
+
+## Reviewing
+
+Two different questions, and conflating them is how bad work lands.
+
+**Is the code sound?** Run `/code-review low` against the task's branch. It
+finds correctness bugs and reuse/simplification issues at high confidence. Read
+its findings; they are advisory, not binding — you decide which block landing.
+
+**Is it the work that was asked for?** `/code-review` cannot answer this and
+never will. It has no idea what the task said. So you do it, against the diff:
+
+```bash
+git -C <worktree> diff main...HEAD
+```
+
+Walk the task's `acceptance` criteria one at a time and cite the hunk that
+satisfies each. **A criterion you cannot verify from the diff is not
+satisfied** — send it back and say what evidence is missing. Never accept on the
+assumption that it probably works. Then check the constitution: the PRODUCT
+rules and the PROCESS rules that `invariants.sh` cannot see — scope creep beyond
+`touches`, criteria quietly reinterpreted, a data migration with no reversible
+path. A PRODUCT violation is not a revision request; it is a rejection.
+
+The gate already proved it compiles, tests pass, and the mechanical rules hold.
+You are judging the two things a script cannot: whether it is correct, and
+whether it is what was wanted.
+
+## Landing
+
+Landing is an instruction you give, not an action you take. When the gate is
+green, `/code-review low` is clean or its findings are ones you accept, and the
+criteria are met:
+
+- If `land_requires_human` is true, **ask the human first**. Show them what
+  landed on the criteria, the review findings, and the diffstat. Do not proceed
+  until they answer.
+- Then message the agent: `land it — run .claude/factory/bin/merge.sh <id>`.
+
+`merge.sh` holds the merge lock, rebases onto main, **re-runs the full gate**,
+and squash-merges. If it comes back with a post-rebase gate failure or a rebase
+conflict, that is not something to route around: the task returns to the
+implementer, or to you.
+
+Only after a real merge do you tick the box in `ROADMAP.md`.
 
 ## Managing the roadmap
 

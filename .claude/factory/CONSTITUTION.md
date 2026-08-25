@@ -79,10 +79,12 @@ orchestrator is the only writer of factory state.
 **X4. `ROADMAP.md` is the human's document.**
 Only the orchestrator ticks a box, and only on merge. Never edit its prose.
 
-**X5. Never touch `main` directly.**
-Work happens on `factory/<task-id>-<slug>` in a worktree. No commits to `main`,
-no `git push --force` anywhere, no rewriting published history, no
-`git checkout main` inside a worktree.
+**X5. `main` is reached only through `merge.sh`, only when told.**
+Work happens on `factory/<task-id>-<slug>` in a worktree. No direct commits to
+`main`, no `git push --force` anywhere, no rewriting published history, no
+`git checkout main` inside a worktree. An implementer lands only on an explicit
+instruction from the overseer, and only by running `bin/merge.sh`, which rebases
+and re-runs the gate first. Finishing the work is not permission to ship it.
 
 **X6. Never commit build output or user state.**
 `build/`, `build-device/`, `DerivedData/`, `.dd/`, `xcuserdata/`, `*.xcresult`,
@@ -109,13 +111,18 @@ commit messages — this repo becomes public in Q2.
 
 ---
 
-## Reviewer verdicts
+## Review outcomes
 
-| Verdict | Meaning | Consequence |
+Review is two things: `/code-review low` for code soundness, and the overseer
+for intent — the acceptance criteria and these rules. `/code-review` does not
+know what the task asked for, so it can never answer the second question.
+
+| Outcome | Meaning | Consequence |
 |---|---|---|
-| `approve` | Every acceptance criterion is met and no rule is broken. | Merge queue. |
+| `land` | Every acceptance criterion is met, no rule is broken, review findings are clean or accepted. | Overseer instructs the agent to run `merge.sh`. |
 | `revise` | Right direction, specific fixable defects. Notes are mandatory and must be concrete. | Back to the implementer, `attempts++`. |
-| `reject` | Wrong work, or any PRODUCT/PROCESS violation. | Discard the branch, park the task, escalate. |
+| `reject` | Wrong work, or any PRODUCT/PROCESS violation. | Park the task, preserve the worktree, escalate. |
 
-A reviewer that cannot verify a criterion from the diff must say so explicitly
-and return `revise` — never `approve` on the assumption that it probably works.
+A criterion that cannot be verified from the diff is **not satisfied**. Say what
+evidence is missing and return `revise` — never accept on the assumption that it
+probably works.

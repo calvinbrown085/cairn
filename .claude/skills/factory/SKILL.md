@@ -76,9 +76,11 @@ tasks are dispatched in the same message so they run in parallel.
 
 ### 4. Review
 
-When an implementer reports done, spawn `factory-reviewer` against that
-worktree. Set status `in_review`. The reviewer returns `approve`, `revise`, or
-`reject`. Record the verdict in the task history.
+When an implementer reports done, set status `in_review` and review it yourself,
+in two parts: run `/code-review low` against the branch for code soundness, then
+check the task's `acceptance` criteria and the constitution against
+`git -C <worktree> diff main...HEAD`. `/code-review` does not know what the task
+asked for; that half is yours. Record the outcome in the task history.
 
 ### 5. Iterate, or park
 
@@ -91,14 +93,16 @@ worktree. Set status `in_review`. The reviewer returns `approve`, `revise`, or
 
 ### 6. Merge
 
-```bash
-.claude/factory/bin/merge.sh <id>
+Instruct the implementer to land it:
+
+```
+land it — run .claude/factory/bin/merge.sh <id>
 ```
 
-It holds the merge lock, rebases onto `main`, **re-runs verify.sh**, and then
-squash-merges — or opens a PR when `auto_merge` is false. A failed post-rebase
-verify is not a merge failure to route around; it returns the task to the
-implementer.
+`merge.sh` holds the merge lock, rebases onto `main`, **re-runs verify.sh**, and
+squash-merges. A failed post-rebase verify is not a merge failure to route
+around; it returns the task to the implementer. When `land_requires_human` is
+true, get the human's sign-off before giving that instruction.
 
 On success: tick the task's box in `ROADMAP.md` (you are the only agent allowed
 to), set status `merged`, destroy the worktree, log it.
@@ -121,4 +125,4 @@ cycle 3 — main green
 - **Never relax a threshold, skip a test, or edit the gate to make something pass.** That is escalation, always.
 - **Never widen a task's `touches`** to accommodate an implementer that wandered. Park it instead.
 - **Escalate to the human, and stop, when:** `main` is red, a constitution rule is contested, a task needs a `decide` that has not happened, or a merge conflicts in a way rebase cannot resolve.
-- Config is read fresh each cycle from `config.json`; the human may flip `auto_merge` or `max_parallel` between cycles.
+- Config is read fresh each cycle from `config.json`; the human may flip `land_requires_human` or `max_parallel` between cycles.

@@ -30,14 +30,14 @@ ROADMAP.md ──(planner, you approve)──> ledger ──> orchestrator
 | Planner | Opus | main checkout | ROADMAP.md → draft ledger tasks. You approve. |
 | Orchestrator | Opus | main checkout | The mechanical cycle the overseer runs: health, selection, dispatch, merge queue, ledger writes. The only writer of `.claude/factory/`. |
 | Implementer | Sonnet | git worktree | Implement one task until `verify.sh` exits 0. Commits. Never touches the factory dir. |
-| Reviewer | Opus | worktree, read-only | Does the diff satisfy the acceptance criteria and the constitution? approve / revise / reject. |
+| Review | — | overseer + `/code-review low` | Two questions: is the code sound (`/code-review low`), and is it the work that was asked for (the overseer, against the acceptance criteria and the constitution). |
 
 ## Settled decisions
 
 | Question | Decision |
 |---|---|
 | Queue | In-repo JSON ledger, one file per task, dependency edges. ROADMAP.md stays the human narrative. |
-| Merge authority | Auto-merge on green — **but the flag ships OFF** and is flipped only after the gate has been seen catching a real regression. |
+| Landing authority | The overseer decides; the implementing agent executes `merge.sh` on instruction. No PRs, no `gh`. `land_requires_human` gates whether the overseer needs your sign-off first — it ships **true**. |
 | Parallelism | 2 implementers to start, 3 ceiling. Merges serialized. Simulator serialized. |
 | Verify bar | `xcodegen → build → test → invariants`, one script, one exit code. |
 | Run mode | Supervised `/loop` session. Promote to overnight cron only after calibration. |
@@ -55,11 +55,10 @@ ROADMAP.md ──(planner, you approve)──> ledger ──> orchestrator
   skills/factory/SKILL.md          orchestrator loop
   skills/factory-plan/SKILL.md     planner pass
   agents/factory-implementer.md    Sonnet, worktree isolation
-  agents/factory-reviewer.md       Opus, read-only
   factory/
     DESIGN.md                      this file
     CONSTITUTION.md                hard rules, derived from ROADMAP decisions
-    config.json                    auto_merge, max_parallel, attempts, models, sim
+    config.json                    land_requires_human, max_parallel, attempts, models
     tasks/T-0001-*.json            the ledger
     state/                         gitignored
       locks/{merge,sim}.lock       mkdir-atomic, pid + stale timeout
@@ -113,7 +112,7 @@ resolve them.
 1. **Reap.** Collect finished agents, advance their tasks.
 2. **Select.** `status: ready` (all `depends_on` merged) ∧ `factory_eligible` ∧ `touches` disjoint from every in-flight task. Cap at `max_parallel`. File-overlap exclusion is what keeps `ReaderView.swift` from being edited by two agents at once.
 3. **Dispatch.** Branch + worktree + per-worktree DerivedData. Implementer gets the task JSON, the constitution, and one instruction that matters: *`verify.sh` must exit 0.*
-4. **Review.** Opus reads `git diff main...HEAD` against the acceptance criteria and the constitution. `approve` | `revise` (notes) | `reject` (wrong work).
+4. **Review.** `/code-review low` on the branch for code soundness; the overseer reads `git diff main...HEAD` against the acceptance criteria and the constitution. `land` | `revise` (notes) | `reject` (wrong work).
 5. **Iterate.** `revise` → attempt++ → back to the implementer with notes. At attempt 3, one Opus rescue attempt, then park.
 6. **Park.** Worktree preserved, log + diff + reason written to `state/blocked/`, task marked `blocked`, orchestrator moves on. The factory never stalls on one bad task.
 7. **Merge.** Acquire `merge.lock` → rebase onto `main` → **re-run `verify.sh`** (the rebase is new code; the pre-rebase green does not count) → squash-merge → push → tick the ROADMAP box → update ledger → destroy worktree and its DerivedData → release.
@@ -156,7 +155,7 @@ nobody watching, the ability to undo exactly one feature is the safety net.
 - **Phase 0 — scaffolding.** Directories, config, constitution, ledger seeded from ROADMAP, the four skill/agent definitions, `worktree.sh`. No app behaviour changes.
 - **Phase 1 — the gate.** `StacksTests` unit target in `project.yml`, first extractor fixtures, `verify.sh`, `invariants.sh`, `main-health.sh`, `merge.sh`. Auto-merge OFF; these land as PRs you read.
 - **Phase 2 — calibration.** Two or three genuinely low-risk real tasks, supervised, one at a time: `PrivacyInfo.xcprivacy`, accessibility labels on icon-only controls, more fixtures. Watch the gate catch something real.
-- **Phase 3 — production.** Flip `auto_merge`, raise `max_parallel` to 3, consider the nightly cron with a per-night task cap.
+- **Phase 3 — production.** Flip `land_requires_human` to false, raise `max_parallel` to 3, consider the nightly cron with a per-night task cap.
 
 ## Open
 

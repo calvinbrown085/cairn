@@ -1,7 +1,5 @@
 {
   "$comment": "Runtime knobs for the Stacks factory. See DESIGN.md.",
-  "auto_merge": false,
-  "$auto_merge": "OFF until verify.sh has been seen catching a real regression on main. While off, an approved task opens a PR and waits for you. Phase 3 flips this.",
   "max_parallel": 2,
   "$max_parallel": "Implementers in flight. Ceiling is 3 on this machine; Xcode, not the harness, is the constraint.",
   "max_attempts": 3,
@@ -57,5 +55,8 @@
     "dailyDigest",
     "readingStreak"
   ],
-  "$banned_identifiers": "The guilt-engine ban from ROADMAP.md. A library does not nag."
+  "$banned_identifiers": "The guilt-engine ban from ROADMAP.md. A library does not nag.",
+  "land_requires_human": true,
+  "$land_requires_human": "true: the overseer must get your sign-off before instructing an agent to land. false: it lands on its own judgement once the gate is green and /code-review low is clean. Start true; flip it when the loop has earned it.",
+  "$review": "Code review is /code-review low, run by the overseer against the task branch. The overseer separately checks acceptance criteria and the constitution — /code-review does not do that."
 }

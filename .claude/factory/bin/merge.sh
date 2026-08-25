@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Serialized merge queue for one task.
+# Lands one task on main. Serialized.
 #
 #   merge.sh <task-id>
 #
-# Holds the merge lock, rebases onto main, RE-RUNS the gate (the rebase produces
-# code no gate has seen), then squash-merges — or opens a PR when auto_merge is
-# false. A failed post-rebase gate is not routed around: the task goes back to
-# its implementer.
+# Run ONLY when the overseer instructs it. This script is the mechanism, not the
+# authority: it does not decide whether the work is ready, it makes landing safe
+# once someone has decided. Holds the merge lock, rebases onto main, RE-RUNS the
+# gate (a rebase produces code no gate has seen), then squash-merges.
+#
+# A failed post-rebase gate is not routed around: the task goes back to its
+# implementer.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -39,18 +42,6 @@ if ! (cd "$WT" && "$FACTORY_BIN/verify.sh" --task "$ID" --attempt rebase); then
   say "GATE FAILED after rebase — not merging"
   "$LEDGER" log "$ID" merge-failed "post-rebase gate failure"
   exit 4
-fi
-
-if [ "$(cfg '.auto_merge')" != "true" ]; then
-  say "auto_merge is off — pushing branch and opening a PR"
-  git -C "$WT" push -u origin "$BRANCH" >/dev/null 2>&1 || { say "push failed"; exit 5; }
-  body="$(printf 'Task: %s\n\n%s\n\n---\nGate: verify.sh passed after rebase onto main.\nReview: see .claude/factory/state/runs/%s/\n' "$ID" "$TITLE" "$ID")"
-  gh pr create --title "$TYPE: $TITLE" --body "$body" --head "$BRANCH" --base main \
-    || { say "gh pr create failed"; exit 5; }
-  "$LEDGER" set "$ID" status '"in_review"' >/dev/null
-  "$LEDGER" log "$ID" pr-opened "auto_merge off; awaiting human merge"
-  say "PR opened. Task left in_review."
-  exit 0
 fi
 
 say "squash-merging into main"

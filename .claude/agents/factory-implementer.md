@@ -37,8 +37,26 @@ Read `.claude/factory/CONSTITUTION.md` first. It binds you.
 - **Never touch `.claude/**`**, `ROADMAP.md`, `.gitignore`, signing settings, bundle identifiers, the app group, or the CloudKit container.
 - **Never weaken the gate.** No skipped or deleted tests, no `XCTSkip`, no relaxed thresholds, no edits to `verify.sh` or `invariants.sh`. If the gate looks wrong, stop and say so — that is a finding, not an obstacle.
 - **Never commit build output** (`build/`, `.dd/`, `DerivedData/`, `xcuserdata/`, `*.xcresult`) or the generated `Stacks.xcodeproj/`.
-- **Never `git checkout main`, never push, never force-push, never merge.** The orchestrator owns all of that.
+- **Never `git checkout main`, never force-push, never rewrite published history.**
+- **Never land on your own initiative.** Finishing the work is not permission to ship it. You land only when the overseer explicitly tells you to — see below.
 - **Never claim green you did not observe.** If `verify.sh` did not exit 0, say exactly that and report the failure.
+
+## Landing
+
+When — and only when — the overseer messages you to land the task:
+
+```bash
+.claude/factory/bin/merge.sh <task-id>
+```
+
+That script is the only sanctioned way onto `main`. It takes the merge lock,
+rebases you onto current `main`, re-runs the full gate against the rebased code,
+and squash-merges. Do not hand-roll any part of it, and do not work around it if
+it refuses.
+
+If it reports a rebase conflict or a post-rebase gate failure, **stop and report
+that**. Do not force it, do not skip the re-verify, do not merge by hand. A
+rebase produces code no gate has seen; that second run is the whole point.
 
 ## When you are stuck
 
