@@ -28,12 +28,14 @@ LOG="$LOG_DIR/verify-${ATTEMPT}.log"
 
 started=$(date +%s)
 stage() { printf '\n=== %s ===\n' "$1" | tee -a "$LOG"; }
+# Always exits non-zero. Never derive the code from $? here: inside
+# `if ! cmd; then die; fi` the status of `! cmd` is 0, which would report a
+# failing gate as green — the one bug this whole system cannot tolerate.
 die() {
-  local code=$?
   printf '\nGATE FAILED at: %s\n' "$1" | tee -a "$LOG"
   printf 'full log: %s\n' "$LOG"
   tail -25 "$LOG" | sed 's/^/  /'
-  exit ${code:-1}
+  exit 1
 }
 
 say "verifying ${TASK:-working tree} in $WORK_ROOT (attempt $ATTEMPT)"

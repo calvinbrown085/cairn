@@ -29,6 +29,11 @@
       "ts": "2026-08-25T15:41:29Z",
       "event": "completed",
       "detail": "gate passes in 21s with no simulator (generic/platform=iOS Simulator needs no booted device)"
+    },
+    {
+      "ts": "2026-08-25T15:43:23Z",
+      "event": "bug-fixed",
+      "detail": "die() derived its exit code from $? inside 'if ! cmd', which is 0 — the gate reported green on red. Now always exits 1. Both failure paths regression-tested."
     }
   ]
 }
