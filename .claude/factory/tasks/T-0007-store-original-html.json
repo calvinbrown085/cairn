@@ -2,7 +2,7 @@
   "id": "T-0007",
   "title": "Store the original HTML alongside extracted blocks",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Durability > Store the original HTML",
   "depends_on": [
@@ -21,7 +21,7 @@
   "risk": "high",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0007-store-original-html",
   "notes": "Reverses an earlier call; without it nothing can ever be re-extracted. Data-model change — highest-risk item in Q1.",
   "history": [
     {
@@ -38,6 +38,17 @@
       "ts": "2026-08-25T18:24:45Z",
       "event": "touches-narrowed",
       "detail": "dropped StacksShareExtension/** — the extension only queues URLs into the inbox; ArchiveService does the fetch and store, and the overlap would have blocked on T-0012's lease"
+    },
+    {
+      "ts": "2026-08-25T18:25:44Z",
+      "event": "dispatched",
+      "detail": "attempt 1; prioritised ahead of remaining Q2 features because saves are being truncated now"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a091c347d4ffd16c2",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T18:25:44Z"
+  }
 }
