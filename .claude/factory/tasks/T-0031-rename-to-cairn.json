@@ -1,0 +1,21 @@
+{
+  "id": "T-0031",
+  "title": "Rename the app to Cairn",
+  "type": "chore", "status": "todo", "quarter": "Q1",
+  "roadmap_anchor": null,
+  "depends_on": ["D-0003"],
+  "acceptance": [
+    "PRODUCT_NAME, display name, scheme and project are Cairn",
+    "Bundle identifiers become com.calvinbrown.Cairn, com.calvinbrown.Cairn.ShareExtension and com.calvinbrown.Cairn.UITests",
+    "The app group stays group.com.calvinbrown.Stacks and the CloudKit container stays iCloud.com.calvinbrown.Stacks, each with a comment saying the name is legacy and why it was kept",
+    "Directories Stacks/, StacksShareExtension/ and StacksUITests/ become Cairn/, CairnShareExtension/ and CairnUITests/, moved with git mv so history follows",
+    "Swift symbols named for the app are renamed: StacksApp, and any Stacks-prefixed type or test class",
+    "README and ROADMAP call the app Cairn",
+    "Tools/seed-simulator.sh targets the new bundle id",
+    "The gate passes and the app builds; an existing install still opens its library because the app group is unchanged"
+  ],
+  "touches": ["**"],
+  "risk": "high", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "EXCLUSIVE TASK — must run alone. It renames directories every other task edits, so any concurrent worktree would face unresolvable rebase conflicts. Do not dispatch until the fleet is empty. EXPLICIT CONSTITUTION EXCEPTION, granted by the overseer: X7 forbids agents from changing signing or identity, and this task is permitted to change the three bundle identifiers ONLY. It remains forbidden from touching DEVELOPMENT_TEAM, the app group identifier, and the CloudKit container identifier — those three are what keep the existing library readable, and changing them is the failure mode this task exists to avoid. The repo directory itself (~/Documents/stacks) is NOT renamed: the factory scripts, worktree paths and settings allowlist all use absolute paths through it. Renaming the checkout is a separate, later, human operation.",
+  "history": []
+}

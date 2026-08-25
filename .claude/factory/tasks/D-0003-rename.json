@@ -1,7 +1,9 @@
 {
   "id": "D-0003",
   "title": "Choose a new name: Stacks is unavailable on the App Store",
-  "type": "decide", "status": "todo", "quarter": "Q1",
+  "type": "decide",
+  "status": "merged",
+  "quarter": "Q1",
   "roadmap_anchor": null,
   "depends_on": [],
   "acceptance": [
@@ -10,7 +12,16 @@
     "Bundle identifiers, app group, CloudKit container, product name, scheme, directory names and the repo are all updated together"
   ],
   "touches": [],
-  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
-  "notes": "TIMING IS THE WHOLE POINT. Renaming changes the CloudKit container from iCloud.com.calvinbrown.Stacks, and container identity is what synced data hangs off — an existing container's records do not follow a rename. Today that costs nothing: the only data is the owner's, and T-0004 has not even confirmed sync works yet. After TestFlight it means abandoning every beta tester's library or writing a migration. Do it now or accept the name forever. Blast radius: project.yml, both .entitlements, Stacks/Services/AppGroup.swift, Tools/seed-simulator.sh, three bundle ids (app, ShareExtension, UITests), the app group, the CloudKit container, and the directories Stacks/, StacksShareExtension/, StacksUITests/, plus the repo name and README. Note SwiftReadability is already name-neutral and needs nothing. CONSTITUTION NOTE: X7 forbids agents changing signing or identity, so the implementation task must carry an explicit written exception from the overseer, the way T-0026 was granted permission to touch verify.sh.",
-  "history": []
+  "risk": "high",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "DECIDED 2026-08-25: the app is CAIRN. Checked against the iTunes search API — no published app holds the exact name; the owner must still confirm the reservation in App Store Connect, which is stricter. Chosen because a cairn is literally a stack of stones, keeping continuity with the original name, and its purpose is to mark a path so you can find your way back — which is the product thesis. SCOPE DECIDED TOO: rename everything user-visible plus the three bundle identifiers, but KEEP group.com.calvinbrown.Stacks and iCloud.com.calvinbrown.Stacks. Reason: the SwiftData store lives in the app group container (StacksApp.swift:60 -> AppGroup.storeURL), so a bundle-id change alone preserves every post, tag, highlight and note, while changing the group id orphans the entire library. Highlights and notes are the one thing that cannot be re-fetched. Container identifiers are invisible plumbing and Tools/configure.sh rewrites them for contributors.",
+  "history": [
+    {
+      "ts": "2026-08-25T18:38:34Z",
+      "event": "decided",
+      "detail": "Cairn; user-visible rename only, container identifiers preserved to protect the library"
+    }
+  ]
 }
