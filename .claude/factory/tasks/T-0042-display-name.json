@@ -1,0 +1,44 @@
+{
+  "id": "T-0042",
+  "title": "The user-visible name is Cairnfield",
+  "type": "chore",
+  "status": "in_progress",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "CFBundleDisplayName is Cairnfield in the app and the share extension, so the home screen and App Store show Cairnfield",
+    "PRODUCT_NAME, the three bundle identifiers, the app group, the CloudKit container, directory names and Swift symbols all remain Cairn and are untouched",
+    "User-visible copy says Cairnfield — the sidebar title, library empty states, and the share extension's confirmation",
+    "README and ROADMAP call the app Cairnfield while noting the code and bundle stay Cairn",
+    "invariants.sh X7 passes WITHOUT the ALLOW_IDENTITY_CHANGE waiver, proving no identifier moved"
+  ],
+  "touches": [
+    "project.yml",
+    "Cairn/Info.plist",
+    "CairnShareExtension/Info.plist",
+    "Cairn/Views/LibraryFilter.swift",
+    "Cairn/Views/LibraryView.swift",
+    "Cairn/Views/SidebarView.swift",
+    "CairnShareExtension/ShareViewController.swift",
+    "README.md",
+    "ROADMAP.md"
+  ],
+  "risk": "low",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0042",
+  "notes": "Stacks, Cairn and Pilcrow were all unavailable at App Store Connect reservation despite looking free in store search. Cairnfield is a real archaeological term — a landscape scattered with many cairns — which is a better fit for an archive than a single marker. The display name is deliberately decoupled from the bundle id and repo, which stay Cairn: mismatched bundle ids and display names are entirely normal and nobody but the developer sees the identifier. Criterion 5 is the safety property — if X7 fails without the waiver, the task has changed an identifier it should not have.",
+  "history": [
+    {
+      "ts": "2026-08-25T20:08:18Z",
+      "event": "dispatched",
+      "detail": "attempt 1; display name only, no identifiers"
+    }
+  ],
+  "agent": {
+    "id": "a36c26dd328b3e620",
+    "role": "implementer",
+    "spawned": "2026-08-25T20:08:18Z"
+  }
+}
