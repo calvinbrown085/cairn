@@ -405,6 +405,7 @@ struct ReaderView: View {
                 Image(systemName: "ellipsis.circle")
             }
             .accessibilityIdentifier("reader.overflow")
+            .accessibilityLabel("More actions")
         }
     }
 

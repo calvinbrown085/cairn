@@ -341,6 +341,7 @@ struct ClipboardCard: View {
                     .padding(4)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Dismiss")
         }
         .padding(.horizontal, 13)
         .padding(.vertical, 11)

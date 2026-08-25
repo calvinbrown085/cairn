@@ -54,6 +54,7 @@ struct TagSheet: View {
                                         .foregroundStyle(.secondary)
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityLabel("Remove \(tag)")
                             }
                         }
                     }

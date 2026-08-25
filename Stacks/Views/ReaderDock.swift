@@ -63,6 +63,7 @@ struct ReaderDock: View {
             .accessibilityIdentifier("reader.markup")
         label("Aa", isOn: false, action: openTypography)
             .accessibilityIdentifier("reader.typography")
+            .accessibilityLabel("Text settings")
         label("\(highlightCount)", systemImage: "sparkle", isOn: false, action: openHighlights)
             .disabled(highlightCount == 0)
             .opacity(highlightCount == 0 ? 0.4 : 1)
