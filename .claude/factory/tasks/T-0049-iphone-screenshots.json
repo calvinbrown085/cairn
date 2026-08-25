@@ -2,7 +2,7 @@
   "id": "T-0049",
   "title": "Screenshots on iPhone: the reader never opens from a fresh install",
   "type": "debt",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -38,6 +38,11 @@
       "ts": "2026-08-25T23:50:37Z",
       "event": "nudged",
       "detail": "no live process and no edits for 20 minutes; told to conclude and land"
+    },
+    {
+      "ts": "2026-08-25T23:52:34Z",
+      "event": "merged",
+      "detail": "6ff9a70"
     }
   ],
   "agent": {
