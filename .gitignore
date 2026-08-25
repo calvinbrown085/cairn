@@ -21,3 +21,8 @@ Packages/*/.build/
 # Factory: transient run state, locks, logs, escalations, per-worktree DerivedData.
 .claude/factory/state/
 .dd/
+
+# Tools/screenshots.sh: regenerated App Store screenshots, and its own
+# scratch build/result state. Build artefacts, not source — never committed.
+/screenshots/
+.dd-screenshots/
