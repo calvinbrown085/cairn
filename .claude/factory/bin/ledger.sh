@@ -28,9 +28,14 @@ find_task() {
 
 # Two path patterns overlap when either is a prefix of the other at a path boundary.
 JQ_OVERLAP='
-def norm: sub("/\\*\\*$";"") | sub("/\\*$";"") | sub("/+$";"");
-def ov($a; $b): (($a|norm)+"/") as $x | (($b|norm)+"/") as $y
-  | ($x|startswith($y)) or ($y|startswith($x));
+# A bare "**" normalises to the empty string and must overlap EVERYTHING — it is
+# how an exclusive task (the rename) declares a lease on the whole tree. Without
+# the empty check it normalised to a prefix that matched nothing, so the task
+# that conflicts with everything appeared to conflict with nothing.
+def norm: sub("^\\*\\*$";"") | sub("/\\*\\*$";"") | sub("/\\*$";"") | sub("/+$";"");
+def ov($a; $b): ($a|norm) as $x | ($b|norm) as $y
+  | if ($x == "") or ($y == "") then true
+    else (($x+"/")|startswith($y+"/")) or (($y+"/")|startswith($x+"/")) end;
 '
 
 ROW='"\(.id)  \(.status | . + "            "[0:12-length])  \(.type | . + "         "[0:9-length])  \(.title)"'
