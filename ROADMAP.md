@@ -206,7 +206,7 @@ outstanding work, not speculation.
 - [ ] `accessibilityLabel` on every icon-only control.
 - [ ] VoiceOver pass over the reader — the per-block text views need sensible
       rotor navigation and reading order. Depends on the Q1 architecture call.
-- [ ] Contrast audit of the warm palette in all three reader themes.
+- [x] Contrast audit of the warm palette in all three reader themes.
 
 **Ship a beta**
 - [x] `PrivacyInfo.xcprivacy` with the `UserDefaults` reason declared.

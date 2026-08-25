@@ -2,7 +2,7 @@
   "id": "T-0005",
   "title": "Re-run and extend the functional UI suite",
   "type": "debt",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Re-run and extend the functional UI suite",
   "depends_on": [
@@ -19,13 +19,24 @@
   "risk": "low",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0005-ui-suite",
   "notes": "The reader was rewritten under this suite; it is currently unverified.",
   "history": [
     {
       "ts": "2026-08-25T15:55:16Z",
       "event": "approved",
       "detail": "overseer standing authority; low/medium risk"
+    },
+    {
+      "ts": "2026-08-25T17:29:06Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a17d8a157f9869bbc",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T17:29:06Z"
+  }
 }

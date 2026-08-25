@@ -2,7 +2,7 @@
   "id": "T-0014",
   "title": "Contrast audit of the warm palette in all three reader themes",
   "type": "implement",
-  "status": "in_review",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Contrast audit",
   "depends_on": [],
@@ -40,6 +40,11 @@
       "ts": "2026-08-25T17:28:02Z",
       "event": "review-finding",
       "detail": "code-review: ReaderContrastAudit is dead code; no app-target test surface exists to run it from. Filed D-0002. Criterion 4 met as written (ratios recorded, re-derivable); the stronger 'cannot regress' framing was in my brief, not the criteria."
+    },
+    {
+      "ts": "2026-08-25T17:28:17Z",
+      "event": "merged",
+      "detail": "e473e7f"
     }
   ],
   "agent": {
