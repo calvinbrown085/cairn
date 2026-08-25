@@ -56,42 +56,105 @@ enum LibraryFilter: Hashable, Codable {
 
     /// Archived posts are hidden everywhere except their own list, so the
     /// inbox stays a genuine inbox.
-    func predicate(search: String) -> Predicate<Post> {
+    ///
+    /// `timeFilter` is a second, independent axis — see `LibraryTimeFilter` —
+    /// so every case below gains the same extra clause rather than a
+    /// parallel set of "unread-and-short", "starred-and-short" cases.
+    func predicate(search: String, timeFilter: LibraryTimeFilter = .any) -> Predicate<Post> {
         let query = search.squeezed
         let hasQuery = !query.isEmpty
+        let maxWordCount = timeFilter.maxWordCount
+        let hasTimeLimit = maxWordCount != nil
+        let wordLimit = maxWordCount ?? 0
 
         switch self {
         case .unread:
             return #Predicate<Post> { post in
                 post.isArchived == false && post.openedAt == nil
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
+                    && (!hasTimeLimit || post.wordCount <= wordLimit)
             }
         case .all:
             return #Predicate<Post> { post in
                 post.isArchived == false
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
+                    && (!hasTimeLimit || post.wordCount <= wordLimit)
             }
         case .starred:
             return #Predicate<Post> { post in
                 post.isStarred
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
+                    && (!hasTimeLimit || post.wordCount <= wordLimit)
             }
         case .archived:
             return #Predicate<Post> { post in
                 post.isArchived
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
+                    && (!hasTimeLimit || post.wordCount <= wordLimit)
             }
         case .tag(let name):
             return #Predicate<Post> { post in
                 post.tagNames.contains(name)
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
+                    && (!hasTimeLimit || post.wordCount <= wordLimit)
             }
         case .site(let host):
             return #Predicate<Post> { post in
                 post.host == host
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
+                    && (!hasTimeLimit || post.wordCount <= wordLimit)
             }
         }
+    }
+}
+
+/// A second axis over the library, orthogonal to `LibraryFilter`: how long a
+/// post takes to read, rather than which bucket (unread, starred, …) it
+/// belongs to. `.any` leaves whatever `LibraryFilter` already selected
+/// untouched; every other case narrows it further — see
+/// `LibraryFilter.predicate(search:timeFilter:)`, which ANDs this in rather
+/// than branching on it, so time composes with every existing filter and
+/// with search instead of replacing either.
+enum LibraryTimeFilter: String, CaseIterable, Identifiable, Hashable, Codable {
+    case any
+    case under5
+    case under10
+    case under20
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .any: "Any length"
+        case .under5: "Under 5 min"
+        case .under10: "Under 10 min"
+        case .under20: "Under 20 min"
+        }
+    }
+
+    /// Words assumed read per minute, for turning a minutes ceiling into a
+    /// word-count one a `#Predicate` can compare directly against the stored
+    /// `wordCount` — a predicate can't call back into `Post.readingMinutes`,
+    /// so this mirrors that property's own 220 wpm constant instead. Chosen
+    /// there, and kept here, as the middle of the ~200-250 wpm range typical
+    /// for adult prose reading, per Post.swift.
+    private static let wordsPerMinute = 220.0
+
+    /// The reading-time ceiling in minutes this case represents, `nil` for
+    /// no ceiling.
+    private var maxMinutes: Int? {
+        switch self {
+        case .any: nil
+        case .under5: 5
+        case .under10: 10
+        case .under20: 20
+        }
+    }
+
+    /// `maxMinutes` converted to the word count it corresponds to, `nil`
+    /// when there is no ceiling to apply.
+    var maxWordCount: Int? {
+        maxMinutes.map { Int(Double($0) * LibraryTimeFilter.wordsPerMinute) }
     }
 }
 

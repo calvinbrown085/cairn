@@ -10,6 +10,7 @@ struct LibraryView: View {
     @Environment(ReadingPreferences.self) private var preferences
     @State private var search = ""
     @State private var sort: LibrarySort = .recentlySaved
+    @State private var timeFilter: LibraryTimeFilter = .any
     @State private var isShowingSortSheet = false
 
     var body: some View {
@@ -17,6 +18,7 @@ struct LibraryView: View {
             filter: filter,
             search: search,
             sort: sort,
+            timeFilter: timeFilter,
             groupBySite: preferences.groupBySite,
             style: preferences.libraryStyle,
             selection: $selection,
@@ -49,9 +51,12 @@ struct LibraryView: View {
         }
     }
 
-    /// The three sorts worth reaching without a sheet, then the sheet. Pinned
-    /// under the search field rather than buried in a toolbar menu, because
-    /// changing the order of a library is a browsing move, not a setting.
+    /// The three sorts worth reaching without a sheet, then the sheet, then
+    /// how long a post takes to read — a second, independent axis that
+    /// narrows whatever `filter` and search already picked rather than
+    /// replacing it (see `LibraryFilter.predicate(search:timeFilter:)`).
+    /// Pinned under the search field rather than buried in a toolbar menu,
+    /// because both are browsing moves, not settings.
     private var sortChips: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 7) {
@@ -59,6 +64,12 @@ struct LibraryView: View {
                     chip(option.label, isOn: sort == option) { sort = option }
                 }
                 chip("Sort & group…", isOn: false) { isShowingSortSheet = true }
+
+                Divider().frame(height: 16)
+
+                ForEach(LibraryTimeFilter.allCases) { option in
+                    chip(option.title, isOn: timeFilter == option) { timeFilter = option }
+                }
             }
             .padding(.horizontal, Metrics.gutter)
             .padding(.vertical, 9)
@@ -109,6 +120,7 @@ private struct PostList: View {
         filter: LibraryFilter,
         search: String,
         sort: LibrarySort,
+        timeFilter: LibraryTimeFilter,
         groupBySite: Bool,
         style: LibraryStyle,
         selection: Binding<Post?>,
@@ -123,7 +135,7 @@ private struct PostList: View {
         self._selection = selection
         self._isAddingURL = isAddingURL
         self._clipboardOffer = clipboardOffer
-        self._posts = Query(PostList.descriptor(filter: filter, search: search, sort: sort))
+        self._posts = Query(PostList.descriptor(filter: filter, search: search, sort: sort, timeFilter: timeFilter))
     }
 
     /// Neither `PostRow` nor `PostCard` shows a post's body — only its title,
@@ -134,9 +146,11 @@ private struct PostList: View {
     /// matches doesn't pull a thousand articles' worth of text into memory
     /// just to list their titles; each excluded property is faulted back in
     /// individually, only for the one post that ends up needing it.
-    private static func descriptor(filter: LibraryFilter, search: String, sort: LibrarySort) -> FetchDescriptor<Post> {
+    private static func descriptor(
+        filter: LibraryFilter, search: String, sort: LibrarySort, timeFilter: LibraryTimeFilter
+    ) -> FetchDescriptor<Post> {
         var descriptor = FetchDescriptor<Post>(
-            predicate: filter.predicate(search: search),
+            predicate: filter.predicate(search: search, timeFilter: timeFilter),
             sortBy: sort.descriptors
         )
         descriptor.propertiesToFetch = [
