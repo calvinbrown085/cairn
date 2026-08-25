@@ -2,7 +2,7 @@
   "id": "T-0044",
   "title": "Screenshot pipeline for App Store submission",
   "type": "chore",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [
@@ -23,7 +23,18 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "The UI suite already navigates library to reader to highlights and calls XCTAttachment on both device classes, so most of this exists - the job is turning attachments into named files at the right sizes rather than writing new navigation. Apple currently requires 6.9-inch iPhone and 13-inch iPad shots; other sizes are derived. Note T-0005 found the suite needs a signed local build because CloudKit traps under CODE_SIGNING_ALLOWED=NO, so the script must not force signing off. Output is gitignored: screenshots are build artefacts, not source, and a 5MB PNG in git history is permanent.",
-  "history": []
+  "branch": "factory/T-0044",
+  "notes": "The UI suite already navigates library to reader to highlights and calls XCTAttachment on both device classes, so most of this exists - the job is turning attachments into named files at the right sizes rather than writing new navigation. Apple currently requires 6.9-inch iPhone and 13-inch iPad shots; other sizes are derived. Note T-0005 found the suite needs a signed local build because CloudKit traps under CODE_SIGNING_ALLOWED=NO, so the script must not force signing off. Output is gitignored: screenshots are build artefacts, not source, and a 5MB PNG in git history is permanent. SIMULATOR CONTENTION, learned the hard way during T-0024: two agents running xcodebuild test against the same named simulator kill each other with signal kill. This pipeline must boot a dedicated simulator by UDID rather than selecting by name, or it will destroy any UI test run happening beside it.",
+  "history": [
+    {
+      "ts": "2026-08-25T20:25:03Z",
+      "event": "dispatched",
+      "detail": "attempt 1; warned about simulator contention by UDID"
+    }
+  ],
+  "agent": {
+    "id": "aa1aaee3aa60350a7",
+    "role": "implementer",
+    "spawned": "2026-08-25T20:25:03Z"
+  }
 }

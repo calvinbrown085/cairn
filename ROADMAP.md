@@ -84,7 +84,7 @@ of real captured pages.
 
 ### Reading — the stated pain
 
-- [ ] **Opening an article goes straight to full screen.** Reading is the point; asking for it every time is friction the app imposes on its own primary action.
+- [x] **Opening an article goes straight to full screen.** *(T-0024, `1b0f846`.)* Reading is the point; asking for it every time is friction the app imposes on its own primary action.
 - [ ] **Markup taps land.** A tap in markup mode places a text caret instead of highlighting roughly half the time — `UITextView`'s own recogniser races the custom one.
 - [ ] **A scroll indicator that means something.** `LazyVStack` means only realised blocks count toward content height, so the bar measures a document that appears to grow as you scroll.
 - [ ] **Profile the scroll cost.** 3.8s of CPU for 8 swipes, still unexplained. Cut once as "nobody is complaining" — reinstated, because *reading is unpleasant* is the complaint.

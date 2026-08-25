@@ -2,7 +2,7 @@
   "id": "T-0024",
   "title": "Opening an article goes straight to full screen",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Reading experience",
   "depends_on": [
@@ -46,6 +46,16 @@
       "ts": "2026-08-25T19:51:02Z",
       "event": "resumed",
       "detail": "agent was waiting on a killed self-referential pgrep loop; work intact, 81 insertions uncommitted"
+    },
+    {
+      "ts": "2026-08-25T20:23:19Z",
+      "event": "merged",
+      "detail": "1b0f846"
+    },
+    {
+      "ts": "2026-08-25T20:25:03Z",
+      "event": "landed",
+      "detail": "1b0f846; criterion 6 recorded unverified — 9/11 UI tests passed, 2 left to T-0045"
     }
   ],
   "agent": {

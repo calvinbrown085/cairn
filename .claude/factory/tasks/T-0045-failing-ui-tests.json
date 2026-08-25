@@ -1,0 +1,24 @@
+{
+  "id": "T-0045",
+  "title": "Two failing UI tests, one of them newly added",
+  "type": "debt",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "testFullScreenEntryIsNotSticky passes reliably, or is rewritten to assert the same behaviour in a way that can pass",
+    "testMarkingUpASentence passes reliably once the markup tap fix has landed",
+    "The full suite is run on an isolated simulator and its pass count reported",
+    "No test is deleted, skipped or weakened to reach green"
+  ],
+  "touches": [
+    "CairnUITests/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Left behind by T-0024, which was capped deliberately: 9 of 11 tests passed and two were left undiagnosed rather than spend more cycles blocking other work. testFullScreenEntryIsNotSticky is NEW - T-0024 added it and it fails with 'Timed out while evaluating UI query', suspected accessibility-tree flakiness rather than a real defect, but unproven. testMarkingUpASentence is the pre-existing markup flake that T-0034 is fixing, so it may simply pass once that lands - check before touching it. IMPORTANT INFRASTRUCTURE FINDING from the same run: two agents running xcodebuild test against the same named simulator ('iPhone 17 Pro') killed each other, every test dying with signal kill. That is not a code fault. Any task running UI tests must boot a dedicated simulator by UDID, as T-0024 eventually did with iPhone 17 Pro Max.",
+  "history": []
+}
