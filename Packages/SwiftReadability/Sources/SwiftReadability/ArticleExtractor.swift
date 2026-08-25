@@ -86,6 +86,23 @@ public enum ArticleExtractor {
         "post-body", "postbody", "prose", "essay", "text-body", "rich-text",
     ]
 
+    /// Heading names that mark backmatter — support material for the article,
+    /// not part of it — when a container is explicitly bound to one via
+    /// `aria-labelledby`. See the check in `strip()` for why the binding
+    /// matters as much as the name.
+    private static let backmatterHeadings: Set<String> = [
+        "references", "notes", "external links", "further reading",
+    ]
+
+    private static func isBackmatterHeading(_ idOrText: String) -> Bool {
+        let normalized = idOrText
+            .replacingOccurrences(of: "_", with: " ")
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ":"))
+        return backmatterHeadings.contains(normalized)
+    }
+
     private static func strip(_ root: HTMLElement) {
         var doomed: [HTMLElement] = []
 
@@ -106,6 +123,26 @@ public enum ArticleExtractor {
             if element.attributes["aria-hidden"] == "true" { doomed.append(element); return }
             if element.attributes["hidden"] != nil { doomed.append(element); return }
             if element.attributes["role"].map({ ["navigation", "banner", "complementary", "search"].contains($0) }) == true {
+                doomed.append(element)
+                return
+            }
+
+            // A backmatter section — a citation list, "Notes", "External
+            // links", "Further reading" — support material for the article,
+            // not part of it. `aria-labelledby` is how MediaWiki's Parsoid
+            // output (and any other generator that follows the same ARIA
+            // convention) explicitly binds a container to the heading that
+            // introduces it, which is exactly the boundary we need: it names
+            // the section without our having to guess where it ends by
+            // scanning forward through the flat block list, a guess that
+            // would just as happily swallow the first plain, unwrapped
+            // "References" heading it met on a page with no such binding.
+            // This keys on the heading identity and a real accessibility
+            // attribute, never on the host — the same markup drops
+            // wikipedia_readability's and wikipedia_epub's backmatter
+            // identically, because MediaWiki's Cite extension and section
+            // renderer produce it identically on both.
+            if let labelledBy = element.attributes["aria-labelledby"], isBackmatterHeading(labelledBy) {
                 doomed.append(element)
                 return
             }

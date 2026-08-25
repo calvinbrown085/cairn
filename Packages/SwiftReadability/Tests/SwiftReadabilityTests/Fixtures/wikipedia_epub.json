@@ -1,10 +1,10 @@
 {
   "title": "EPUB",
-  "wordCount": 5458,
+  "wordCount": 4339,
   "blockCounts": {
-    "heading": 25,
+    "heading": 22,
     "paragraph": 86,
-    "list": 11,
+    "list": 8,
     "quote": 1,
     "code": 7
   }
