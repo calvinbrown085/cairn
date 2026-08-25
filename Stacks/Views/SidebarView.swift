@@ -8,6 +8,10 @@ struct SidebarView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var index = LibraryIndex()
 
+    // Re-extraction
+    @State private var reExtraction = ReExtractionService()
+    @State private var isConfirmingLibraryRebuild = false
+
     var body: some View {
         List(selection: Binding(
             get: { filter },
@@ -42,6 +46,21 @@ struct SidebarView: View {
                     header("Sites")
                 }
             }
+
+            // A maintenance action, not a filter — it doesn't take part in
+            // the list's selection, only its own tap.
+            Section {
+                if reExtraction.isRunning {
+                    libraryRebuildProgress
+                } else {
+                    Button {
+                        isConfirmingLibraryRebuild = true
+                    } label: {
+                        Label("Rebuild library", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
+                }
+            }
         }
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
@@ -53,6 +72,79 @@ struct SidebarView: View {
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
             index.refresh(context: context)
         }
+        .confirmationDialog(
+            "Rebuild the library from saved pages?",
+            isPresented: $isConfirmingLibraryRebuild,
+            titleVisibility: .visible
+        ) {
+            Button("Rebuild") { reExtraction.reExtractLibrary(in: context) }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Every archived post is rebuilt from the page it was saved from. Posts saved before that page was kept are left untouched, and no highlight is removed without asking first.")
+        }
+        .alert(
+            "Rebuild complete",
+            isPresented: Binding(
+                get: { reExtraction.lastSummary != nil },
+                set: { if !$0 { reExtraction.dismissSummary() } }
+            ),
+            presenting: reExtraction.lastSummary
+        ) { summary in
+            Button("OK", role: .cancel) {}
+            if summary.skippedAtRisk > 0 {
+                Button("Include those too", role: .destructive) {
+                    reExtraction.reExtractLibrary(in: context, dropAtRiskHighlights: true)
+                }
+            }
+        } message: { summary in
+            Text(summaryText(summary))
+        }
+    }
+
+    private var libraryRebuildProgress: some View {
+        HStack(spacing: 11) {
+            ProgressView()
+                .controlSize(.small)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Rebuilding…")
+                    .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
+                    .foregroundStyle(Palette.ink)
+                if let progress = reExtraction.progress {
+                    Text("\(progress.completed) of \(progress.total)")
+                        .font(.scaled(12, relativeTo: .caption))
+                        .foregroundStyle(Palette.inkTertiary)
+                }
+            }
+
+            Spacer(minLength: 6)
+
+            Button("Cancel") { reExtraction.cancel() }
+                .font(.scaled(13, weight: .medium, relativeTo: .footnote))
+                .buttonStyle(.plain)
+                .foregroundStyle(Palette.accent)
+        }
+        .padding(.vertical, 2)
+    }
+
+    /// Turns a finished (or cancelled) pass into the sentence the alert shows.
+    private func summaryText(_ summary: ReExtractionService.LibrarySummary) -> String {
+        var parts: [String] = []
+        if summary.cancelled { parts.append("Cancelled partway through.") }
+        parts.append("\(summary.rebuilt) post\(summary.rebuilt == 1 ? "" : "s") rebuilt.")
+        if summary.skippedNoSource > 0 {
+            parts.append("\(summary.skippedNoSource) skipped — no saved page to rebuild from.")
+        }
+        if summary.skippedAtRisk > 0 {
+            parts.append("\(summary.skippedAtRisk) skipped — \(summary.highlightsAtRisk) highlight\(summary.highlightsAtRisk == 1 ? "" : "s") couldn't be matched to the rebuilt text.")
+        }
+        if summary.highlightsReanchored > 0 {
+            parts.append("\(summary.highlightsReanchored) highlight\(summary.highlightsReanchored == 1 ? "" : "s") moved to their new spot.")
+        }
+        if summary.highlightsDropped > 0 {
+            parts.append("\(summary.highlightsDropped) highlight\(summary.highlightsDropped == 1 ? "" : "s") couldn't be matched and \(summary.highlightsDropped == 1 ? "was" : "were") removed.")
+        }
+        return parts.joined(separator: " ")
     }
 
     private func header(_ title: String) -> some View {

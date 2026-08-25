@@ -21,6 +21,14 @@ struct ReaderView: View {
     @State private var hasRestoredPosition = false
     @State private var progressWriter: Task<Void, Never>?
 
+    // Re-extraction
+    @State private var reExtraction = ReExtractionService()
+    @State private var isReExtracting = false
+    @State private var reExtractionRiskCount = 0
+    @State private var reExtractionSafeCount = 0
+    @State private var isShowingReExtractionRisk = false
+    @State private var reExtractionReport: String?
+
     // Markup
     @State private var isMarkingUp = false
     @State private var tool: MarkupTool = .highlight
@@ -119,6 +127,23 @@ struct ReaderView: View {
             NoteSheet(highlight: highlight)
                 .presentationDetents([.height(360)])
                 .presentationDragIndicator(.visible)
+        }
+        .alert("Highlights can't all be relocated", isPresented: $isShowingReExtractionRisk) {
+            Button("Cancel", role: .cancel) {}
+            Button("Rebuild anyway", role: .destructive) { performReExtraction(dropAtRiskHighlights: true) }
+        } message: {
+            Text(reExtractionRiskMessage)
+        }
+        .alert(
+            "Rebuilt from the saved page",
+            isPresented: Binding(
+                get: { reExtractionReport != nil },
+                set: { if !$0 { reExtractionReport = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(reExtractionReport ?? "")
         }
         .onChange(of: renderGeneration, initial: true) { _, generation in
             ReaderRenderCache.shared.prepare(generation: generation)
@@ -398,6 +423,21 @@ struct ReaderView: View {
 
                 Divider()
 
+                // A maintenance action, not an everyday one: it exists so a
+                // fix to the extractor can repair a post that was archived
+                // before the fix landed, without a network re-fetch. Nothing
+                // to rebuild from for a post saved before the source page
+                // itself was kept, so the option isn't offered at all — a
+                // second tap while one is already running is harmless (the
+                // service itself ignores it), so nothing more is needed there.
+                if post.originalHTMLData != nil {
+                    Button {
+                        performReExtraction()
+                    } label: {
+                        Label("Rebuild from saved page", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                }
+
                 if let url = post.url {
                     Link(destination: url) { Label("Open original", systemImage: "safari") }
                     ShareLink(item: url) { Label("Share link", systemImage: "square.and.arrow.up") }
@@ -519,6 +559,46 @@ struct ReaderView: View {
         context.insert(highlight)
         try? context.save()
         return highlight
+    }
+
+    // MARK: - Re-extraction
+
+    private var reExtractionRiskMessage: String {
+        let riskPart = "\(reExtractionRiskCount) highlight\(reExtractionRiskCount == 1 ? "" : "s") couldn't be matched to the rebuilt text and would be removed."
+        guard reExtractionSafeCount > 0 else { return riskPart }
+        return riskPart + " \(reExtractionSafeCount) other\(reExtractionSafeCount == 1 ? "" : "s") would move to its new spot safely."
+    }
+
+    /// Rebuilds this post from its stored HTML. The first pass never removes
+    /// a highlight — one that can't be matched unambiguously to the rebuilt
+    /// text stops the rebuild and asks before anything is lost.
+    private func performReExtraction(dropAtRiskHighlights: Bool = false) {
+        guard !isReExtracting else { return }
+        isReExtracting = true
+        Task {
+            let outcome = await reExtraction.reExtract(post, in: context, dropAtRiskHighlights: dropAtRiskHighlights)
+            isReExtracting = false
+            handle(outcome)
+        }
+    }
+
+    private func handle(_ outcome: ReExtractionService.PostOutcome) {
+        guard outcome.rebuilt else {
+            guard outcome.highlightsAtRisk > 0 else { return }
+            reExtractionRiskCount = outcome.highlightsAtRisk
+            reExtractionSafeCount = outcome.highlightsReanchored
+            isShowingReExtractionRisk = true
+            return
+        }
+
+        var parts = ["Rebuilt into \(outcome.newBlockCount) block\(outcome.newBlockCount == 1 ? "" : "s")."]
+        if outcome.highlightsReanchored > 0 {
+            parts.append("\(outcome.highlightsReanchored) highlight\(outcome.highlightsReanchored == 1 ? "" : "s") moved to its new spot.")
+        }
+        if outcome.highlightsDropped > 0 {
+            parts.append("\(outcome.highlightsDropped) highlight\(outcome.highlightsDropped == 1 ? "" : "s") couldn't be matched and \(outcome.highlightsDropped == 1 ? "was" : "were") removed.")
+        }
+        reExtractionReport = parts.joined(separator: " ")
     }
 
     private func markOpened() {
