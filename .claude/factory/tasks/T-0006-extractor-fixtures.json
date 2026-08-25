@@ -1,16 +1,34 @@
 {
-  "id": "T-0006", "title": "Freeze ~30 real pages as fixtures and assert against them",
-  "type": "implement", "status": "draft", "quarter": "Q1",
+  "id": "T-0006",
+  "title": "Freeze ~30 real pages as fixtures and assert against them",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
-  "depends_on": ["F-0002"],
+  "depends_on": [
+    "F-0002"
+  ],
   "acceptance": [
     "About 30 frozen HTML fixtures covering Wikipedia, table-era markup, lazy-loaded galleries, <br><br> paragraphs, meta-refresh redirects, paywalls, and 404s",
     "Each asserts title, word count, and block-type mix",
     "The whole suite runs offline with no live site access",
     "A regression in ArticleExtractor or HTMLParser fails at least one fixture"
   ],
-  "touches": ["StacksTests/**", "Tests/**", "Fixtures/**"],
-  "risk": "low", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "StacksTests/**",
+    "Tests/**",
+    "Fixtures/**"
+  ],
+  "risk": "low",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Prerequisite for public source and the first thing that can actually gate a PR. Ideal early factory work: mechanical, well-specified, self-verifying.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:55:16Z",
+      "event": "approved",
+      "detail": "overseer standing authority; low/medium risk"
+    }
+  ]
 }

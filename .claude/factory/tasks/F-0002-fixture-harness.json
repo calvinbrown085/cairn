@@ -2,27 +2,49 @@
   "id": "F-0002",
   "title": "Fixture harness plus three seed fixtures",
   "type": "chore",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "bootstrap",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [
     "F-0001"
   ],
   "acceptance": [
-    "A helper loads a frozen HTML fixture and its expected-result JSON from disk",
+    "A helper in the SwiftReadability test target loads a frozen HTML fixture and its expected-result JSON from disk",
+    "Fixtures are bundled as test resources so `swift test` finds them with no network access and no simulator",
     "Three fixtures land: a Wikipedia article, a Paul Graham table-era page, and a <br><br>-paragraph page",
-    "Each asserts title, word count, and block-type mix",
-    "Fixtures are checked in as static files with no network access at test time"
+    "Each asserts title, word count, and block-type mix against the frozen expectation",
+    "A regression in ArticleExtractor or HTMLParser fails at least one fixture"
   ],
   "touches": [
-    "StacksTests/**",
-    "Tests/**",
-    "Fixtures/**"
+    "Packages/SwiftReadability/Tests/**",
+    "Packages/SwiftReadability/Package.swift"
   ],
   "risk": "low",
-  "factory_eligible": false,
+  "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "Bootstrap slice. T-0006 scales this to ~30 fixtures and is factory work.",
-  "history": []
+  "branch": "factory/F-0002-fixture-harness",
+  "notes": "Realigned to the SPM layout after D-0001. Unblocks T-0006 (~30 fixtures). Mechanical and self-verifying: good factory work.",
+  "history": [
+    {
+      "ts": "2026-08-25T00:00:00Z",
+      "event": "realigned",
+      "detail": "acceptance and touches moved from the abandoned StacksTests iOS target to the SwiftReadability package"
+    },
+    {
+      "ts": "2026-08-25T15:54:09Z",
+      "event": "approved",
+      "detail": "overseer standing authority: keep the roadmap moving"
+    },
+    {
+      "ts": "2026-08-25T15:54:45Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "a0709df35f196dd3e",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T15:54:45Z"
+  }
 }

@@ -15,10 +15,14 @@ Read `.claude/factory/CONSTITUTION.md` first. It binds you.
 1. `cd` to the worktree path. Everything happens there. Never operate on the main checkout.
 2. Read the task's `acceptance` criteria and `touches` globs. Read the existing code you are about to change — this is a real codebase with settled conventions, not a greenfield.
 3. Implement. Match the surrounding style: this repo is dependency-free Swift, SwiftUI + SwiftData, `@Observable`, no third-party anything. Comment density and naming should look like the file you are in.
-4. Run the gate:
+4. Run the gate — **always by absolute path to the primary checkout**, never the
+   copy inside your worktree:
    ```bash
-   .claude/factory/bin/verify.sh
+   /Users/calvinbrown/Documents/stacks/.claude/factory/bin/verify.sh --task <id>
    ```
+   Your worktree contains a frozen copy of these scripts from your branch point.
+   Running it means running whatever gate existed then, against a ledger that
+   predates your own dispatch. Always use the primary path.
    Iterate until it exits 0. Read the failure; do not guess at fixes.
 5. Commit once, on the task's branch:
    ```
@@ -46,7 +50,7 @@ Read `.claude/factory/CONSTITUTION.md` first. It binds you.
 When — and only when — the overseer messages you to land the task:
 
 ```bash
-.claude/factory/bin/merge.sh <task-id>
+/Users/calvinbrown/Documents/stacks/.claude/factory/bin/merge.sh <task-id>
 ```
 
 That script is the only sanctioned way onto `main`. It takes the merge lock,

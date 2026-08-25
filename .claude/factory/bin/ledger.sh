@@ -12,9 +12,8 @@
 #   ledger.sh validate              structural check of the whole ledger
 set -euo pipefail
 
-FACTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 TASKS="$FACTORY/tasks"
-CONFIG="$FACTORY/config.json"
 
 all()   { jq -s '.' "$TASKS"/*.json; }
 types() { jq -c '.dispatchable_types' "$CONFIG"; }

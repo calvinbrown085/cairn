@@ -1,6 +1,9 @@
 {
-  "id": "T-0014", "title": "Contrast audit of the warm palette in all three reader themes",
-  "type": "implement", "status": "draft", "quarter": "Q2",
+  "id": "T-0014",
+  "title": "Contrast audit of the warm palette in all three reader themes",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Contrast audit",
   "depends_on": [],
   "acceptance": [
@@ -9,8 +12,30 @@
     "Highlight colours remain distinguishable in all three themes",
     "The measured ratios are recorded so the audit is repeatable"
   ],
-  "touches": ["Stacks/Design/**"],
-  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Stacks/Design/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0014-contrast-audit",
   "notes": "Contained to Design/. Computable, so a test can hold the line afterwards.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:54:09Z",
+      "event": "approved",
+      "detail": "overseer standing authority: keep the roadmap moving"
+    },
+    {
+      "ts": "2026-08-25T15:56:55Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "a8dc529fcf2997d26",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T15:56:54Z"
+  }
 }

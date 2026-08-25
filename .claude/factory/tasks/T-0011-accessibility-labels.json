@@ -2,7 +2,7 @@
   "id": "T-0011",
   "title": "accessibilityLabel on every icon-only control",
   "type": "implement",
-  "status": "draft",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > accessibilityLabel on every icon-only control",
   "depends_on": [],
@@ -16,9 +16,26 @@
     "Stacks/Views/**"
   ],
   "risk": "low",
-  "factory_eligible": false,
+  "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0011-accessibility-labels",
   "notes": "Zero labels exist today. Additive, low-blast-radius, mechanically verifiable — second calibration candidate.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:51:17Z",
+      "event": "approved",
+      "detail": "human approved for first dispatch"
+    },
+    {
+      "ts": "2026-08-25T15:51:58Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "a3148043f4f972e3c",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T15:51:58Z"
+  }
 }

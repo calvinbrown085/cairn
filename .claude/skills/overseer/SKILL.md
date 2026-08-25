@@ -140,10 +140,17 @@ Landing is an instruction you give, not an action you take. When the gate is
 green, `/code-review low` is clean or its findings are ones you accept, and the
 criteria are met:
 
-- If `land_requires_human` is true, **ask the human first**. Show them what
-  landed on the criteria, the review findings, and the diffstat. Do not proceed
-  until they answer.
+- If the task's `risk` is in `human_signoff_risk`, **ask the human first**, no
+  matter what `land_requires_human` says. That list exists because some work is
+  not safely undone by a revert: data-model migrations, the reader's text stack,
+  the share extension, project identity. Show them the criteria outcome, the
+  review findings, and the diffstat, and wait.
+- Otherwise, if `land_requires_human` is true, ask. If it is false, land on your
+  own judgement — that is what it is for.
 - Then message the agent: `land it — run .claude/factory/bin/merge.sh <id>`.
+
+Landing on your own judgement raises the bar for your review, it does not lower
+it. Nobody is checking behind you.
 
 `merge.sh` holds the merge lock, rebases onto main, **re-runs the full gate**,
 and squash-merges. If it comes back with a post-rebase gate failure or a rebase

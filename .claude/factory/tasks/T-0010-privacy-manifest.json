@@ -2,7 +2,7 @@
   "id": "T-0010",
   "title": "PrivacyInfo.xcprivacy with the UserDefaults reason declared",
   "type": "implement",
-  "status": "draft",
+  "status": "verifying",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Ship a beta > PrivacyInfo.xcprivacy",
   "depends_on": [],
@@ -18,9 +18,36 @@
     "Stacks/Resources/**"
   ],
   "risk": "low",
-  "factory_eligible": false,
+  "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0010-privacy-manifest",
   "notes": "App Store blocking, small, mechanical, objectively checkable. The best first calibration task for the factory.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:51:17Z",
+      "event": "approved",
+      "detail": "human approved for first dispatch"
+    },
+    {
+      "ts": "2026-08-25T15:51:58Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T15:56:08Z",
+      "event": "gate-passed",
+      "detail": "verify.sh green in 25s; criterion 4 independently confirmed in the built .app bundle"
+    },
+    {
+      "ts": "2026-08-25T15:56:54Z",
+      "event": "land-instructed",
+      "detail": "overseer approved; low risk, no signoff required"
+    }
+  ],
+  "agent": {
+    "id": "ae05b915cc290590c",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T15:51:58Z"
+  }
 }

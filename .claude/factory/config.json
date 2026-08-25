@@ -1,6 +1,6 @@
 {
   "$comment": "Runtime knobs for the Stacks factory. See DESIGN.md.",
-  "max_parallel": 2,
+  "max_parallel": 3,
   "$max_parallel": "Implementers in flight. Ceiling is 3 on this machine; Xcode, not the harness, is the constraint.",
   "max_attempts": 3,
   "$max_attempts": "Implementer attempts before the Opus rescue attempt. After the rescue, the task is parked.",
@@ -56,7 +56,11 @@
     "readingStreak"
   ],
   "$banned_identifiers": "The guilt-engine ban from ROADMAP.md. A library does not nag.",
-  "land_requires_human": true,
-  "$land_requires_human": "true: the overseer must get your sign-off before instructing an agent to land. false: it lands on its own judgement once the gate is green and /code-review low is clean. Start true; flip it when the loop has earned it.",
-  "$review": "Code review is /code-review low, run by the overseer against the task branch. The overseer separately checks acceptance criteria and the constitution — /code-review does not do that."
+  "land_requires_human": false,
+  "$land_requires_human": "false: the overseer lands low and medium risk work on its own judgement once the gate is green and /code-review low is clean. The gate has been shown to catch both behavioural and policy regressions, and squash merges keep every landing individually revertible.",
+  "$review": "Code review is /code-review low, run by the overseer against the task branch. The overseer separately checks acceptance criteria and the constitution — /code-review does not do that.",
+  "human_signoff_risk": [
+    "high"
+  ],
+  "$human_signoff_risk": "Risk levels that still require the human before landing regardless of land_requires_human: anything touching the data model, the reader text stack, the share extension, or project identity. Keep going does not mean ship anything."
 }

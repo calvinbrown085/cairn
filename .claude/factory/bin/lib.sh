@@ -5,7 +5,6 @@
 # so it does NOT exist inside a worktree. Every script resolves the primary
 # checkout and keeps state there, no matter where it is invoked from.
 
-FACTORY_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORK_ROOT="$(git rev-parse --show-toplevel)"
 
 _gcd="$(git rev-parse --git-common-dir)"
@@ -13,8 +12,26 @@ case "$_gcd" in /*) ;; *) _gcd="$WORK_ROOT/$_gcd";; esac
 MAIN_ROOT="$(cd "$_gcd/.." && pwd)"
 
 FACTORY="$MAIN_ROOT/.claude/factory"
+# Always the primary checkout's scripts and state. A worktree carries a frozen
+# copy of both from its branch point; trusting that copy means reading stale
+# ledger records and running whatever gate existed when the branch was cut.
+FACTORY_BIN="$FACTORY/bin"
 STATE="$FACTORY/state"
 CONFIG="$FACTORY/config.json"
+
+# A worktree carries a frozen copy of these scripts from its branch point. A gate
+# from before a gate fix is worse than no gate — the die() bug made verify.sh exit
+# 0 on a failing test. So any script invoked from a worktree copy re-execs the
+# primary checkout's version of itself, once.
+if [ "${FACTORY_PRIMARY:-0}" != 1 ] && [ -n "${BASH_SOURCE[1]:-}" ]; then
+  _caller_dir="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
+  _caller_name="$(basename "${BASH_SOURCE[1]}")"
+  if [ "$_caller_dir" != "$FACTORY_BIN" ] && [ -x "$FACTORY_BIN/$_caller_name" ]; then
+    export FACTORY_PRIMARY=1
+    exec "$FACTORY_BIN/$_caller_name" "$@"
+  fi
+fi
+export FACTORY_PRIMARY=1
 
 cfg() { jq -r "$1" "$CONFIG"; }
 

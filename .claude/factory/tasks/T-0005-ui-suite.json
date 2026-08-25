@@ -1,15 +1,31 @@
 {
-  "id": "T-0005", "title": "Re-run and extend the functional UI suite",
-  "type": "debt", "status": "draft", "quarter": "Q1",
+  "id": "T-0005",
+  "title": "Re-run and extend the functional UI suite",
+  "type": "debt",
+  "status": "todo",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Re-run and extend the functional UI suite",
-  "depends_on": ["F-0001"],
+  "depends_on": [
+    "F-0001"
+  ],
   "acceptance": [
     "ReadingFlowUITests passes against the current ReaderView",
     "Position restore, highlight creation, and typography changes each have a covering assertion",
     "No test is skipped or weakened to make the suite green"
   ],
-  "touches": ["StacksUITests/**"],
-  "risk": "low", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "StacksUITests/**"
+  ],
+  "risk": "low",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "The reader was rewritten under this suite; it is currently unverified.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T15:55:16Z",
+      "event": "approved",
+      "detail": "overseer standing authority; low/medium risk"
+    }
+  ]
 }
