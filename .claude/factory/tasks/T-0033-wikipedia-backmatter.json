@@ -1,9 +1,13 @@
 {
   "id": "T-0033",
   "title": "Reference lists and external links are extracted as article prose",
-  "type": "implement", "status": "todo", "quarter": "Q1",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
-  "depends_on": ["T-0027"],
+  "depends_on": [
+    "T-0027"
+  ],
   "acceptance": [
     "A citation list, Notes list, Further reading and External links section are not part of the extracted article body",
     "wikipedia_readability and wikipedia_epub both exclude their backmatter, and BOTH frozen expectations are updated together to reflect it",
@@ -11,8 +15,26 @@
     "Real prose that happens to be list-shaped is still extracted; apache_license and python_docs_tutorial do not regress",
     "The word-count drop for both Wikipedia fixtures is stated in the commit message so the change is auditable"
   ],
-  "touches": ["Packages/SwiftReadability/Sources/**", "Packages/SwiftReadability/Tests/**"],
-  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Packages/SwiftReadability/Sources/**",
+    "Packages/SwiftReadability/Tests/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0033",
   "notes": "EXPLICIT AUTHORITY TO EDIT TWO FROZEN EXPECTATIONS, granted by the overseer: wikipedia_epub.json and wikipedia_readability.json. This is the rare case where the expectation itself encodes the defect. wikipedia_epub was frozen at T-0006 because the page extracted completely, and nobody asked whether a 69-item citation list belongs in a reading view; it does not. The normal rule stands everywhere else — never edit a frozen expectation to make your own diff pass — and it stands here for every OTHER fixture. Found by T-0027's agent, which correctly refused to exclude references because doing so would have failed wikipedia_epub, and reported the tension rather than shipping a silent compromise. Backmatter is roughly 40-43% of raw text on both pages, so this is a large and very visible quality change for a reading app.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T19:40:20Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "ae810fb98cfab4fc5",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T19:40:19Z"
+  }
 }

@@ -2,7 +2,7 @@
   "id": "T-0034",
   "title": "Markup mode: a tap sometimes places a caret instead of highlighting",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Reading experience",
   "depends_on": [],
@@ -17,13 +17,24 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "Found by T-0005 while repairing the UI suite, and it is a real user-facing defect rather than a test problem: roughly half of markup-mode taps place a caret instead of highlighting the sentence. Root cause named by that agent: SelectableTextView.makeUIView sets tap.cancelsTouchesInView = false, so UITextView's own tap recognizer races the custom one and sometimes wins. The agent left the test failing rather than weakening it \u2014 correctly, since the test is reporting a genuine bug. Note the fix must not break ordinary selection or link tapping, which is why cancelsTouchesInView was false in the first place; the likely answer is a gesture dependency or gating on markupTool rather than flipping the flag outright.",
+  "branch": "factory/T-0034",
+  "notes": "Found by T-0005 while repairing the UI suite, and it is a real user-facing defect rather than a test problem: roughly half of markup-mode taps place a caret instead of highlighting the sentence. Root cause named by that agent: SelectableTextView.makeUIView sets tap.cancelsTouchesInView = false, so UITextView's own tap recognizer races the custom one and sometimes wins. The agent left the test failing rather than weakening it — correctly, since the test is reporting a genuine bug. Note the fix must not break ordinary selection or link tapping, which is why cancelsTouchesInView was false in the first place; the likely answer is a gesture dependency or gating on markupTool rather than flipping the flag outright.",
   "history": [
     {
       "ts": "2026-08-25T00:00:00Z",
       "event": "touches-renamed",
       "detail": "Stacks/ paths rewritten to Cairn/ after T-0031; a lease naming a directory that no longer exists is the drift that bit T-0006 and T-0007"
+    },
+    {
+      "ts": "2026-08-25T19:40:20Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a94f8ba588ca606e3",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T19:40:19Z"
+  }
 }

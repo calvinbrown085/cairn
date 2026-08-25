@@ -2,7 +2,7 @@
   "id": "T-0024",
   "title": "Opening an article goes straight to full screen",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Reading experience",
   "depends_on": [
@@ -24,8 +24,8 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "User request 2026-08-25. NOT sticky: always enter immersive; exiting applies to the current post only. No stored preference. iPAD DECIDED 2026-08-25: same as iPhone \u2014 the library column collapses on open and returns on exit, one behaviour on every device.",
+  "branch": "factory/T-0024",
+  "notes": "User request 2026-08-25. NOT sticky: always enter immersive; exiting applies to the current post only. No stored preference. iPAD DECIDED 2026-08-25: same as iPhone — the library column collapses on open and returns on exit, one behaviour on every device.",
   "history": [
     {
       "ts": "2026-08-25T18:32:35Z",
@@ -36,6 +36,17 @@
       "ts": "2026-08-25T00:00:00Z",
       "event": "touches-renamed",
       "detail": "Stacks/ paths rewritten to Cairn/ after T-0031; a lease naming a directory that no longer exists is the drift that bit T-0006 and T-0007"
+    },
+    {
+      "ts": "2026-08-25T19:40:19Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a6393af240a8452a1",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T19:40:19Z"
+  }
 }
