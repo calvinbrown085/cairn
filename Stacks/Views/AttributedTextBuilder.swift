@@ -12,6 +12,16 @@ struct AttributedTextBuilder {
 
     /// Changes whenever anything that affects rendering changes, which is what
     /// tells `ReaderRenderCache` to start over.
+    ///
+    /// The reader's fonts now scale with the system's Dynamic Type category
+    /// (`ReaderTypography.uiFont`/`monoFont` register with `UIFontMetrics`), so
+    /// a category change can grow or shrink already-cached text without this
+    /// builder's own settings changing at all. Folding the live category into
+    /// the hash means `ReaderView`'s existing generation check (it already
+    /// depends on `\.dynamicTypeSize` and recomputes this on every such
+    /// change) drops the stale cached heights along with everything else,
+    /// instead of leaving a UITextView to clip against a measurement taken at
+    /// the old, smaller size.
     var styleGeneration: Int {
         var hasher = Hasher()
         hasher.combine(typography.family)
@@ -19,6 +29,7 @@ struct AttributedTextBuilder {
         hasher.combine(typography.lineSpacingRatio)
         hasher.combine(typography.measure)
         hasher.combine(theme)
+        hasher.combine(UIApplication.shared.preferredContentSizeCategory)
         return hasher.finalize()
     }
 

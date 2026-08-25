@@ -182,7 +182,7 @@ struct ArticleBlockView: View {
             HStack {
                 Spacer()
                 Text("❋")
-                    .font(.system(size: typography.bodySize * 0.8))
+                    .font(typography.font(size: typography.bodySize * 0.8))
                     .foregroundStyle(theme.inkSecondary.opacity(0.6))
                 Spacer()
             }

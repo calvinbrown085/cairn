@@ -30,7 +30,12 @@ struct SelectableTextView: UIViewRepresentable {
         view.textContainer.lineFragmentPadding = 0
         view.textContainer.lineBreakMode = .byWordWrapping
         view.dataDetectorTypes = []
-        view.adjustsFontForContentSizeCategory = false
+        // Fonts in `attributed` are built through `UIFontMetrics`
+        // (`ReaderTypography.uiFont`/`monoFont`), which registers them for this
+        // exact rescaling; the block's cached height is invalidated separately
+        // (see `AttributedTextBuilder.styleGeneration`) whenever the system
+        // category changes, so a taller re-render is measured, not clipped.
+        view.adjustsFontForContentSizeCategory = true
         view.delegate = context.coordinator
         view.setContentCompressionResistancePriority(.required, for: .vertical)
         view.setContentHuggingPriority(.required, for: .vertical)

@@ -23,6 +23,15 @@ final class ReadingPreferences {
 
     var theme: ReaderTheme = .paper { didSet { write(theme.rawValue, Key.theme) } }
     var family: ReaderFontFamily = .serif { didSet { write(family.rawValue, Key.family) } }
+    /// The point size at the system's *default* text-size setting — that has
+    /// always been what this number meant, and stays true after T-0022. What
+    /// changed is not this value or its stored key, but what `ReaderTypography`
+    /// does with it: it is now the base `UIFontMetrics`/`Font.custom(relativeTo:)`
+    /// scales from, so Dynamic Type grows or shrinks it from here instead of it
+    /// being drawn at this literal size regardless of the system's accessibility
+    /// setting. A `bodySize` of 19 read back from an older install still means
+    /// "19pt at the default setting" today, so no stored value needs migrating
+    /// or reinterpreting — only bigger settings now make it bigger still.
     var bodySize: Double = 19 { didSet { write(bodySize, Key.bodySize) } }
     var lineSpacingRatio: Double = 0.55 { didSet { write(lineSpacingRatio, Key.lineSpacing) } }
     var measure: Double = Metrics.readingWidth { didSet { write(measure, Key.measure) } }
@@ -113,9 +122,12 @@ extension Comparable {
 /// size grows. `relativeTo` picks which style's growth curve to follow — a
 /// small caption need not grow at the same rate as a headline.
 ///
-/// The reader's own text stack (`ArticleBlockView`, `ReaderTheme`) keeps
-/// its fixed-size system font on purpose: its size slider becomes a relative
-/// offset over Dynamic Type in T-0022, not before.
+/// The reader's own text stack (`ArticleBlockView`, `ReaderTheme`) uses this
+/// same technique for its SwiftUI-drawn glyphs, and the `UIFontMetrics`
+/// equivalent for the `UITextView`-backed prose — see `ReaderTypography.font`
+/// and `.uiFont`. `bodySize` there keeps meaning exactly what it always did,
+/// the point size at the system's default text setting; Dynamic Type now
+/// scales from that base instead of the slider producing a fixed pixel count.
 extension Font {
     static func scaled(
         _ size: CGFloat,

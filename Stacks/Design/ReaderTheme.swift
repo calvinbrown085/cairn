@@ -121,11 +121,21 @@ struct ReaderTypography: Equatable {
     var lineSpacingRatio: Double = 0.55
     var measure: Double = Metrics.readingWidth
 
+    /// `size` is the point size at the system's default text size setting —
+    /// exactly what the slider always meant. `Font.scaled` turns it into a
+    /// relative offset over Dynamic Type: identical glyphs at the default
+    /// setting, but it grows and shrinks along the `.body` curve as the
+    /// reader's accessibility text size changes, same as `size` alone never did.
     func font(size: Double, weight: Font.Weight = .regular, italic: Bool = false) -> Font {
-        let base = Font.system(size: size, weight: weight, design: family.design)
+        let base = Font.scaled(size, weight: weight, design: family.design, relativeTo: .body)
         return italic ? base.italic() : base
     }
 
+    /// The `UIFont` twin of `font(size:weight:italic:)`, for the reader's
+    /// `UITextView`-backed blocks. Registering the font with `UIFontMetrics`
+    /// is what lets `SelectableTextView.adjustsFontForContentSizeCategory`
+    /// rescale already-built text automatically when the system category
+    /// changes, without rebuilding the attributed string.
     func uiFont(size: Double, weight: UIFont.Weight = .regular, italic: Bool = false) -> UIFont {
         let system = UIFont.systemFont(ofSize: size, weight: weight)
         var descriptor = system.fontDescriptor
@@ -135,12 +145,15 @@ struct ReaderTypography: Equatable {
         ) {
             descriptor = slanted
         }
-        return UIFont(descriptor: descriptor, size: size)
+        let fixed = UIFont(descriptor: descriptor, size: size)
+        return UIFontMetrics(forTextStyle: .body).scaledFont(for: fixed)
     }
 
     /// Monospace stays monospace regardless of the chosen family — code needs it.
+    /// Scaled the same way as `uiFont`, so a code block grows along with prose.
     func monoFont(size: Double) -> UIFont {
-        UIFont.monospacedSystemFont(ofSize: size, weight: .regular)
+        let fixed = UIFont.monospacedSystemFont(ofSize: size, weight: .regular)
+        return UIFontMetrics(forTextStyle: .body).scaledFont(for: fixed)
     }
 
     var body: Font { font(size: bodySize) }
