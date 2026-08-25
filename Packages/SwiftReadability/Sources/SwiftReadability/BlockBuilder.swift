@@ -173,15 +173,72 @@ struct BlockBuilder {
         appendImage(img, caption: caption?.isEmpty == true ? nil : caption)
     }
 
+    /// `blockProducers` minus the tags that are already atomic blocks in
+    /// their own right (an image, a divider, a stray list item...). Those
+    /// never hide a second paragraph behind them, so their presence in a cell
+    /// says nothing about whether the cell is prose. The rest — `<p>`,
+    /// `<div>`, headings, lists, nested tables — exist specifically to
+    /// segment content into more than one block, and collapsing them to
+    /// inline text is exactly the flattening bug this guards against.
+    private static let cellBlockContainers: Set<String> =
+        blockProducers.subtracting(["img", "picture", "hr", "li", "figcaption", "center"])
+
+    /// True when a cell wraps genuine block content (paragraphs, headings, a
+    /// nested table, ...) rather than a bare label or value. This is what
+    /// tells a layout table — cells used as columns to hold prose — apart
+    /// from a data table, where a cell's content is the data itself.
+    private func cellHoldsBlockContent(_ cell: HTMLElement) -> Bool {
+        !cell.elements(tagged: Self.cellBlockContainers).isEmpty
+    }
+
+    /// The `<tr>` elements that belong to this table directly, not to some
+    /// other table nested inside one of its cells. A plain descendant search
+    /// would pull a nested table's rows into the outer table's count and
+    /// throw off both the layout/data decision and the row-count check below.
+    private func directRows(of table: HTMLElement) -> [HTMLElement] {
+        var rows: [HTMLElement] = []
+        func walk(_ element: HTMLElement) {
+            for child in element.childElements {
+                if child.tag == "tr" {
+                    rows.append(child)
+                } else if child.tag != "table" {
+                    walk(child)
+                }
+            }
+        }
+        walk(table)
+        return rows
+    }
+
     private mutating func appendTable(_ element: HTMLElement) {
-        // Layout tables carry no prose worth keeping; data tables become lines.
-        let rows = element.elements(tagged: ["tr"])
+        let rows = directRows(of: element)
+        guard !rows.isEmpty else { descend(element); return }
+
+        let cells = rows.flatMap { row in row.childElements.filter { $0.tag == "td" || $0.tag == "th" } }
+
+        // A cell that itself wraps block content is a layout cell, not
+        // tabular data — regardless of how many rows or columns surround it.
+        // Recurse into each cell at block granularity so the paragraphs (or
+        // headings, or lists) inside come out as their own blocks instead of
+        // being glued into one flattened run of text. This is what lets a
+        // single-row 2000s layout table, a multi-row one, and a table
+        // nested inside another all fall out of the same rule.
+        if cells.contains(where: cellHoldsBlockContent) {
+            for cell in cells { descend(cell) }
+            return
+        }
+
+        // No cell holds block content: this reads as a genuine data table
+        // (or a layout table with nothing worth extracting). A single row
+        // falls back to the old inline flattening — some legacy pages keep
+        // an image and `<br>`-separated prose in one cell with no block tags
+        // at all, and that content still deserves a chance to become prose.
         guard rows.count > 1 else { descend(element); return }
 
         var lines: [RichText] = []
         for row in rows {
-            let cells = row.childElements.filter { $0.tag == "td" || $0.tag == "th" }
-            let text = cells.map { $0.textContent.squeezed }.filter { !$0.isEmpty }.joined(separator: "  ·  ")
+            let rowCells = row.childElements.filter { $0.tag == "td" || $0.tag == "th" }
+            let text = rowCells.map { $0.textContent.squeezed }.filter { !$0.isEmpty }.joined(separator: "  ·  ")
             if !text.isEmpty { lines.append(RichText(text)) }
         }
         guard !lines.isEmpty else { return }

@@ -71,6 +71,65 @@ struct ExtractorTests {
     }
 }
 
+@Suite("Tables")
+struct TableTests {
+
+    @Test("A multi-row layout table recurses into each cell's paragraphs")
+    func multiRowLayoutTable() {
+        // Two rows, each a full-width cell wrapping its own paragraph — the
+        // same "table as a layout grid" trick as a single-row table, just
+        // stacked. Neither row is tabular data, so each cell's <p> should
+        // survive as its own block instead of being joined into a row line.
+        let article = extract(page("""
+        <article><table>
+        <tr><td><p>\(paragraph)</p></td></tr>
+        <tr><td><p>\(paragraph)</p></td></tr>
+        </table></article>
+        """))
+        let paragraphs = article.content.blocks.filter { if case .paragraph = $0 { return true } else { return false } }
+        #expect(paragraphs.count == 2)
+    }
+
+    @Test("A table nested inside a layout cell is recursed on its own terms")
+    func nestedTable() {
+        // The outer table is a layout wrapper for prose; the inner table is
+        // genuine key/value data. Recursing into the outer cell should reach
+        // the paragraph, and the nested table should still resolve as data
+        // (a list), not have its rows mistaken for the outer table's own.
+        let article = extract(page("""
+        <article><table><tr><td>
+        <p>\(paragraph)</p>
+        <table><tr><td>Published</td><td>2026</td></tr><tr><td>Author</td><td>M. Alden</td></tr></table>
+        </td></tr></table></article>
+        """))
+        let paragraphs = article.content.blocks.filter { if case .paragraph = $0 { return true } else { return false } }
+        let lists = article.content.blocks.filter { if case .list = $0 { return true } else { return false } }
+        #expect(paragraphs.count == 1)
+        #expect(lists.count == 1)
+    }
+
+    @Test("A genuine data table keeps its rows joined, not shredded per cell")
+    func dataTableStaysJoined() {
+        // Cells hold bare values, not block content, so the rows should still
+        // collapse to one list item apiece rather than becoming a paragraph
+        // per cell — the failure mode a naive "always recurse" fix would add.
+        let article = extract(page("""
+        <article><p>\(paragraph)</p>
+        <table>
+        <tr><td>Author</td><td>M. Alden</td></tr>
+        <tr><td>Published</td><td>2026</td></tr>
+        <tr><td>Pages</td><td>212</td></tr>
+        </table></article>
+        """))
+        let lists = article.content.blocks.compactMap { block -> [RichText]? in
+            if case .list(_, let items) = block { return items }
+            return nil
+        }
+        #expect(lists.count == 1)
+        #expect(lists.first?.count == 3)
+    }
+}
+
 @Suite("Entities")
 struct EntityTests {
 
