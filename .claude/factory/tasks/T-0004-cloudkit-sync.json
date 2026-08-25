@@ -1,6 +1,9 @@
 {
-  "id": "T-0004", "title": "Verify CloudKit sync on two real devices",
-  "type": "spike", "status": "draft", "quarter": "Q1",
+  "id": "T-0004",
+  "title": "Verify CloudKit sync on two real devices",
+  "type": "spike",
+  "status": "todo",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Verify CloudKit sync on two real devices",
   "depends_on": [],
   "acceptance": [
@@ -8,7 +11,17 @@
     "Highlights, tags, and read state all round-trip",
     "Conflict behaviour on simultaneous edits is characterised"
   ],
-  "touches": [], "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Physical hardware. A load-bearing unverified assumption under the whole product; kill criterion 3 hangs off it.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T17:34:12Z",
+      "event": "approved",
+      "detail": "human approved all pending drafts"
+    }
+  ]
 }

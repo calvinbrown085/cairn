@@ -127,12 +127,19 @@ is worth using at all given "AI never writes" (probably not this year).
 - **`PrivacyInfo.xcprivacy` is missing.** Required. `UserDefaults` in
   `Stacks/Services/AppGroup.swift` is a "required reason" API and must declare
   one (app-group shared defaults).
-- **Zero Dynamic Type support.** 29 hardcoded `.system(size:)` call sites across
-  10 files, plus `adjustsFontForContentSizeCategory = false` in
+- **Zero Dynamic Type support.** **77** hardcoded `.system(size:)` call sites
+  across **16** files, plus `adjustsFontForContentSizeCategory = false` in
   `SelectableTextView.swift`. For a reading app this is close to disqualifying
-  for low-vision users.
-- **Zero accessibility labels.** Every icon-only control — star, `AA`, ellipsis,
-  `+`, the filter menu — is unlabelled for VoiceOver.
+  for low-vision users. *(Recounted 2026-08-25: the original figure of 29 across
+  10 files was measured before the markup and card work landed. T-0012 is 2.6x
+  the job this line originally described.)*
+- ~~**Zero accessibility labels.**~~ **Closed 2026-08-25** by T-0011 (`0feb6c2`);
+  every icon-only control now carries one. Two corrections to the original
+  audit, for the record: 13 labels already existed when it was written, and
+  there is no icon-only *filter menu* — filtering is `SidebarView` rows, which
+  pair each icon with visible text and were never unlabelled. VoiceOver reading
+  order inside the reader is still open; it is Q2 work and depends on the text
+  architecture decision.
 
 ---
 

@@ -1,16 +1,34 @@
 {
-  "id": "T-0009", "title": "Re-extraction command",
-  "type": "implement", "status": "draft", "quarter": "Q1",
+  "id": "T-0009",
+  "title": "Re-extraction command",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Durability > Re-extraction command",
-  "depends_on": ["T-0007"],
+  "depends_on": [
+    "T-0007"
+  ],
   "acceptance": [
     "Rebuilds blocks from stored original HTML for one post and for the whole library",
     "Highlights survive re-extraction or the user is warned before any are lost",
     "Posts with no stored HTML are skipped, not corrupted",
     "The operation is cancellable and reports what changed"
   ],
-  "touches": ["Stacks/Services/**", "Stacks/Content/**", "Stacks/Views/**"],
-  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Stacks/Services/**",
+    "Stacks/Content/**",
+    "Stacks/Views/**"
+  ],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Constitution P7: must not lossily rewrite the archive.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T17:34:13Z",
+      "event": "approved",
+      "detail": "human approved all pending drafts"
+    }
+  ]
 }

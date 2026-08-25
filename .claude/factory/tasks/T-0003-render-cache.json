@@ -1,15 +1,33 @@
 {
-  "id": "T-0003", "title": "Revert ReaderRenderCache unless profiling vindicates it",
-  "type": "debt", "status": "draft", "quarter": "Q1",
+  "id": "T-0003",
+  "title": "Revert ReaderRenderCache unless profiling vindicates it",
+  "type": "debt",
+  "status": "todo",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Revert ReaderRenderCache",
-  "depends_on": ["T-0001"],
+  "depends_on": [
+    "T-0001"
+  ],
   "acceptance": [
     "If T-0001 shows no measurable benefit, ReaderRenderCache.swift is removed and its call sites unwound",
     "Reader scroll and position restore still behave identically after removal",
     "No other behaviour changes ride along with the revert"
   ],
-  "touches": ["Stacks/Views/ReaderRenderCache.swift", "Stacks/Views/ReaderView.swift", "Stacks/Views/ArticleBlockView.swift"],
-  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Stacks/Views/ReaderRenderCache.swift",
+    "Stacks/Views/ReaderView.swift",
+    "Stacks/Views/ArticleBlockView.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Conditional on T-0001's finding. Unearned complexity by the roadmap's own account.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T17:34:12Z",
+      "event": "approved",
+      "detail": "human approved all pending drafts"
+    }
+  ]
 }

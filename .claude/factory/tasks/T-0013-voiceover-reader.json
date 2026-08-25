@@ -1,16 +1,33 @@
 {
-  "id": "T-0013", "title": "VoiceOver pass over the reader",
-  "type": "implement", "status": "draft", "quarter": "Q2",
+  "id": "T-0013",
+  "title": "VoiceOver pass over the reader",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > VoiceOver pass over the reader",
-  "depends_on": ["T-0002", "T-0012"],
+  "depends_on": [
+    "T-0002",
+    "T-0012"
+  ],
   "acceptance": [
     "Reading order through blocks is correct with no duplicated or skipped content",
     "Rotor navigation by heading works in a long article",
     "Highlight creation and navigation are reachable and announced",
     "Verified by a human with VoiceOver on a device, not inferred from code"
   ],
-  "touches": ["Stacks/Views/**"],
-  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Stacks/Views/**"
+  ],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Depends on the T-0002 architecture call. Final sign-off is human.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T17:34:13Z",
+      "event": "approved",
+      "detail": "human approved all pending drafts"
+    }
+  ]
 }

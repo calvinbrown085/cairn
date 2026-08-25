@@ -1,17 +1,33 @@
 {
   "id": "T-0020",
   "title": "Make the backlog honest rather than hidden",
-  "type": "implement", "status": "draft", "quarter": "Q2",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "Q2",
   "roadmap_anchor": "Q2 > Shed the queue > Make the backlog honest rather than hidden",
-  "depends_on": ["T-0017"],
+  "depends_on": [
+    "T-0017"
+  ],
   "acceptance": [
     "The depth of the backlog can be stated plainly when the user asks for it, and never when they do not",
     "If the pile is months deep the app says so in plain language, without a standing tally anywhere",
     "A bulk-archive path is offered alongside that statement",
     "Nothing added here reintroduces a persistent count, badge, or nag"
   ],
-  "touches": ["Stacks/Views/LibraryView.swift", "Stacks/Views/SidebarView.swift"],
-  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Stacks/Views/LibraryView.swift",
+    "Stacks/Views/SidebarView.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
   "notes": "Split from T-0017, which folded two roadmap bullets into one task. This half needs a surface that does not exist yet — the codebase uses neither .alert nor .contextMenu anywhere — so it is interaction design, not a labelling change. The T-0017 agent correctly declined to invent it rather than reach outside its touches.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T17:34:14Z",
+      "event": "approved",
+      "detail": "human approved all pending drafts"
+    }
+  ]
 }

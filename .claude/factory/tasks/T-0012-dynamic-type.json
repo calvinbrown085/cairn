@@ -2,7 +2,7 @@
   "id": "T-0012",
   "title": "Dynamic Type as the base, reader slider as a relative offset",
   "type": "implement",
-  "status": "draft",
+  "status": "todo",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Dynamic Type as the base",
   "depends_on": [
@@ -20,9 +20,15 @@
     "Stacks/Design/**"
   ],
   "risk": "high",
-  "factory_eligible": false,
+  "factory_eligible": true,
   "attempts": 0,
   "branch": null,
   "notes": "Close to disqualifying for low-vision users today. Touches nearly every view — will monopolise the touches lock, so schedule it alone.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T17:34:13Z",
+      "event": "approved",
+      "detail": "human approved all pending drafts"
+    }
+  ]
 }

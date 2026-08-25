@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.claude/factory/bin/*)",
+      "Bash(/Users/calvinbrown/Documents/stacks/.claude/factory/bin/*)"
+    ]
+  }
+}
