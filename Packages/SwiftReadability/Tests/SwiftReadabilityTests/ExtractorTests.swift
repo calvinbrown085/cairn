@@ -69,6 +69,24 @@ struct ExtractorTests {
         let restored = ArticleContent.decoded(from: article.content.encoded())
         #expect(restored == article.content)
     }
+
+    @Test("A document split across sibling sections keeps every section, not just the best-scoring one")
+    func siblingSectionsAllSurvive() {
+        // Several `<div class="chapter">` elements as direct siblings of
+        // `<body>`, nothing wrapping them — the shape that collapsed to a
+        // single surviving chapter (see Fixtures/README.md and
+        // gutenberg_frankenstein): no shared ancestor closer than `<body>`
+        // ever scored highly enough for the old "climb to a nearly-as-good
+        // parent" step to reach, so only the single best-scoring sibling
+        // survived and the rest of the book was silently dropped.
+        let chapters = (1...5).map { index in
+            "<div class=\"chapter\"><h2>Chapter \(index)</h2><p>\(paragraph) Chapter marker \(index).</p><p>\(paragraph)</p></div>"
+        }.joined()
+        let article = extract(page(chapters))
+        for index in 1...5 {
+            #expect(article.content.plainText.contains("Chapter marker \(index)."), "chapter \(index) was dropped")
+        }
+    }
 }
 
 @Suite("Tables")

@@ -187,24 +187,68 @@ public enum ArticleExtractor {
 
         guard let winner = best else { return nil }
 
-        // Climb while the parent scores nearly as well — this recovers the wrapper
-        // holding intro paragraphs the winner itself excluded.
+        // The richest score found anywhere in `element`'s subtree, not just on
+        // `element` itself. A section's own aggregate score only reflects the
+        // credit that reached it within `ancestors(limit: 3)` of each paragraph
+        // — for content nested one table row, or one wrapper div, deeper than
+        // that (a `<table><tbody><tr><td><p>` chapter, say), the section that
+        // actually holds the prose scores near zero even though a descendant a
+        // level or two down scored highly on its own. Asking "what's the best
+        // candidate inside here" instead of "how much credit collected here"
+        // makes sibling comparison immune to how many wrapper levels separate
+        // the prose from the element being compared.
+        func richestDescendantScore(_ element: HTMLElement) -> Double {
+            var best = scores[ObjectIdentifier(element)]?.value ?? -Double.infinity
+            for child in element.childElements {
+                best = max(best, richestDescendantScore(child))
+            }
+            return best
+        }
+
+        // Climb toward whichever ancestor holds the winner's real siblings.
+        // Three independent reasons to climb a level:
+        //
+        //  - `current` is pure scaffolding — its only child is the one we just
+        //    climbed from (a table row around a single cell, a div wrapping a
+        //    single div). There is no decision to make here: nothing else
+        //    lives at this level, so climbing costs nothing and may be needed
+        //    to reach the real fork further up.
+        //  - the parent itself scores nearly as well as the winner — this
+        //    recovers a wrapper holding intro paragraphs the winner excluded.
+        //  - more than one of `current`'s children holds content within the
+        //    same order of magnitude as the winner, somewhere in its own
+        //    subtree — this recovers a document whose content lives in
+        //    several coequal siblings (book chapters, doc sections, wiki
+        //    `<h2>` sections) where no single sibling scores high enough
+        //    alone to make the previous case fire, but the shared parent
+        //    holds all of them. A stray intro paragraph or caption sitting
+        //    next to the real content scores nowhere near the winner, so it
+        //    doesn't count as a peer.
         var chosen = winner.element
         var chosenScore = winner.value
         var parent = chosen.parent
-        while let current = parent, current.tag != "body", current.tag != "html" {
-            let parentScore = scores[ObjectIdentifier(current)]?.value ?? 0
+        while let current = parent, current.tag != "html" {
             // Climbing into a wrapper that is mostly links means swallowing the
             // site's navigation along with the article.
-            if parentScore > chosenScore * 0.85,
-               current.textContent.count < chosen.textContent.count * 3,
-               current.linkDensity < 0.35 {
+            guard current.linkDensity < 0.35 else { break }
+
+            if current.childElements.count == 1 {
                 chosen = current
-                chosenScore = parentScore
                 parent = current.parent
-            } else {
-                break
+                continue
             }
+
+            let parentScore = scores[ObjectIdentifier(current)]?.value ?? 0
+            let recoversWrapper = parentScore > chosenScore * 0.85
+                && current.textContent.count < chosen.textContent.count * 3
+
+            let peerSiblings = current.childElements.filter { richestDescendantScore($0) >= chosenScore * 0.15 }
+            let joinsSiblingCluster = peerSiblings.count >= 2
+
+            guard recoversWrapper || joinsSiblingCluster else { break }
+            chosen = current
+            chosenScore = max(parentScore, peerSiblings.map(richestDescendantScore).max() ?? chosenScore)
+            parent = current.parent
         }
 
         return chosen.textContent.count > 200 ? chosen : nil

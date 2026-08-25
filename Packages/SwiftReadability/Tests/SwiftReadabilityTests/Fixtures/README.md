@@ -30,23 +30,6 @@ placeholder waiting to be filled in with whatever the extractor happens to
 produce today, because that would assert a bug as if it were the intended
 shape. As of the last audit (T-0006), these have no expectation:
 
-- `gutenberg_frankenstein` — the winning content candidate is a single
-  `<div class="chapter">`; the book's 24 chapters and 4 letters are siblings
-  with no wrapping element scored highly enough for the "climb to the parent"
-  step in `ArticleExtractor.bestCandidate` to reach, so only the single
-  largest chapter (24) survives and the rest of the novel is dropped.
-- `mdn_fetch_api`, `python_docs_tutorial`, `w3c_html4_tables`,
-  `wikipedia_readability`, `wikinews_story` — the same root cause: real
-  content spread across several sibling sections (`<section>`, `<div
-  class="chapter">`, wiki `<h2>` sections) rather than one container. Ancestor
-  scoring credit only flows up three levels (`element.ancestors(limit: 3)` in
-  `ArticleExtractor.bestCandidate`), so a section nested one level deeper than
-  that never contributes its score to a shared ancestor, and the single
-  best-scoring section wins while its siblings are silently dropped. Whether a
-  given page trips this depends on how deeply its sections are wrapped and how
-  evenly their scores are balanced — `mdn_img_element` and `wikipedia_epub`
-  have the same many-sections shape and are *not* affected, which is why they
-  do have expectations.
 - `commons_gallery` — the gallery's real, non-lazy `<img>` elements sit inside
   `<li class="gallerybox">`. `BlockBuilder`'s `"li"` case (a stray list item
   outside a list) always converts to a text paragraph and never looks for an
@@ -67,11 +50,53 @@ shape. As of the last audit (T-0006), these have no expectation:
   itself is captured completely and correctly — all 176 pages, none dropped —
   so this is a title-only defect.
 
+### Fixed by T-0027: sibling-section truncation
+
+Until T-0027, `gutenberg_frankenstein`, `mdn_fetch_api`,
+`python_docs_tutorial`, `w3c_html4_tables`, `wikipedia_readability`, and
+`wikinews_story` had no expectation here for the same root cause: real
+content spread across several sibling sections (`<section>`, `<div
+class="chapter">`, wiki `<h2>` sections, or a chain of `<table>` boxes)
+rather than one container, where `ArticleExtractor.bestCandidate` picked the
+single best-scoring sibling and silently dropped the rest — on
+`gutenberg_frankenstein` that meant keeping chapter 24 alone and losing 24
+chapters and 4 letters. `bestCandidate` now climbs past a shared ancestor
+when either the ancestor's own score is nearly as good as the winner's (the
+original check, for recovering a wrapper holding excluded intro paragraphs),
+or when more than one of the ancestor's children independently holds content
+within the same order of magnitude as the winner — judged against the
+richest score found *anywhere in that child's subtree*, not the ancestor's
+own diluted aggregate, so it isn't defeated by extra wrapper levels (a
+`<table><tbody><tr><td>` chain, say) the way the three-level ancestor-credit
+limit was. Pure single-child scaffolding (a table row around one cell, a div
+wrapping one div) is climbed through for free since there is no sibling to
+compare against. All six now have expectations reflecting complete
+extraction; `mdn_img_element` and `wikipedia_epub`, which already extracted
+completely, are unaffected by the change.
+
+`wikipedia_readability`'s frozen expectation is worth calling out
+specifically: its category-footer links (`#catlinks`) stay out, because they
+sit outside the `mw-parser-output` div entirely and are never part of the
+climbed subtree — but its References, Further reading, and External links
+sections stay *in*, alongside Definition, Applications, and the formula
+sections. There is no way to exclude those sections generically without
+also excluding the structurally-identical References/Notes/External-links
+sections in `wikipedia_epub.json`, which is frozen with that content
+included and must not regress. Any rule keyed on the `mw-references` class,
+on a "References"/"External links" heading, or on list-shape (many short
+list items) matches both pages' footnote sections equally; the only
+observed difference between them (how large the citation cluster is
+relative to the rest of the page) is proportionally similar on both pages
+and would be threshold-tuning, not a structural distinction. Excluding
+`wikipedia_readability`'s backmatter was not achieved for this reason — see
+the T-0027 report.
+
 The sibling-scoring cause was isolated with a synthetic page — several
 `<div class="chapter">` elements as direct siblings of `<body>`, nothing else
 — which reproduces the same single-chapter-survives behaviour seen on
 `gutenberg_frankenstein`, confirming the shape of the page rather than its
-prose is what triggers it.
+prose is what triggers it. That reproduction is now
+`ExtractorTests.siblingSectionsAllSurvive`.
 
 While building `malformed_nesting.html`, an unclosed `<h1>` (no matching
 `</h1>`) turned out to swallow every element after it as its own descendant:
