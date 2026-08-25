@@ -1,7 +1,7 @@
 {
   "$comment": "Runtime knobs for the Stacks factory. See DESIGN.md.",
-  "max_parallel": 3,
-  "$max_parallel": "Implementers in flight. Ceiling is 3 on this machine; Xcode, not the harness, is the constraint.",
+  "max_parallel": 4,
+  "$max_parallel": "Raised to 4 on 2026-08-25. The original ceiling of 2-3 assumed simulator contention; the gate now runs swift test on macOS and builds for a generic simulator destination, so nothing touches simctl and worktrees verify in parallel. Disk is the real limit now.",
   "max_attempts": 3,
   "$max_attempts": "Implementer attempts before the Opus rescue attempt. After the rescue, the task is parked.",
   "rescue_model": "opus",

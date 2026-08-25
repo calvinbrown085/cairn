@@ -1,16 +1,32 @@
 {
   "id": "T-0025",
   "title": "Data tables whose cells wrap values in a styling div are shredded per cell",
-  "type": "implement", "status": "draft", "quarter": "Q1",
+  "type": "implement",
+  "status": "cancelled",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
-  "depends_on": ["T-0019"],
+  "depends_on": [
+    "T-0019"
+  ],
   "acceptance": [
     "A data table whose cells wrap bare values in a <div> for styling keeps its rows joined rather than becoming one block per cell",
     "Layout tables holding real prose still recurse into cell content at block granularity",
     "Both cases are covered by fixtures, so the discriminator cannot silently regress"
   ],
-  "touches": ["Packages/SwiftReadability/Sources/**", "Packages/SwiftReadability/Tests/**"],
-  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Packages/SwiftReadability/Sources/**",
+    "Packages/SwiftReadability/Tests/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
   "notes": "Residual risk flagged by the T-0019 agent, in its own words: it distinguishes layout tables from data tables by whether any cell holds a block-container tag, and div is on that list. A data table wrapping values in a div purely for styling would be misclassified as layout and shredded per cell. No fixture or realistic case in the repo hits it today, and the agent explicitly declined to declare it solved. Likely needs a stronger signal than tag presence alone — cell text length, ratio of cells to prose, or presence of th.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T18:28:05Z",
+      "event": "cancelled",
+      "detail": "extractor edge case with no real page that triggers it"
+    }
+  ]
 }

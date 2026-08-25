@@ -307,6 +307,24 @@ ranking quality. Use them.
 
 ---
 
+## Cut 2026-08-25 — refocus on the reading experience
+
+Killed deliberately, not deferred. The judgement was that the app had accumulated
+infrastructure and compliance work faster than anything a reader can feel, while
+the archive was being actively corrupted at save time.
+
+| Cut | Why |
+|---|---|
+| Scroll-cost profiling, `ReaderRenderCache` revert | Performance debt nobody is complaining about. |
+| A second SPM package for app-logic tests | The gate already works; more test plumbing is not a product. |
+| Cross-block selection | The accepted cost of the text-architecture decision. No evidence anyone hits it. |
+| Extractor edge cases: styling-`div` data tables, unclosed `<h1>` | No real captured page triggers either. |
+| Share-extension privacy manifest question | Compliance. Answer it when the TestFlight submission needs it. |
+
+What survived the cut is the work a reader can feel: articles that are not
+truncated, an archive that can be repaired later, full screen on open, intent
+capture, reader typography, and export.
+
 ## Explicitly not doing this year
 
 | Not doing | Why |

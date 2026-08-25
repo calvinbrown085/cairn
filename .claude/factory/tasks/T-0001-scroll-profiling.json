@@ -2,7 +2,7 @@
   "id": "T-0001",
   "title": "Profile the remaining reader scroll cost with Instruments",
   "type": "spike",
-  "status": "todo",
+  "status": "cancelled",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Finish the scroll investigation",
   "depends_on": [],
@@ -13,7 +13,7 @@
   ],
   "touches": [],
   "risk": "medium",
-  "factory_eligible": true,
+  "factory_eligible": false,
   "attempts": 0,
   "branch": null,
   "notes": "Needs Instruments and a human reading a trace. Never dispatched.",
@@ -22,6 +22,11 @@
       "ts": "2026-08-25T17:34:12Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T18:28:05Z",
+      "event": "cancelled",
+      "detail": "performance debt investigation; no user is complaining about scroll"
     }
   ]
 }

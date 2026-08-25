@@ -2,7 +2,7 @@
   "id": "T-0018",
   "title": "Decide whether the share extension needs its own privacy manifest",
   "type": "decide",
-  "status": "todo",
+  "status": "cancelled",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Ship a beta > PrivacyInfo.xcprivacy",
   "depends_on": [
@@ -18,7 +18,7 @@
     "project.yml"
   ],
   "risk": "medium",
-  "factory_eligible": true,
+  "factory_eligible": false,
   "attempts": 0,
   "branch": null,
   "notes": "Surfaced reviewing T-0010. project.yml compiles Stacks/Services/AppGroup.swift into StacksShareExtension too, so the extension binary also calls UserDefaults — but T-0010's manifest lands only in the app bundle. Apple's guidance on per-extension manifests is ambiguous enough that this is a judgement call, not an implementation task. Kept out of T-0010 rather than widening its scope.",
@@ -27,6 +27,11 @@
       "ts": "2026-08-25T17:34:13Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T18:28:05Z",
+      "event": "cancelled",
+      "detail": "compliance question; defer until the TestFlight submission actually needs an answer"
     }
   ]
 }

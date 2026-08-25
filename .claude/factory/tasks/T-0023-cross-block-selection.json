@@ -1,7 +1,9 @@
 {
   "id": "T-0023",
   "title": "Selection across block boundaries",
-  "type": "implement", "status": "draft", "quarter": "Q4",
+  "type": "implement",
+  "status": "cancelled",
+  "quarter": "Q4",
   "roadmap_anchor": "Q1 > Debt > Resolve the reader's text architecture",
   "depends_on": [],
   "acceptance": [
@@ -9,8 +11,21 @@
     "The resulting highlight persists as one per block, preserving the existing (blockIndex, start, length) anchoring",
     "Existing single-block highlights are unaffected"
   ],
-  "touches": ["Stacks/Views/SelectableTextView.swift", "Stacks/Views/ArticleBlockView.swift", "Stacks/Views/ReaderView.swift"],
-  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "touches": [
+    "Stacks/Views/SelectableTextView.swift",
+    "Stacks/Views/ArticleBlockView.swift",
+    "Stacks/Views/ReaderView.swift"
+  ],
+  "risk": "high",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
   "notes": "The accepted cost of T-0002's decision to keep one UITextView per block. Filed so the trade is visible rather than forgotten. Do not attempt before there is evidence readers actually hit it — a cross-block selection mechanism over N separate text views is genuinely hard, and the roadmap has more valuable work.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T18:28:05Z",
+      "event": "cancelled",
+      "detail": "cross-block selection; no evidence anyone hits it"
+    }
+  ]
 }

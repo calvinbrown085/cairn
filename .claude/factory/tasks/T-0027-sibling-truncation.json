@@ -1,7 +1,9 @@
 {
   "id": "T-0027",
   "title": "Extractor silently discards most of multi-section documents",
-  "type": "implement", "status": "todo", "quarter": "Q1",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [],
   "acceptance": [
@@ -12,8 +14,26 @@
     "mdn_img_element and wikipedia_epub, which already extract completely, do not regress",
     "Furniture rejection is not weakened to achieve this: nav, footers and reference lists still stay out"
   ],
-  "touches": ["Packages/SwiftReadability/Sources/**", "Packages/SwiftReadability/Tests/**"],
-  "risk": "high", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Packages/SwiftReadability/Sources/**",
+    "Packages/SwiftReadability/Tests/**"
+  ],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0027-sibling-truncation",
   "notes": "THE MOST SERIOUS DEFECT FOUND SO FAR. Measured: gutenberg_frankenstein is ~75,085 words in source and the extractor keeps 8,239 — 89% silently lost, chapter 24 of 24. Six of fourteen real captures are affected. Root cause isolated by the T-0006 agent: in ArticleExtractor.bestCandidate, ancestor credit only flows up 3 levels, and the climb-to-parent step only fires when the parent's combined text stays under 3x the winning child's. Pages whose content sits in several sibling sections lose everything but the best-scoring sibling. The agent built a synthetic reproduction — 5 sibling div.chapter under body with no wrapper — that reliably collapses to 1. Note the interaction with T-0007: until original HTML is stored, every long article saved is permanently truncated with no way to repair it later. This is the strongest argument for landing T-0007 immediately.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T18:29:17Z",
+      "event": "dispatched",
+      "detail": "attempt 1; highest-value defect — 89% of long articles lost at save time"
+    }
+  ],
+  "agent": {
+    "id": "a8dd9d6ac09c1d33f",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-25T18:29:17Z"
+  }
 }
