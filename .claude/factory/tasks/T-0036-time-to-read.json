@@ -1,0 +1,15 @@
+{
+  "id": "T-0036", "title": "Time-to-read as a first-class filter and sort",
+  "type": "implement", "status": "todo", "quarter": "next",
+  "roadmap_anchor": null, "depends_on": [],
+  "acceptance": [
+    "The library can be filtered to articles that fit a span of time — under 5, under 10, under 20 minutes",
+    "Reading time is shown on every row and card",
+    "The estimate derives from the existing word count, with the assumed words-per-minute stated in code",
+    "Filtering by time composes with the existing filters rather than replacing them"
+  ],
+  "touches": ["Cairn/Views/**"],
+  "risk": "low", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "Owner saves a lot and reads little. A pile of 300 is paralysing; 'what fits in the seven minutes I have' is a menu. wordCount already exists on Post, so this is close to free and has the best value-to-effort ratio on the list.",
+  "history": []
+}

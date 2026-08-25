@@ -1,0 +1,14 @@
+{
+  "id": "T-0041", "title": "Images behave: zoom, captions, galleries",
+  "type": "implement", "status": "todo", "quarter": "next",
+  "roadmap_anchor": null, "depends_on": ["T-0028"],
+  "acceptance": [
+    "Tapping an image opens it full screen with pinch to zoom and swipe to dismiss",
+    "Captions render as captions rather than as body prose",
+    "Lazy-loaded gallery images are captured at save time rather than lost"
+  ],
+  "touches": ["Cairn/Views/**", "Packages/SwiftReadability/Sources/**"],
+  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "Part of 'reading is unpleasant'. The gallery half overlaps T-0028, which already covers img-inside-li extraction; this task owns the reading-side behaviour.",
+  "history": []
+}

@@ -2,7 +2,7 @@
   "id": "T-0001",
   "title": "Profile the remaining reader scroll cost with Instruments",
   "type": "spike",
-  "status": "cancelled",
+  "status": "todo",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Debt > Finish the scroll investigation",
   "depends_on": [],
@@ -27,6 +27,11 @@
       "ts": "2026-08-25T18:28:05Z",
       "event": "cancelled",
       "detail": "performance debt investigation; no user is complaining about scroll"
+    },
+    {
+      "ts": "2026-08-25T19:19:00Z",
+      "event": "uncancelled",
+      "detail": "owner says reading itself is unpleasant; unprofiled scroll CPU is a prime suspect and killing this was premature"
     }
   ]
 }

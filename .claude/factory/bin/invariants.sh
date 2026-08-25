@@ -102,11 +102,30 @@ else
 fi
 
 # --- X7: signing and identity are fixed ------------------------------------
+# Two tiers, because they are not equally dangerous.
+#
+# DEVELOPMENT_TEAM is the signing identity. Changing it to make a build pass is
+# forgery, and NOTHING unlocks it — not a task brief, not this flag.
+#
+# The bundle identifiers, app group and CloudKit container are product identity.
+# They are normally frozen because changing one orphans a user's library, but a
+# deliberate rename has to change them. ALLOW_IDENTITY_CHANGE=1 permits exactly
+# that, still printing every changed line so the diff stays auditable. A prose
+# exception in a task brief cannot be read by a grep — the exception has to be
+# mechanical or the gate blocks the very change it was told to allow.
 if [ -n "$CHANGED" ]; then
+  team="$(git diff "$BASE"...HEAD -- project.yml '*.entitlements' \
+    | grep -E '^[+-].*DEVELOPMENT_TEAM' || true)"
   ident="$(git diff "$BASE"...HEAD -- project.yml '*.entitlements' \
-    | grep -E '^[+-].*(DEVELOPMENT_TEAM|PRODUCT_BUNDLE_IDENTIFIER|group\.|iCloud\.)' || true)"
-  if [ -n "$ident" ]; then
-    flag "X7  signing or identity changed:"; echo "$ident" | sed 's/^/        /' | head -6
+    | grep -E '^[+-].*(PRODUCT_BUNDLE_IDENTIFIER|group\.|iCloud\.)' || true)"
+  if [ -n "$team" ]; then
+    flag "X7  DEVELOPMENT_TEAM changed — never permitted:"; echo "$team" | sed 's/^/        /' | head -4
+  elif [ -n "$ident" ] && [ "${ALLOW_IDENTITY_CHANGE:-0}" != 1 ]; then
+    flag "X7  product identity changed without ALLOW_IDENTITY_CHANGE=1:"
+    echo "$ident" | sed 's/^/        /' | head -6
+  elif [ -n "$ident" ]; then
+    ok "X7  product identity changed under explicit waiver ($(echo "$ident" | grep -c '^+') added lines); DEVELOPMENT_TEAM untouched"
+    echo "$ident" | sed 's/^/        /' | head -8
   else
     ok "X7  signing and identity unchanged"
   fi

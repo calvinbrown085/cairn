@@ -1,0 +1,15 @@
+{
+  "id": "T-0040", "title": "Bulk archive tools you invoke, never prompted",
+  "type": "implement", "status": "todo", "quarter": "next",
+  "roadmap_anchor": null, "depends_on": [],
+  "acceptance": [
+    "Multiple posts can be selected and archived in one action",
+    "Everything older than a chosen date can be archived in one action, with the count shown before it happens",
+    "Never-opened is available as a filter",
+    "Nothing counts, badges, or prompts: these surfaces appear only when the user goes looking for them"
+  ],
+  "touches": ["Cairn/Views/**"],
+  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "Owner wants tools they reach for, not nagging — explicitly different in kind from T-0020, which was cut for speaking first. The distinction is the whole design constraint: invoked, never volunteered.",
+  "history": []
+}

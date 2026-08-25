@@ -1,0 +1,15 @@
+{
+  "id": "T-0039", "title": "Failed saves are visible and retryable",
+  "type": "implement", "status": "todo", "quarter": "next",
+  "roadmap_anchor": null, "depends_on": [],
+  "acceptance": [
+    "A post whose fetch or extraction failed is visibly distinguishable in the library, not silently present and empty",
+    "The reason is stated in plain language — paywall, unreachable, no readable content",
+    "Retry is one tap and re-runs the real pipeline",
+    "A failed save still keeps its URL and its original HTML if any was fetched"
+  ],
+  "touches": ["Cairn/Views/**", "Cairn/Services/**"],
+  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "ArchiveService already marks posts .failed for paywalls and JS-only pages. If that state is invisible the owner believes something was saved when it was not — the worst possible bug for an app whose primary action is saving. Pairs with T-0027's finding that saves were being truncated silently.",
+  "history": []
+}
