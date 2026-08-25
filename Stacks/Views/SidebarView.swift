@@ -13,7 +13,10 @@ struct SidebarView: View {
             set: { if let value = $0 { filter = value } }
         )) {
             Section {
-                row(.unread, count: index.unreadCount)
+                // Unread is somewhere to look, not a tally to answer for —
+                // no number rides along with it. The rows below count what
+                // exists, which isn't the same thing as what's owed.
+                row(.unread)
                 row(.all, count: index.totalCount)
                 row(.starred, count: index.starredCount)
                 row(.archived, count: index.archivedCount)
@@ -59,7 +62,7 @@ struct SidebarView: View {
             .foregroundStyle(Palette.inkTertiary)
     }
 
-    private func row(_ target: LibraryFilter, count: Int) -> some View {
+    private func row(_ target: LibraryFilter, count: Int? = nil) -> some View {
         let isSelected = filter == target
 
         return HStack(spacing: 11) {
@@ -75,7 +78,7 @@ struct SidebarView: View {
 
             Spacer(minLength: 6)
 
-            if count > 0 {
+            if let count, count > 0 {
                 Text("\(count)")
                     .font(.system(size: 12, weight: .medium).monospacedDigit())
                     .foregroundStyle(Palette.inkTertiary)

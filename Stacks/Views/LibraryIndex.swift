@@ -15,7 +15,6 @@ final class LibraryIndex {
         var id: String { name }
     }
 
-    private(set) var unreadCount = 0
     private(set) var totalCount = 0
     private(set) var starredCount = 0
     private(set) var archivedCount = 0
@@ -23,7 +22,6 @@ final class LibraryIndex {
     private(set) var sites: [Group] = []
 
     func refresh(context: ModelContext) {
-        unreadCount = count(context, #Predicate { !$0.isArchived && $0.openedAt == nil })
         totalCount = count(context, #Predicate { !$0.isArchived })
         starredCount = count(context, #Predicate { $0.isStarred })
         archivedCount = count(context, #Predicate { $0.isArchived })
