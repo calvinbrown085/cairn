@@ -223,8 +223,18 @@ private struct PostList: View {
         // A Button rather than `.onTapGesture`: on a regular-width iPad the
         // list row's own selection gesture competes with a bare tap gesture and
         // neither fires. A button is also what a card actually is.
+        //
+        // A failed post has nothing to read — opening the reader just shows
+        // the same failure a second time, one screen later. The one useful
+        // thing to do with it is try again, so the row's own tap does that
+        // directly: "this one didn't work, tap to try again," not a detour
+        // through a detail view to find the same button.
         Button {
-            selection = post
+            if post.state == .failed {
+                archive.retry(post)
+            } else {
+                selection = post
+            }
         } label: {
             switch style {
             case .cards: PostCard(post: post, isSelected: isSelected, searchQuery: searchQuery)
