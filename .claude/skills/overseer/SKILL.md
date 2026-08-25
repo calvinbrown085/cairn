@@ -100,7 +100,7 @@ cannot see the agent's output.
 Per cycle, in order:
 
 1. **Health** — `bin/main-health.sh`. Red means halt everything and report. Never dispatch onto a broken base.
-2. **Reap** — resolve finished agents, advance their tasks, reconcile against `ListAgents`.
+2. **Reap** — resolve finished agents, advance their tasks, reconcile against `ListAgents`. An agent that died mid-task (rate limit, crash) leaves uncommitted work in its worktree: inspect it before deciding. Resuming the dead agent by name is usually right — it still holds the measurements and reasoning that produced those edits, and a fresh agent would repeat that work from scratch.
 3. **Select** — `bin/ledger.sh dispatchable` already enforces eligibility, type, dependencies, and `touches` disjointness. Take up to `max_parallel`. Prefer work that unblocks other work.
 4. **Dispatch** — `bin/worktree.sh create`, set status, spawn `factory-implementer`, record its identity.
 5. **Review** — see below. Two parts, and both are yours.
@@ -148,6 +148,11 @@ criteria are met:
 - Otherwise, if `land_requires_human` is true, ask. If it is false, land on your
   own judgement — that is what it is for.
 - Then message the agent: `land it — run .claude/factory/bin/merge.sh <id>`.
+- **If the agent reports it was permission-blocked invoking `merge.sh`, land it
+  yourself** by running the same command. This happens: a subagent's tool
+  permissions are not yours. An agent that refuses to hand-roll a merge around a
+  block is behaving correctly and must never be pushed to retry — take the
+  action, do not launder it back through the agent.
 
 Landing on your own judgement raises the bar for your review, it does not lower
 it. Nobody is checking behind you.

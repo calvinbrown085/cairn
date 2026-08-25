@@ -2,7 +2,7 @@
   "id": "T-0011",
   "title": "accessibilityLabel on every icon-only control",
   "type": "implement",
-  "status": "verifying",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > accessibilityLabel on every icon-only control",
   "depends_on": [],
@@ -35,6 +35,11 @@
       "ts": "2026-08-25T16:00:01Z",
       "event": "gate-passed",
       "detail": "verify.sh green; 4 files, +4 lines; independent audit found no unlabeled icon-only controls"
+    },
+    {
+      "ts": "2026-08-25T16:02:27Z",
+      "event": "merged",
+      "detail": "0feb6c2"
     }
   ],
   "agent": {

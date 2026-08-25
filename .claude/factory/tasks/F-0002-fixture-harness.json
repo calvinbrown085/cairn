@@ -2,7 +2,7 @@
   "id": "F-0002",
   "title": "Fixture harness plus three seed fixtures",
   "type": "chore",
-  "status": "in_progress",
+  "status": "in_review",
   "quarter": "bootstrap",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [
@@ -39,6 +39,11 @@
       "ts": "2026-08-25T15:54:45Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T16:04:38Z",
+      "event": "gate-passed",
+      "detail": "9 tests in 3 suites; X1 verified clean, Sources/ revert confirmed; landing held for /code-review"
     }
   ],
   "agent": {

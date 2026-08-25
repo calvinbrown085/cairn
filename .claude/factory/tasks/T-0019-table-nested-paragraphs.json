@@ -1,0 +1,16 @@
+{
+  "id": "T-0019",
+  "title": "BlockBuilder collapses <p> nested inside single-row layout tables",
+  "type": "implement", "status": "draft", "quarter": "Q1",
+  "roadmap_anchor": "Q1 > Extractor hardening",
+  "depends_on": ["F-0002"],
+  "acceptance": [
+    "A fixture with <p> paragraphs inside a single-row <table><tr><td> extracts as distinct paragraph blocks, not one flattened paragraph",
+    "Existing fixtures and the ExtractorTests suite still pass unchanged",
+    "The fix addresses cell-content recursion generally, not the single-row case only"
+  ],
+  "touches": ["Packages/SwiftReadability/Sources/**", "Packages/SwiftReadability/Tests/**"],
+  "risk": "medium", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "Found by the F-0002 agent while authoring the table-era fixture. <td>/<tr> are not in blockProducers, so a single-row table falls through to descend() over the table's own children (<tr> only) rather than recursing into cell content at block granularity — every <p> inside collapses into one inline-flattened paragraph. The agent did not fix it (outside its touches) and restructured its fixture to the historically accurate <br><br> form instead. Real 2000s pages that used <p> inside layout tables will hit this, so T-0006 is likely to surface it again.",
+  "history": []
+}
