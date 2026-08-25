@@ -1,0 +1,19 @@
+{
+  "id": "T-0024",
+  "title": "Opening an article goes straight to full screen",
+  "type": "implement", "status": "todo", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Reading experience",
+  "depends_on": ["T-0005"],
+  "acceptance": [
+    "Selecting a post enters immersive reading immediately, with no tap on the full-screen control",
+    "The exit affordances are present and reachable the moment the reader appears, on both iPhone and iPad",
+    "Leaving full screen applies to the current post only; opening the next post enters immersive again",
+    "On iPad the library column steps aside on entry and returns when the reader is exited",
+    "Returning to the library from a freshly opened post takes one deliberate action",
+    "ReadingFlowUITests is updated for the new entry state and still passes"
+  ],
+  "touches": ["Stacks/Views/ReaderView.swift", "Stacks/Views/RootView.swift", "StacksUITests/**"],
+  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "User request, 2026-08-25: 'when you click into an article it should go full screen, I shouldn't have to click full screen.' Mechanism already exists — ReaderView.isImmersive hides the nav toolbar and RootView collapses the split view to .detailOnly via the callback. The change is which state the reader is entered in. TWO CALLS MADE FOR THE AGENT, do not relitigate: (1) NOT sticky. Always enter immersive, every time. Remembering the last choice would mean that exiting once reintroduces exactly the repeated tap being complained about. Exiting is per-post. (2) No new stored preference in ReadingPreferences. Depends on T-0005 because that task is currently repairing ReadingFlowUITests, which navigates into the reader and would collide.",
+  "history": []
+}

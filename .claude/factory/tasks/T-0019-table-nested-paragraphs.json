@@ -32,6 +32,11 @@
       "ts": "2026-08-25T17:35:32Z",
       "event": "dispatched",
       "detail": "attempt 1; first task authorised to land itself"
+    },
+    {
+      "ts": "2026-08-25T17:44:26Z",
+      "event": "merge-failed",
+      "detail": "post-rebase gate failure"
     }
   ],
   "agent": {

@@ -203,6 +203,13 @@ outstanding work, not speculation.
 - [ ] Make the backlog honest rather than hidden — if the pile is four months
       deep, say so plainly and offer to bulk-archive, rather than nagging.
 
+**Reading experience**
+- [ ] **Opening an article goes straight to full screen.** Reading is the point;
+      having to ask for it every time is friction the app imposes on its own
+      primary action. The chrome comes back on request — the exit affordances
+      already exist and are labelled. Immersive is the state you *enter* a
+      post in, not a mode you *switch to* once you are there.
+
 **Retrieval, before intelligence**
 - [ ] Search result snippets with the matched phrase in context, highlighted.
 - [ ] Saved searches and combined filters (site + tag + date + has-highlights).
