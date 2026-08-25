@@ -86,6 +86,11 @@ final class ArchiveService {
         do {
             let page = try await fetcher.fetch(url)
 
+            // Compressing the source alongside extraction keeps it off the main
+            // actor too, and means a future extractor upgrade can re-derive
+            // blocks from this post without a network re-fetch — see T-0007.
+            async let compressedHTML = Self.compress(html: page.html)
+
             // Parsing a large page is CPU-bound; keep it off the main actor.
             let extracted = await Self.extract(html: page.html, url: page.finalURL)
 
@@ -124,6 +129,10 @@ final class ArchiveService {
             post.canonicalURLString = page.finalURL.canonicalizedForArchive().absoluteString
             post.host = Post.displayHost(for: page.finalURL)
             post.leadImageID = Self.chooseLeadImage(from: content, assets: assets, preferring: extracted.leadImageSource)
+            // Kept even when extraction below turns up short: a page that reads
+            // as boilerplate today may read as an article once the extractor
+            // improves, and only the source makes that recoverable.
+            post.originalHTMLData = await compressedHTML
 
             // A page that parsed but yielded almost no prose is link rot, a
             // paywall, or a page that builds itself in JavaScript. Saying so and
@@ -147,6 +156,14 @@ final class ArchiveService {
     private nonisolated static func extract(html: String, url: URL) async -> ExtractedArticle {
         await Task.detached(priority: .userInitiated) {
             ArticleExtractor.extract(html: html, url: url)
+        }.value
+    }
+
+    /// Compression is pure too, and runs concurrently with extraction rather
+    /// than after it.
+    private nonisolated static func compress(html: String) async -> Data? {
+        await Task.detached(priority: .userInitiated) {
+            Post.compressedHTML(html)
         }.value
     }
 

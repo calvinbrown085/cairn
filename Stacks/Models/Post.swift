@@ -50,6 +50,14 @@ final class Post {
     /// of the row so list queries stay light.
     @Attribute(.externalStorage) var contentData: Data?
 
+    /// The page's original HTML as fetched, LZFSE-compressed and kept in
+    /// external storage next to `contentData` for the same reason. Nothing
+    /// reads it today; it exists so an extractor that improves later can
+    /// re-derive a post's blocks without a network re-fetch — the source page
+    /// may have changed or vanished by then. Posts saved before this field
+    /// existed simply have it `nil`.
+    @Attribute(.externalStorage) var originalHTMLData: Data?
+
     /// Flattened body text, kept inline so `#Predicate` can search it.
     var searchText: String = ""
 
@@ -90,6 +98,11 @@ final class Post {
     var url: URL? { URL(string: urlString) }
 
     var content: ArticleContent { ArticleContent.decoded(from: contentData) }
+
+    /// The original page HTML, decompressed on demand. `nil` for any post
+    /// saved before this field existed, and for the rare post where
+    /// compression or decompression failed rather than block a save.
+    var originalHTML: String? { Post.decompressedHTML(originalHTMLData) }
 
     var isUnread: Bool { openedAt == nil }
 
@@ -168,6 +181,23 @@ final class Post {
         [title, author ?? "", siteName, host, tags.joined(separator: " "), body]
             .filter { !$0.isEmpty }
             .joined(separator: "\n")
+    }
+
+    // MARK: - Original HTML
+
+    /// LZFSE-compresses raw page HTML for storage. Pure and safe to call off
+    /// the main actor; a failure returns `nil` rather than throwing, because
+    /// losing the re-extraction copy should never fail the save itself.
+    static func compressedHTML(_ html: String) -> Data? {
+        guard let raw = html.data(using: .utf8), !raw.isEmpty else { return nil }
+        return try? (raw as NSData).compressed(using: .lzfse) as Data
+    }
+
+    private static func decompressedHTML(_ data: Data?) -> String? {
+        guard let data, let raw = try? (data as NSData).decompressed(using: .lzfse) as Data else {
+            return nil
+        }
+        return String(data: raw, encoding: .utf8)
     }
 }
 
