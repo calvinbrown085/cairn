@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — Cairnfield</title>
+<meta name="description" content="Cairnfield collects nothing. No account, no server, no analytics, no third-party code.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Privacy</h1>
+  <p class="tag">Last updated 25 August 2026</p>
+
+  <p><strong>Cairnfield collects nothing about you.</strong> There is no account
+  to create, no server of mine involved, and no analytics, advertising or
+  crash-reporting code in the app. This is not a policy that describes careful
+  handling of your data — there is no collection to handle.</p>
+
+  <h2>Where your reading is kept</h2>
+  <p>Saved articles, highlights, notes and tags are stored on your device. If you
+  are signed in to iCloud, they also sync through <em>your own</em> private
+  iCloud database so your iPhone and iPad stay in step. That database belongs to
+  your Apple Account. I cannot read it, and neither can anyone else — Apple
+  documents this as the CloudKit private database. If iCloud is unavailable the
+  app simply keeps everything locally instead.</p>
+
+  <h2>Network requests the app makes</h2>
+  <p>Exactly one kind: when you save a link, the app fetches that page and the
+  images in it, directly from the site you chose. Nothing else leaves your
+  device. There is no call home, no telemetry ping, no remote configuration.</p>
+  <p>Those sites will see the request the way they would see any browser
+  visiting them. That is between you and them; it does not pass through me.</p>
+
+  <h2>Third-party code</h2>
+  <p>There is none. The app uses only Apple's own frameworks and code written for
+  this project. There are no SDKs, no dependencies, and therefore no vendor
+  receiving anything about you. This is enforced mechanically: an automated
+  check rejects any change that introduces an import outside Apple's frameworks.</p>
+
+  <h2>Required-reason APIs</h2>
+  <p>Apple asks apps to declare certain APIs. Cairnfield declares one:
+  <code>UserDefaults</code>, used to share a small amount of state between the app
+  and its share extension so a link you save from another app arrives correctly.
+  The declaration is in the app's privacy manifest and is visible in the
+  <a href="https://github.com/calvinbrown085/cairn">source</a>.</p>
+
+  <h2>Children</h2>
+  <p>Cairnfield displays web pages you choose to save. It collects nothing from
+  anyone, of any age.</p>
+
+  <h2>This website</h2>
+  <p>These pages are served by GitHub Pages, which may log requests as any web
+  host does; that logging is GitHub's, not mine, and I see no analytics from it.
+  The site loads no third-party scripts, fonts or images. The <em>Buy me a
+  coffee</em> button is an image stored on this site rather than loaded from
+  their servers, so simply reading this page tells them nothing. If you follow
+  that link, their own privacy policy applies from that point.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy ever changes, the updated date above changes with it, and the
+  history is public in the repository.</p>
+
+  <h2>Contact</h2>
+  <p>Questions, or something here that looks wrong:
+  <a href="https://github.com/calvinbrown085/cairn/issues">open an issue</a>.</p>
+
+  <footer>
+    <hr>
+    <a href="index.html">← Cairnfield</a> ·
+    <a href="https://github.com/calvinbrown085/cairn">Source</a>
+  </footer>
+
+</div>
+</body>
+</html>

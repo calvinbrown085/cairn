@@ -26,11 +26,16 @@
       "ts": "2026-08-25T19:54:13Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T20:13:58Z",
+      "event": "re-dispatched",
+      "detail": "prior agent stopped by user and not resumable; fresh agent took over the surviving worktree"
     }
   ],
   "agent": {
-    "id": "ad251e0bcfeb342f4",
+    "id": "a0d71683a9d5f6f56",
     "role": "implementer",
-    "spawned": "2026-08-25T19:54:13Z"
+    "spawned": "2026-08-25T20:13:58Z"
   }
 }

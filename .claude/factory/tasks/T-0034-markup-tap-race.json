@@ -29,12 +29,16 @@
       "ts": "2026-08-25T19:40:20Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T20:13:58Z",
+      "event": "re-dispatched",
+      "detail": "prior agent stopped by user and not resumable; fresh agent took over the surviving worktree"
     }
   ],
   "agent": {
-    "id": "a94f8ba588ca606e3",
+    "id": "a1174097bd4f022e0",
     "role": "implementer",
-    "model": "sonnet",
-    "spawned": "2026-08-25T19:40:19Z"
+    "spawned": "2026-08-25T20:13:58Z"
   }
 }

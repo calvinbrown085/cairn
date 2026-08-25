@@ -1,0 +1,39 @@
+/* The app's own palette, so the site and the product read as one thing.
+   Values lifted from Cairn/Design/Palette.swift. */
+:root {
+  --paper: #FBF7F0; --recessed: #F3EDE2; --ink: #1F1B16; --ink-2: #564D45;
+  --ink-3: #998C7C; --rule: #E6DCCC; --accent: #A0472B; --accent-soft: #F0E2DA;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14120F; --recessed: #100E0C; --ink: #F3EBE1; --ink-2: #A89A8B;
+    --ink-3: #7A6E61; --rule: #2E2822; --accent: #E49876; --accent-soft: #3A2620;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 17px/1.65 ui-serif, "Iowan Old Style", Georgia, serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 34rem; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
+h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 .4rem; letter-spacing: -.02em; }
+h2 { font-size: 1.15rem; margin: 2.6rem 0 .6rem; letter-spacing: -.01em; }
+.tag { color: var(--ink-2); font-size: 1.05rem; margin: 0 0 2.2rem; }
+p { margin: 0 0 1.1rem; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+ul { padding-left: 1.1rem; margin: 0 0 1.1rem; }
+li { margin-bottom: .5rem; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+.note {
+  background: var(--recessed); border: 1px solid var(--rule);
+  border-radius: 10px; padding: 1rem 1.15rem; margin: 1.6rem 0;
+  font-size: .95rem; color: var(--ink-2);
+}
+.note strong { color: var(--ink); }
+footer { margin-top: 3rem; font-size: .9rem; color: var(--ink-3); }
+footer a { color: var(--ink-2); }
+.coffee { margin: 2rem 0 0; }
+.coffee img { height: 44px; width: auto; border-radius: 8px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em;
+       background: var(--recessed); padding: .1em .35em; border-radius: 4px; }
