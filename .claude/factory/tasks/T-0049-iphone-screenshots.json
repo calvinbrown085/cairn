@@ -2,13 +2,13 @@
   "id": "T-0049",
   "title": "Screenshots on iPhone: the reader never opens from a fresh install",
   "type": "debt",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
   "acceptance": [
     "Tools/screenshots.sh produces the full set for the 6.9-inch iPhone as well as the 13-inch iPad",
-    "The cause is established by evidence, not inferred \u2014 state which of the two hypotheses below was right",
+    "The cause is established by evidence, not inferred — state which of the two hypotheses below was right",
     "If the seeded post is the problem, the test asserts it reached .ready before tapping instead of tapping blind",
     "If tapping a .ready post genuinely fails to navigate on compact width, that is an app bug and is fixed as one"
   ],
@@ -21,7 +21,18 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "T-0044 landed the pipeline; iPad works end to end, verified twice. iPhone fails: tapping a post's row never opens the reader on a genuinely fresh install, confirmed with accessibility-tree dumps showing no reader.* element ever appears. That agent concluded it was iPhone compact-width NavigationSplitView selection handling in RootView. I think that is wrong and it should be checked FIRST. COMPETING HYPOTHESIS, and the cheaper one: LibraryView.swift line ~300, landed the same day as T-0039, now reads `if post.state == .failed { archive.retry(post) } else { selection = post }`. A row whose post is .failed no longer navigates \u2014 it retries in place. On a fresh install the seeded post fetches a live URL; if that fetch fails, or the extraction lands under ArchiveService.minimumArticleWords (40), the post is .failed and every tap retries forever. That reproduces the exact symptom with no NavigationSplitView involvement, and explains why it tracks install freshness rather than device. Test it by asserting the seeded post reaches .ready before tapping. If that is it, the fix is in the test seeding, not the app. If the post really is .ready and the tap still does not navigate, then it IS an app bug on compact width and should be fixed as one. Do not skip straight to editing RootView.",
-  "history": []
+  "branch": "factory/T-0049",
+  "notes": "T-0044 landed the pipeline; iPad works end to end, verified twice. iPhone fails: tapping a post's row never opens the reader on a genuinely fresh install, confirmed with accessibility-tree dumps showing no reader.* element ever appears. That agent concluded it was iPhone compact-width NavigationSplitView selection handling in RootView. I think that is wrong and it should be checked FIRST. COMPETING HYPOTHESIS, and the cheaper one: LibraryView.swift line ~300, landed the same day as T-0039, now reads `if post.state == .failed { archive.retry(post) } else { selection = post }`. A row whose post is .failed no longer navigates — it retries in place. On a fresh install the seeded post fetches a live URL; if that fetch fails, or the extraction lands under ArchiveService.minimumArticleWords (40), the post is .failed and every tap retries forever. That reproduces the exact symptom with no NavigationSplitView involvement, and explains why it tracks install freshness rather than device. Test it by asserting the seeded post reaches .ready before tapping. If that is it, the fix is in the test seeding, not the app. If the post really is .ready and the tap still does not navigate, then it IS an app bug on compact width and should be fixed as one. Do not skip straight to editing RootView.",
+  "history": [
+    {
+      "ts": "2026-08-25T23:36:06Z",
+      "event": "dispatched",
+      "detail": "attempt 1; test the .failed-row hypothesis before touching RootView"
+    }
+  ],
+  "agent": {
+    "id": "a17bb537b43cfd4db",
+    "role": "implementer",
+    "spawned": "2026-08-25T23:36:06Z"
+  }
 }
