@@ -86,29 +86,41 @@ case "$cmd" in
     ;;
   drift)
     # A task's `touches` is its lease on the tree, and selection trusts it. If an
-    # agent is editing files the lease does not cover, two things are wrong at
-    # once: the reviewer's X1 check has the wrong yardstick, and another task can
-    # be dispatched onto the same files. T-0006 ran its whole first attempt with
-    # stale pre-SPM globs and nothing noticed.
+    # agent edits files the lease does not cover, two things are wrong at once:
+    # the reviewer's X1 check has the wrong yardstick, and another task can be
+    # dispatched onto the same files. T-0006 ran a whole attempt on stale globs.
+    #
+    # Note `set -f`: without it, `for g in $globs` pathname-expands the lease
+    # patterns against the CURRENT directory, so "Stacks/Services/**" silently
+    # becomes a list of existing files and is never matched as a pattern.
     fail=0
+    set -f
     for id in $("$0" inflight | jq -r '.[].id' || true); do
-      wt="$(jq -r '.worktree_root' "$CONFIG")"
-      case "$wt" in /*) root="$wt";; *) root="$MAIN_ROOT/$wt";; esac
+      raw="$(jq -r '.worktree_root' "$CONFIG")"
+      case "$raw" in /*) root="$raw";; *) root="$MAIN_ROOT/$raw";; esac
       p="$root/$id"
       [ -d "$p" ] || continue
       changed="$( { git -C "$p" diff --name-only main...HEAD 2>/dev/null || true; git -C "$p" status --porcelain 2>/dev/null | cut -c4- || true; } | sort -u | grep -v '^$' || true )"
       [ -n "$changed" ] || continue
-      globs="$("$0" get "$id" | jq -r '.touches[]?')"
-      for f in $changed; do
-        case "$f" in .dd/*|.dd-signed/*|*.xcodeproj/*) continue;; esac
+      globs="$("$0" get "$id" | jq -r '.touches[]?' || true)"
+      while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        case "$f" in .dd/*|.dd-signed/*|*.xcodeproj/*|*.xcuserstate) continue;; esac
         covered=0
-        for g in $globs; do
+        while IFS= read -r g; do
+          [ -n "$g" ] || continue
           base="${g%/\*\*}"; base="${base%/\*}"
+          [ "$g" = "**" ] && { covered=1; break; }
           case "$f" in $base|$base/*) covered=1; break;; esac
-        done
+        done <<GLOBS_EOF
+$globs
+GLOBS_EOF
         [ "$covered" -eq 1 ] || { echo "$id: OUTSIDE touches -> $f"; fail=1; }
-      done
+      done <<CHANGED_EOF
+$changed
+CHANGED_EOF
     done
+    set +f
     [ $fail -eq 0 ] && echo "no drift: every in-flight change is inside its declared touches"
     exit $fail
     ;;
