@@ -194,8 +194,10 @@ outstanding work, not speculation.
       convenience one, and it pairs with the privacy positioning. T-0007 now
       stores the original HTML, so the raw material for an export exists if the
       call is ever reversed.
-- [ ] Re-extraction command — rebuild blocks from stored HTML when the parser
-      improves.
+- [x] Re-extraction command — rebuild blocks from stored HTML when the parser
+      improves. *(T-0009, `4817891`. Highlights re-anchor only on an unambiguous
+      match; a post with an unresolvable highlight is not rebuilt unless the
+      reader explicitly accepts the loss, and deletions are reported.)*
 
 ---
 

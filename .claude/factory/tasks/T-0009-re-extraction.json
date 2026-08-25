@@ -2,7 +2,7 @@
   "id": "T-0009",
   "title": "Re-extraction command",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Durability > Re-extraction command",
   "depends_on": [
@@ -44,6 +44,11 @@
       "ts": "2026-08-25T18:47:45Z",
       "event": "revise",
       "detail": "code-review: overlapping matches make the exactly-once uniqueness guarantee false (silent misplacement); destructive drop path never accounts for deleted highlights; progress off by one"
+    },
+    {
+      "ts": "2026-08-25T18:49:45Z",
+      "event": "merged",
+      "detail": "4817891"
     }
   ],
   "agent": {
