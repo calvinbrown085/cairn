@@ -2,7 +2,7 @@
   "id": "T-0039",
   "title": "Failed saves are visible and retryable",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -33,6 +33,11 @@
       "ts": "2026-08-25T19:46:25Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T19:52:05Z",
+      "event": "merged",
+      "detail": "f1ca60d"
     }
   ],
   "agent": {
