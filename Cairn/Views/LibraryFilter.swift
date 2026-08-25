@@ -57,10 +57,14 @@ enum LibraryFilter: Hashable, Codable {
     /// Archived posts are hidden everywhere except their own list, so the
     /// inbox stays a genuine inbox.
     ///
-    /// `timeFilter` is a second, independent axis — see `LibraryTimeFilter` —
-    /// so every case below gains the same extra clause rather than a
-    /// parallel set of "unread-and-short", "starred-and-short" cases.
-    func predicate(search: String, timeFilter: LibraryTimeFilter = .any) -> Predicate<Post> {
+    /// `timeFilter` and `neverOpened` are second and third, independent axes
+    /// — see `LibraryTimeFilter` — so every case below gains the same extra
+    /// clauses rather than a parallel set of "unread-and-short",
+    /// "starred-and-short" cases. `neverOpened` composes with every bucket,
+    /// including `.archived`: finding archived posts that were never read is
+    /// exactly the point of an orthogonal axis rather than a variant of
+    /// `.unread`, which already excludes archived posts by definition.
+    func predicate(search: String, timeFilter: LibraryTimeFilter = .any, neverOpened: Bool = false) -> Predicate<Post> {
         let query = search.squeezed
         let hasQuery = !query.isEmpty
         let maxWordCount = timeFilter.maxWordCount
@@ -73,36 +77,42 @@ enum LibraryFilter: Hashable, Codable {
                 post.isArchived == false && post.openedAt == nil
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
                     && (!hasTimeLimit || post.wordCount <= wordLimit)
+                    && (!neverOpened || post.openedAt == nil)
             }
         case .all:
             return #Predicate<Post> { post in
                 post.isArchived == false
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
                     && (!hasTimeLimit || post.wordCount <= wordLimit)
+                    && (!neverOpened || post.openedAt == nil)
             }
         case .starred:
             return #Predicate<Post> { post in
                 post.isStarred
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
                     && (!hasTimeLimit || post.wordCount <= wordLimit)
+                    && (!neverOpened || post.openedAt == nil)
             }
         case .archived:
             return #Predicate<Post> { post in
                 post.isArchived
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
                     && (!hasTimeLimit || post.wordCount <= wordLimit)
+                    && (!neverOpened || post.openedAt == nil)
             }
         case .tag(let name):
             return #Predicate<Post> { post in
                 post.tagNames.contains(name)
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
                     && (!hasTimeLimit || post.wordCount <= wordLimit)
+                    && (!neverOpened || post.openedAt == nil)
             }
         case .site(let host):
             return #Predicate<Post> { post in
                 post.host == host
                     && (!hasQuery || post.searchText.localizedStandardContains(query))
                     && (!hasTimeLimit || post.wordCount <= wordLimit)
+                    && (!neverOpened || post.openedAt == nil)
             }
         }
     }

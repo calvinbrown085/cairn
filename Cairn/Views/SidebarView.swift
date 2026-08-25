@@ -12,6 +12,15 @@ struct SidebarView: View {
     @State private var reExtraction = ReExtractionService()
     @State private var isConfirmingLibraryRebuild = false
 
+    // Archive older than — a maintenance tool, reached the same way as
+    // library rebuild: a row here, tapped on purpose. The count of what it
+    // would affect only appears once that tap has happened, inside the
+    // confirmation this leads to.
+    @State private var isShowingArchiveOlderSheet = false
+    @State private var archiveOlderThanDate = Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
+    @State private var isConfirmingArchiveOlder = false
+    @State private var archiveOlderCandidateCount = 0
+
     var body: some View {
         List(selection: Binding(
             get: { filter },
@@ -47,8 +56,8 @@ struct SidebarView: View {
                 }
             }
 
-            // A maintenance action, not a filter — it doesn't take part in
-            // the list's selection, only its own tap.
+            // Maintenance actions, not filters — neither takes part in the
+            // list's selection, only its own tap.
             Section {
                 if reExtraction.isRunning {
                     libraryRebuildProgress
@@ -60,6 +69,13 @@ struct SidebarView: View {
                     }
                     .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
                 }
+
+                Button {
+                    isShowingArchiveOlderSheet = true
+                } label: {
+                    Label("Archive older than…", systemImage: "calendar.badge.minus")
+                }
+                .font(.scaled(15, weight: .medium, relativeTo: .subheadline))
             }
         }
         .listStyle(.sidebar)
@@ -99,6 +115,51 @@ struct SidebarView: View {
         } message: { summary in
             Text(summaryText(summary))
         }
+        .sheet(isPresented: $isShowingArchiveOlderSheet) {
+            ArchiveOlderThanSheet(date: $archiveOlderThanDate) {
+                archiveOlderCandidateCount = archivableCount(before: archiveOlderThanDate)
+                isShowingArchiveOlderSheet = false
+                isConfirmingArchiveOlder = true
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        .confirmationDialog(
+            archiveOlderConfirmationTitle,
+            isPresented: $isConfirmingArchiveOlder,
+            titleVisibility: .visible
+        ) {
+            Button("Archive", role: .destructive) { archivePostsOlderThanChosenDate() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Archived posts stay in your library — find them again from Archived.")
+        }
+    }
+
+    private var archiveOlderConfirmationTitle: String {
+        let count = archiveOlderCandidateCount
+        let dateText = archiveOlderThanDate.formatted(date: .abbreviated, time: .omitted)
+        return "Archive \(count) post\(count == 1 ? "" : "s") saved before \(dateText)?"
+    }
+
+    /// How many not-yet-archived posts were saved before `date` — computed
+    /// only once the tool has been opened and a date chosen, never ahead of
+    /// that ask.
+    private func archivableCount(before date: Date) -> Int {
+        let descriptor = FetchDescriptor<Post>(
+            predicate: #Predicate<Post> { $0.isArchived == false && $0.savedAt < date }
+        )
+        return (try? context.fetchCount(descriptor)) ?? 0
+    }
+
+    private func archivePostsOlderThanChosenDate() {
+        let date = archiveOlderThanDate
+        let descriptor = FetchDescriptor<Post>(
+            predicate: #Predicate<Post> { $0.isArchived == false && $0.savedAt < date }
+        )
+        guard let matches = try? context.fetch(descriptor) else { return }
+        for post in matches { post.isArchived = true }
+        try? context.save()
     }
 
     private var libraryRebuildProgress: some View {
@@ -186,5 +247,48 @@ struct SidebarView: View {
                 .padding(.horizontal, 6)
         )
         .tag(target)
+    }
+}
+
+/// The date-picking step of "archive older than." Deliberately just a date
+/// and one button — a maintenance tool, not a feature. It never states how
+/// many posts that date would affect; that number belongs to the
+/// confirmation this button leads to, which is the action the user actually
+/// asked for, not this picker.
+private struct ArchiveOlderThanSheet: View {
+    @Binding var date: Date
+    let onContinue: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("Everything saved before this date will be archived. Archived posts aren't deleted — they stay in your library under Archived.")
+                    .font(.scaled(14, relativeTo: .subheadline))
+                    .foregroundStyle(Palette.inkSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+
+                DatePicker("Archive before", selection: $date, displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    .padding(.horizontal, 16)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.top, 16)
+            .background(Palette.recessed)
+            .navigationTitle("Archive Older Than")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Continue", action: onContinue)
+                        .font(.scaled(15, weight: .semibold, relativeTo: .subheadline))
+                }
+            }
+        }
     }
 }

@@ -8,10 +8,18 @@ struct LibraryView: View {
     @Binding var clipboardOffer: URL?
 
     @Environment(ReadingPreferences.self) private var preferences
+    @Environment(\.modelContext) private var context
     @State private var search = ""
     @State private var sort: LibrarySort = .recentlySaved
     @State private var timeFilter: LibraryTimeFilter = .any
+    @State private var neverOpenedOnly = false
     @State private var isShowingSortSheet = false
+
+    // Bulk archive by selection: platform edit mode, not an invented picker.
+    // Both live here rather than inside `PostList` because the toolbar that
+    // acts on them is built here.
+    @State private var editMode: EditMode = .inactive
+    @State private var selectedIDs: Set<Post.ID> = []
 
     var body: some View {
         PostList(
@@ -19,12 +27,15 @@ struct LibraryView: View {
             search: search,
             sort: sort,
             timeFilter: timeFilter,
+            neverOpened: neverOpenedOnly,
             groupBySite: preferences.groupBySite,
             style: preferences.libraryStyle,
             selection: $selection,
             isAddingURL: $isAddingURL,
-            clipboardOffer: $clipboardOffer
+            clipboardOffer: $clipboardOffer,
+            selectedIDs: $selectedIDs
         )
+        .environment(\.editMode, $editMode)
         .safeAreaInset(edge: .top, spacing: 0) { sortChips }
         .searchable(
             text: $search,
@@ -34,14 +45,24 @@ struct LibraryView: View {
         .navigationTitle(filter.title)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                EditButton()
+            }
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    isAddingURL = true
-                } label: {
-                    Image(systemName: "plus")
+                if editMode.isEditing {
+                    Button("Archive") {
+                        archiveSelection()
+                    }
+                    .disabled(selectedIDs.isEmpty)
+                } else {
+                    Button {
+                        isAddingURL = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .keyboardShortcut("n", modifiers: .command)
+                    .accessibilityLabel("Save a link")
                 }
-                .keyboardShortcut("n", modifiers: .command)
-                .accessibilityLabel("Save a link")
             }
         }
         .sheet(isPresented: $isShowingSortSheet) {
@@ -49,14 +70,38 @@ struct LibraryView: View {
                 .presentationDetents([.height(520), .large])
                 .presentationDragIndicator(.visible)
         }
+        // A selection made in one filter means nothing in another; leaving it
+        // live across a filter switch would archive posts the user never saw
+        // checked.
+        .onChange(of: filter) { _, _ in
+            editMode = .inactive
+            selectedIDs.removeAll()
+        }
+    }
+
+    /// Archives every selected post in one save, then drops back out of
+    /// selection mode — the same shape as the per-row swipe action, just
+    /// batched. This is reached only by first tapping Edit and checking rows,
+    /// never surfaced on its own.
+    private func archiveSelection() {
+        let ids = selectedIDs
+        guard !ids.isEmpty else { return }
+        let descriptor = FetchDescriptor<Post>(predicate: #Predicate<Post> { ids.contains($0.id) })
+        guard let matches = try? context.fetch(descriptor) else { return }
+        for post in matches { post.isArchived = true }
+        try? context.save()
+        selectedIDs.removeAll()
+        editMode = .inactive
     }
 
     /// The three sorts worth reaching without a sheet, then the sheet, then
-    /// how long a post takes to read — a second, independent axis that
-    /// narrows whatever `filter` and search already picked rather than
-    /// replacing it (see `LibraryFilter.predicate(search:timeFilter:)`).
-    /// Pinned under the search field rather than buried in a toolbar menu,
-    /// because both are browsing moves, not settings.
+    /// how long a post takes to read, then whether it's ever been opened —
+    /// two independent axes that narrow whatever `filter` and search already
+    /// picked rather than replacing it (see
+    /// `LibraryFilter.predicate(search:timeFilter:neverOpened:)`). Pinned
+    /// under the search field rather than buried in a toolbar menu, because
+    /// all of these are browsing moves, not settings. Neither chip carries a
+    /// count: this is a way to find something, not a tally of it.
     private var sortChips: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 7) {
@@ -70,6 +115,10 @@ struct LibraryView: View {
                 ForEach(LibraryTimeFilter.allCases) { option in
                     chip(option.title, isOn: timeFilter == option) { timeFilter = option }
                 }
+
+                Divider().frame(height: 16)
+
+                chip("Never opened", isOn: neverOpenedOnly) { neverOpenedOnly.toggle() }
             }
             .padding(.horizontal, Metrics.gutter)
             .padding(.vertical, 9)
@@ -110,6 +159,13 @@ private struct PostList: View {
     @Binding private var selection: Post?
     @Binding private var isAddingURL: Bool
     @Binding private var clipboardOffer: URL?
+    /// The rows checked while the platform's edit mode is active — see
+    /// `LibraryView`, which owns this alongside the `\.editMode` environment
+    /// value and is the only thing that acts on it (the bulk archive
+    /// toolbar button). Independent of `selection`: that binding tracks
+    /// which single post is open in the reader pane and keeps doing so
+    /// whether or not the list is in edit mode.
+    @Binding private var selectedIDs: Set<Post.ID>
 
     @Environment(ArchiveService.self) private var archive
     @Environment(\.modelContext) private var context
@@ -121,11 +177,13 @@ private struct PostList: View {
         search: String,
         sort: LibrarySort,
         timeFilter: LibraryTimeFilter,
+        neverOpened: Bool,
         groupBySite: Bool,
         style: LibraryStyle,
         selection: Binding<Post?>,
         isAddingURL: Binding<Bool>,
-        clipboardOffer: Binding<URL?>
+        clipboardOffer: Binding<URL?>,
+        selectedIDs: Binding<Set<Post.ID>>
     ) {
         self.filter = filter
         self.groupBySite = groupBySite
@@ -135,7 +193,10 @@ private struct PostList: View {
         self._selection = selection
         self._isAddingURL = isAddingURL
         self._clipboardOffer = clipboardOffer
-        self._posts = Query(PostList.descriptor(filter: filter, search: search, sort: sort, timeFilter: timeFilter))
+        self._selectedIDs = selectedIDs
+        self._posts = Query(PostList.descriptor(
+            filter: filter, search: search, sort: sort, timeFilter: timeFilter, neverOpened: neverOpened
+        ))
     }
 
     /// Neither `PostRow` nor `PostCard` shows a post's body — only its title,
@@ -147,10 +208,10 @@ private struct PostList: View {
     /// just to list their titles; each excluded property is faulted back in
     /// individually, only for the one post that ends up needing it.
     private static func descriptor(
-        filter: LibraryFilter, search: String, sort: LibrarySort, timeFilter: LibraryTimeFilter
+        filter: LibraryFilter, search: String, sort: LibrarySort, timeFilter: LibraryTimeFilter, neverOpened: Bool
     ) -> FetchDescriptor<Post> {
         var descriptor = FetchDescriptor<Post>(
-            predicate: filter.predicate(search: search, timeFilter: timeFilter),
+            predicate: filter.predicate(search: search, timeFilter: timeFilter, neverOpened: neverOpened),
             sortBy: sort.descriptors
         )
         descriptor.propertiesToFetch = [
@@ -179,7 +240,13 @@ private struct PostList: View {
     }
 
     private var list: some View {
-        List(selection: $selection) {
+        // Bound to the checked-row set rather than `selection` (a single
+        // `Post?`): that's what lets `\.editMode` — set active by the
+        // `EditButton` in `LibraryView`'s toolbar — turn each row into a
+        // checkmark target using nothing but the platform's own multi-select
+        // chrome. Reading still goes through `selection`, set directly by
+        // each row's own button below.
+        List(selection: $selectedIDs) {
             // The clipboard offer rides at the top of the list rather than
             // hovering over it: it is one more thing you could read, so it
             // belongs where the things you could read are.
@@ -248,7 +315,7 @@ private struct PostList: View {
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("post.row")
-        .tag(post)
+        .tag(post.id)
         .listRowBackground(Palette.paper)
         .listRowSeparator(style == .cards ? .hidden : .visible)
         .listRowSeparatorTint(Palette.rule)
