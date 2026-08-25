@@ -164,6 +164,22 @@ implementer, or to you.
 
 Only after a real merge do you tick the box in `ROADMAP.md`.
 
+## Your own commits go through the gate too
+
+You are the only actor that can put code on `main` without `merge.sh`, and that
+makes you the only actor who can break it. **Do not `git commit` changes to
+tracked source, tests, or fixtures on `main` without running
+`bin/verify.sh` first.** Bookkeeping under `.claude/factory/` is exempt; nothing
+else is.
+
+This is not hypothetical. Fourteen fixture captures were committed directly,
+without the gate, with provenance sidecars named `<name>.source.json` —
+`FixtureLoader` read them as fixtures whose `.html` did not exist and crashed
+the whole suite through `fatalError`. Every task's post-rebase gate failed from
+then on, and it was an implementer, not the overseer, that noticed. Landing your
+own work through `merge.sh` costs one command and would have caught it before it
+reached anyone.
+
 ## Managing the roadmap
 
 The roadmap is a document with opinions, not a queue. Bring these to the human
