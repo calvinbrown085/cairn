@@ -2,7 +2,7 @@
   "id": "T-0038",
   "title": "Save from Shortcuts and the Action Button",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -38,7 +38,16 @@
       "ts": "2026-08-25T20:41:24Z",
       "event": "unblocked",
       "detail": "AppIntents (and WidgetKit, for T-0047) added to the allowlist by the overseer; agent correctly refused to edit factory config itself"
+    },
+    {
+      "ts": "2026-08-25T20:42:17Z",
+      "event": "re-dispatched",
+      "detail": "allowlist unblocked"
     }
   ],
-  "agent": null
+  "agent": {
+    "id": "a43b43922533b90ef",
+    "role": "implementer",
+    "spawned": "2026-08-25T20:42:17Z"
+  }
 }

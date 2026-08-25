@@ -2,7 +2,7 @@
   "id": "T-0046",
   "title": "Mount the image viewer in the reader",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [
@@ -21,7 +21,18 @@
   "risk": "low",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0046",
   "notes": "Phase 2 of the image viewer. Split out because ArticleBlockView.swift is a single-file bottleneck: T-0043 needs it to remove the per-block ink canvas, T-0041 needed it to mount the viewer, and the lease system correctly refuses to let two agents edit one file. Phase 1 builds the viewer standalone; this wires it in. The last criterion is the interesting one - once ink is document-level, a tap on an image must still mean 'open the image' when markup is off and 'draw' when it is on.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T20:42:18Z",
+      "event": "dispatched",
+      "detail": "attempt 1; the tap-vs-pen question is its to answer"
+    }
+  ],
+  "agent": {
+    "id": "a312d7a428bd7d6d8",
+    "role": "implementer",
+    "spawned": "2026-08-25T20:42:17Z"
+  }
 }
