@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import Observation
+import SwiftReadability
 
 /// Turns a URL into an archived post: fetch, extract, pull the images down, save.
 ///

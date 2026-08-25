@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftReadability
 
 /// Everything the reader needs to know about markup while a block is on screen.
 /// Nil means markup is off — the block draws its ink but takes no input.

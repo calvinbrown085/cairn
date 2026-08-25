@@ -1,4 +1,5 @@
 import UIKit
+import SwiftReadability
 
 /// Turns a `RichText` run list into an `NSAttributedString` styled for the
 /// current reader settings, with highlight backgrounds painted on top.

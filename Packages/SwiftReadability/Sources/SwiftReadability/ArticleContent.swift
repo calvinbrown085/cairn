@@ -3,18 +3,18 @@ import Foundation
 /// A run of text sharing one set of inline traits. Paragraphs are stored as runs
 /// rather than HTML so the reader can restyle freely and highlights can anchor to
 /// plain character offsets.
-struct InlineRun: Codable, Hashable {
-    var text: String
-    var isBold: Bool = false
-    var isItalic: Bool = false
-    var isCode: Bool = false
-    var link: String?
+public struct InlineRun: Codable, Hashable {
+    public var text: String
+    public var isBold: Bool = false
+    public var isItalic: Bool = false
+    public var isCode: Bool = false
+    public var link: String?
 
     enum CodingKeys: String, CodingKey {
         case text = "t", isBold = "b", isItalic = "i", isCode = "c", link = "l"
     }
 
-    init(text: String, isBold: Bool = false, isItalic: Bool = false, isCode: Bool = false, link: String? = nil) {
+    public init(text: String, isBold: Bool = false, isItalic: Bool = false, isCode: Bool = false, link: String? = nil) {
         self.text = text
         self.isBold = isBold
         self.isItalic = isItalic
@@ -22,7 +22,7 @@ struct InlineRun: Codable, Hashable {
         self.link = link
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         text = try container.decode(String.self, forKey: .text)
         isBold = try container.decodeIfPresent(Bool.self, forKey: .isBold) ?? false
@@ -31,7 +31,7 @@ struct InlineRun: Codable, Hashable {
         link = try container.decodeIfPresent(String.self, forKey: .link)
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(text, forKey: .text)
         if isBold { try container.encode(true, forKey: .isBold) }
@@ -40,31 +40,31 @@ struct InlineRun: Codable, Hashable {
         try container.encodeIfPresent(link, forKey: .link)
     }
 
-    var traits: InlineTraits {
+    public var traits: InlineTraits {
         InlineTraits(isBold: isBold, isItalic: isItalic, isCode: isCode, link: link)
     }
 }
 
-struct InlineTraits: Hashable {
-    var isBold = false
-    var isItalic = false
-    var isCode = false
-    var link: String?
+public struct InlineTraits: Hashable {
+    public var isBold = false
+    public var isItalic = false
+    public var isCode = false
+    public var link: String?
 
-    var isPlain: Bool { !isBold && !isItalic && !isCode && link == nil }
+    public var isPlain: Bool { !isBold && !isItalic && !isCode && link == nil }
 }
 
-struct RichText: Codable, Hashable {
-    var runs: [InlineRun]
+public struct RichText: Codable, Hashable {
+    public var runs: [InlineRun]
 
-    init(runs: [InlineRun] = []) { self.runs = runs }
-    init(_ plain: String) { self.runs = plain.isEmpty ? [] : [InlineRun(text: plain)] }
+    public init(runs: [InlineRun] = []) { self.runs = runs }
+    public init(_ plain: String) { self.runs = plain.isEmpty ? [] : [InlineRun(text: plain)] }
 
-    var plain: String { runs.map(\.text).joined() }
-    var isEmpty: Bool { plain.squeezed.isEmpty }
+    public var plain: String { runs.map(\.text).joined() }
+    public var isEmpty: Bool { plain.squeezed.isEmpty }
 
     /// Merges adjacent runs with identical traits and trims the outer edges.
-    func normalized() -> RichText {
+    public func normalized() -> RichText {
         var merged: [InlineRun] = []
         for var run in runs where !run.text.isEmpty {
             // A <br> is followed by the source's own indentation, which would
@@ -100,11 +100,11 @@ struct RichText: Codable, Hashable {
     }
 }
 
-extension RichText {
+public extension RichText {
     /// Splits at blank lines. Sites that predate CSS layout separate paragraphs
     /// with `<br><br>` instead of `<p>`, which would otherwise land the whole
     /// essay in a single block.
-    func splitOnBlankLines() -> [RichText] {
+    public func splitOnBlankLines() -> [RichText] {
         guard plain.contains("\n\n") else { return [self] }
 
         var groups: [[InlineRun]] = [[]]
@@ -123,22 +123,22 @@ extension RichText {
     }
 }
 
-struct ArticleImage: Codable, Hashable {
-    var source: String
-    var alt: String?
-    var caption: RichText?
+public struct ArticleImage: Codable, Hashable {
+    public var source: String
+    public var alt: String?
+    public var caption: RichText?
     /// Set once the bytes are downloaded into a `StoredImage`.
-    var assetID: UUID?
-    var width: Double?
-    var height: Double?
+    public var assetID: UUID?
+    public var width: Double?
+    public var height: Double?
 
-    var aspectRatio: Double? {
+    public var aspectRatio: Double? {
         guard let width, let height, width > 0, height > 0 else { return nil }
         return width / height
     }
 }
 
-enum ArticleBlock: Codable, Hashable {
+public enum ArticleBlock: Codable, Hashable {
     case heading(level: Int, text: RichText)
     case paragraph(RichText)
     case quote(RichText)
@@ -149,7 +149,7 @@ enum ArticleBlock: Codable, Hashable {
 
     /// The text a highlight can anchor into. Blocks with no anchorable prose
     /// return nil and are skipped by the highlighting UI.
-    var selectableText: String? {
+    public var selectableText: String? {
         switch self {
         case .heading(_, let text), .paragraph(let text), .quote(let text):
             return text.plain
@@ -160,7 +160,7 @@ enum ArticleBlock: Codable, Hashable {
         }
     }
 
-    var plainText: String {
+    public var plainText: String {
         switch self {
         case .heading(_, let text), .paragraph(let text), .quote(let text):
             return text.plain
@@ -177,38 +177,38 @@ enum ArticleBlock: Codable, Hashable {
 }
 
 /// Blocks are addressed by position, so the reader pairs each one with its index.
-struct IndexedBlock: Identifiable, Hashable {
-    let id: Int
-    let block: ArticleBlock
+public struct IndexedBlock: Identifiable, Hashable {
+    public let id: Int
+    public let block: ArticleBlock
 }
 
-struct ArticleContent: Codable, Hashable {
-    var blocks: [ArticleBlock] = []
+public struct ArticleContent: Codable, Hashable {
+    public var blocks: [ArticleBlock] = []
 
-    var plainText: String {
+    public var plainText: String {
         blocks.map(\.plainText).filter { !$0.isEmpty }.joined(separator: "\n\n")
     }
 
-    var wordCount: Int {
+    public var wordCount: Int {
         plainText.split(whereSeparator: { $0.isWhitespace }).count
     }
 
-    var indexed: [IndexedBlock] {
+    public var indexed: [IndexedBlock] {
         blocks.enumerated().map { IndexedBlock(id: $0.offset, block: $0.element) }
     }
 
-    var imageSources: [(index: Int, image: ArticleImage)] {
+    public var imageSources: [(index: Int, image: ArticleImage)] {
         blocks.enumerated().compactMap { offset, block in
             if case .image(let image) = block { return (offset, image) }
             return nil
         }
     }
 
-    func encoded() -> Data? {
+    public func encoded() -> Data? {
         try? JSONEncoder().encode(self)
     }
 
-    static func decoded(from data: Data?) -> ArticleContent {
+    public static func decoded(from data: Data?) -> ArticleContent {
         guard let data, let content = try? JSONDecoder().decode(ArticleContent.self, from: data) else {
             return ArticleContent()
         }

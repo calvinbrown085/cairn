@@ -8,6 +8,10 @@ options:
   groupSortPosition: top
   xcodeVersion: "2620"
 
+packages:
+  SwiftReadability:
+    path: Packages/SwiftReadability
+
 fileGroups:
   - README.md
   - ROADMAP.md
@@ -49,6 +53,7 @@ targets:
       - target: StacksShareExtension
         embed: true
         codeSign: true
+      - package: SwiftReadability
 
   StacksUITests:
     type: bundle.ui-testing

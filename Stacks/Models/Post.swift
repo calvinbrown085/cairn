@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import SwiftReadability
 
 enum PostState: String, Codable, CaseIterable {
     case pending    // queued, not yet fetched

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftReadability
 
 /// The reader's prepared, immutable view of a post's body.
 ///

@@ -2,20 +2,27 @@
   "id": "D-0001",
   "title": "Decide the test host: iOS unit target vs. SwiftReadability SPM package",
   "type": "decide",
-  "status": "todo",
+  "status": "merged",
   "quarter": "bootstrap",
   "roadmap_anchor": "Q2 > Open source > Extract SwiftReadability as an SPM package",
   "depends_on": [],
   "acceptance": [
-    "A written decision recorded in DESIGN.md under Open",
-    "If SPM: Stacks/Content and the pure-logic parts of Stacks/Services move to a local package whose tests run via `swift test` on macOS with no simulator",
-    "If iOS target: accept that the sim lock serializes the gate and cap max_parallel accordingly"
+    "DECIDED: local SPM package at Packages/SwiftReadability",
+    "Extractor and parser tests run via swift test on macOS with no simulator",
+    "The app and share extension consume it as a package dependency",
+    "Recorded in DESIGN.md"
   ],
   "touches": [],
   "risk": "high",
   "factory_eligible": false,
   "attempts": 0,
   "branch": null,
-  "notes": "Gates every Phase 1 task. An iOS unit-test target needs a booted simulator, so the sim lock serializes the gate and largely defeats parallelism. Extracting the extractor (Content/*, ~1700 lines, the most fixture-driven code in the repo) as a local SPM package makes the gate seconds-long, simulator-free, and parallel-safe. It also pulls a Q2 roadmap item forward. Human decision, never dispatched.",
-  "history": []
+  "notes": "DECIDED 2026-08-25: local SPM package. Stacks/Content plus pure-logic Services become Packages/SwiftReadability, tested via swift test on macOS with no simulator. Rationale: makes the gate seconds-long and parallel-safe across worktrees, and turns the Q2 SwiftReadability extraction from aspiration into fact. Cost is one refactor: file moves, public access control, project.yml package dependency.",
+  "history": [
+    {
+      "ts": "2026-08-25T15:26:36Z",
+      "event": "decided",
+      "detail": "SPM package; supersedes the iOS-unit-target shape for F-0001/F-0002/F-0003"
+    }
+  ]
 }

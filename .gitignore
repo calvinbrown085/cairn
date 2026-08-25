@@ -11,6 +11,11 @@ Stacks.xcodeproj/
 
 .DS_Store
 
+# SwiftPM
+.build/
+.swiftpm/
+Packages/*/.build/
+
 # Factory: transient run state, locks, logs, escalations, per-worktree DerivedData.
 .claude/factory/state/
 .dd/

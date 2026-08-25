@@ -1,21 +1,21 @@
 import Foundation
 
-struct ExtractedArticle {
-    var title: String
-    var author: String?
-    var siteName: String?
-    var excerpt: String
-    var publishedAt: Date?
-    var publishedOffset: Int?
-    var leadImageSource: String?
-    var content: ArticleContent
+public struct ExtractedArticle {
+    public var title: String
+    public var author: String?
+    public var siteName: String?
+    public var excerpt: String
+    public var publishedAt: Date?
+    public var publishedOffset: Int?
+    public var leadImageSource: String?
+    public var content: ArticleContent
 }
 
 /// A Readability-style content extractor: strip the furniture, score what's left
 /// by how much prose it holds, and keep the winning subtree.
-enum ArticleExtractor {
+public enum ArticleExtractor {
 
-    static func extract(html: String, url: URL) -> ExtractedArticle {
+    public static func extract(html: String, url: URL) -> ExtractedArticle {
         let document = HTMLParser.parse(html)
         let metadata = ArticleMetadata(document: document, url: url)
 
