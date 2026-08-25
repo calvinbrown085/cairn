@@ -12,7 +12,7 @@
     "The UI suite can run under CODE_SIGNING_ALLOWED=NO"
   ],
   "touches": [
-    "Cairn/App/StacksApp.swift",
+    "Cairn/App/CairnApp.swift",
     "Cairn/Services/AppGroup.swift"
   ],
   "risk": "medium",
