@@ -44,6 +44,11 @@
       "ts": "2026-08-25T17:53:44Z",
       "event": "revise",
       "detail": "code-review found the most-representative ranking is dead code (all scores tie on whole-phrase matches) — criterion 3 unmet; plus unsqueezed text vs squeezed phrase, and a stale-snippet frame in PostRow"
+    },
+    {
+      "ts": "2026-08-25T18:00:02Z",
+      "event": "review-disputed",
+      "detail": "code-review claimed SnippetRequest must be Hashable for .task(id:) and would not compile. Disproven: SwiftUI's task(id:) is constrained to Equatable per the SDK swiftinterface, and the gate builds the app. Finding rejected."
     }
   ],
   "agent": {
