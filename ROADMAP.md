@@ -183,7 +183,7 @@ outstanding work, not speculation.
 ## Q2 (Dec 2026–Feb 2027) — Become a library, get accessible, ship a beta
 
 **Shed the queue**
-- [ ] Rethink "unread" as a library concept, not an inbox. No badge counts.
+- [x] Rethink "unread" as a library concept, not an inbox. No badge counts.
       Recency and "never opened" become *filters*, not accusations.
 - [ ] Make the backlog honest rather than hidden — if the pile is four months
       deep, say so plainly and offer to bulk-archive, rather than nagging.

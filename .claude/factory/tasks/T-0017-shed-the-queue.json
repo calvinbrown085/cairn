@@ -2,7 +2,7 @@
   "id": "T-0017",
   "title": "Shed the queue: rethink unread as a library concept, not an inbox",
   "type": "implement",
-  "status": "in_review",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Shed the queue",
   "depends_on": [],
@@ -38,6 +38,11 @@
       "ts": "2026-08-25T17:25:41Z",
       "event": "rescoped",
       "detail": "criterion 4 (backlog stated plainly on request) split to T-0020: it is a separate roadmap bullet needing UI outside this task's touches. Planning error, not an implementation failure."
+    },
+    {
+      "ts": "2026-08-25T17:26:01Z",
+      "event": "merged",
+      "detail": "ff0e1ba"
     }
   ],
   "agent": {
