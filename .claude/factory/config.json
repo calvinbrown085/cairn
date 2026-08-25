@@ -23,6 +23,7 @@
     "system_size_call_sites": null,
     "$system_size_call_sites": "Deliberately null. This number moves with active development (29 at HEAD f93d48f, 57 in the working tree on 2026-08-24). invariants.sh must measure it against the merge-base with main at run time and assert non-increase, never against a number frozen in this file.",
     "allowed_imports": [
+      "AppIntents",
       "AppKit",
       "CloudKit",
       "Compression",
@@ -44,6 +45,7 @@
       "Testing",
       "UIKit",
       "UniformTypeIdentifiers",
+      "WidgetKit",
       "XCTest"
     ],
     "$allowed_imports": "Apple frameworks only. Anything outside this list fails the gate: the Data Not Collected privacy label depends on there being no third-party SDK, ever."
