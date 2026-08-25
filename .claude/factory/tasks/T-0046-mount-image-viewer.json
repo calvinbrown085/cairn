@@ -2,7 +2,7 @@
   "id": "T-0046",
   "title": "Mount the image viewer in the reader",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [
@@ -28,6 +28,11 @@
       "ts": "2026-08-25T20:42:18Z",
       "event": "dispatched",
       "detail": "attempt 1; the tap-vs-pen question is its to answer"
+    },
+    {
+      "ts": "2026-08-25T20:47:18Z",
+      "event": "merged",
+      "detail": "f2f645b"
     }
   ],
   "agent": {

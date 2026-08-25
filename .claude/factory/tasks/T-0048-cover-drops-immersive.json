@@ -1,0 +1,23 @@
+{
+  "id": "T-0048",
+  "title": "Opening an image may drop the reader out of full screen",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": "Reading experience",
+  "depends_on": [],
+  "acceptance": [
+    "Tapping an image and dismissing it leaves the reader exactly as it was: still immersive, same scroll position, library column still collapsed on iPad",
+    "The behaviour is confirmed by running it, not reasoned from the code",
+    "Leaving the reader for real \u2014 going back to the library \u2014 still exits immersive as it does today"
+  ],
+  "touches": [
+    "Cairn/Views/ReaderView.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Flagged by T-0046 as the one thing it could not verify without a screen, and it looks real. ReaderView.swift line ~171 has .onDisappear { ... if isImmersive { onImmersiveChange(false) } }, and RootView uses that callback to restore the split view. If SwiftUI fires onDisappear when a DESCENDANT presents a fullScreenCover \u2014 ArticleBlockView now does exactly that for the image viewer \u2014 then opening an image restores the library column behind the cover and leaves the reader non-immersive on dismiss. Most visible on iPad, which is where the owner is testing. FIRST STEP IS TO REPRODUCE, not to fix: if onDisappear does not fire in this case, there is no bug and the correct outcome is to say so and close it. If it does, the fix is to distinguish 'covered' from 'left' \u2014 leaving for the library should still exit immersive.",
+  "history": []
+}
