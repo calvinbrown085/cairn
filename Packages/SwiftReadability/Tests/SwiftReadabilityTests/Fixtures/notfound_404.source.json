@@ -1,0 +1,7 @@
+{
+  "source": "https://en.wikipedia.org/wiki/Special:ThisPageDoesNotExist404xyz",
+  "shape": "404 page",
+  "license": "CC BY-SA 4.0",
+  "captured": "2026-08-25",
+  "http_status": 404
+}
