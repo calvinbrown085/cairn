@@ -2,7 +2,7 @@
   "id": "T-0032",
   "title": "Move the local checkout to cairn and repoint the factory",
   "type": "chore",
-  "status": "todo",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": null,
   "depends_on": [
@@ -33,6 +33,11 @@
       "ts": "2026-08-25T19:12:29Z",
       "event": "rescoped",
       "detail": "GitHub repo already renamed by the owner; origin repointed to the canonical URL. Remaining scope is the local checkout, the worktree root, the settings allowlist and the stale ledger globs."
+    },
+    {
+      "ts": "2026-08-25T19:26:15Z",
+      "event": "completed",
+      "detail": "checkout moved to ~/Documents/cairn, worktrees to ~/Documents/cairn-worktrees, config and allowlist repointed, 6 stale leases rewritten; stale SwiftPM and DerivedData caches cleared (absolute paths baked in), gate green cold from the new home"
     }
   ]
 }
