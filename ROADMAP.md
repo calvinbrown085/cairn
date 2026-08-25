@@ -218,7 +218,7 @@ outstanding work, not speculation.
       and the lazy rendering it depends on is not negotiable — an 80,000-word
       article has to stay usable. Needs an estimated total height or a
       purpose-built reading-progress indicator.
-- [ ] **The app needs a new name.** The old name is unavailable in App Store Connect.
+- [x] **The app needs a new name.** **Done 2026-08-25: the app is Cairn** (T-0031, `68cdcd9`). A cairn is a stack of stones that marks a path so you can find your way back.
       Must be decided and executed **before TestFlight**: the CloudKit container
       is named for the app, and container identity is what synced records hang
       off. Today the only data at risk is the owner's. After beta testers exist,
