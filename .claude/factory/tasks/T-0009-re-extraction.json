@@ -21,7 +21,7 @@
   ],
   "risk": "high",
   "factory_eligible": true,
-  "attempts": 0,
+  "attempts": 1,
   "branch": "factory/T-0009-re-extraction",
   "notes": "Constitution P7: must not lossily rewrite the archive.",
   "history": [
@@ -39,6 +39,11 @@
       "ts": "2026-08-25T18:34:13Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T18:47:45Z",
+      "event": "revise",
+      "detail": "code-review: overlapping matches make the exactly-once uniqueness guarantee false (silent misplacement); destructive drop path never accounts for deleted highlights; progress off by one"
     }
   ],
   "agent": {
