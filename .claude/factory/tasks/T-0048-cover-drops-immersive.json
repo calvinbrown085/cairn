@@ -24,6 +24,11 @@
       "ts": "2026-08-25T20:49:19Z",
       "event": "dispatched",
       "detail": "attempt 1; reproduce before fixing — a clean 'no bug' is an acceptable outcome"
+    },
+    {
+      "ts": "2026-08-25T21:03:50Z",
+      "event": "lease-violation",
+      "detail": "edited CairnUITests/ReadingFlowUITests.swift, outside its lease and inside T-0044's; told to revert and instrument ReaderView instead; capped at this run"
     }
   ],
   "agent": {
