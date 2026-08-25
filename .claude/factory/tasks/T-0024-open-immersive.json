@@ -17,20 +17,25 @@
     "ReadingFlowUITests is updated for the new entry state and still passes"
   ],
   "touches": [
-    "Stacks/Views/ReaderView.swift",
-    "Stacks/Views/RootView.swift",
-    "StacksUITests/**"
+    "Cairn/Views/ReaderView.swift",
+    "Cairn/Views/RootView.swift",
+    "CairnUITests/**"
   ],
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
   "branch": null,
-  "notes": "User request 2026-08-25. NOT sticky: always enter immersive; exiting applies to the current post only. No stored preference. iPAD DECIDED 2026-08-25: same as iPhone — the library column collapses on open and returns on exit, one behaviour on every device.",
+  "notes": "User request 2026-08-25. NOT sticky: always enter immersive; exiting applies to the current post only. No stored preference. iPAD DECIDED 2026-08-25: same as iPhone \u2014 the library column collapses on open and returns on exit, one behaviour on every device.",
   "history": [
     {
       "ts": "2026-08-25T18:32:35Z",
       "event": "decided",
       "detail": "iPad behaves the same as iPhone; library collapses"
+    },
+    {
+      "ts": "2026-08-25T00:00:00Z",
+      "event": "touches-renamed",
+      "detail": "Stacks/ paths rewritten to Cairn/ after T-0031; a lease naming a directory that no longer exists is the drift that bit T-0006 and T-0007"
     }
   ]
 }

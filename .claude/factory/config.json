@@ -15,7 +15,7 @@
     "debt"
   ],
   "$dispatchable_types": "decide and spike are never dispatched. They queue to the human.",
-  "worktree_root": "../stacks-worktrees",
+  "worktree_root": "../cairn-worktrees",
   "derived_data_dir": ".dd",
   "simulator": "iPhone 17 Pro",
   "$simulator": "Single named destination for all sim work, held under state/locks/sim.lock.",

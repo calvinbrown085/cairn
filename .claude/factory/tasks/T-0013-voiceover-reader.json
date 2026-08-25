@@ -16,7 +16,7 @@
     "Verified by a human with VoiceOver on a device, not inferred from code"
   ],
   "touches": [
-    "Stacks/Views/**"
+    "Cairn/Views/**"
   ],
   "risk": "high",
   "factory_eligible": true,
@@ -28,6 +28,11 @@
       "ts": "2026-08-25T17:34:13Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T00:00:00Z",
+      "event": "touches-renamed",
+      "detail": "Stacks/ paths rewritten to Cairn/ after T-0031; a lease naming a directory that no longer exists is the drift that bit T-0006 and T-0007"
     }
   ]
 }
