@@ -2,7 +2,7 @@
   "id": "T-0007",
   "title": "Store the original HTML alongside extracted blocks",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Durability > Store the original HTML",
   "depends_on": [
@@ -43,6 +43,11 @@
       "ts": "2026-08-25T18:25:44Z",
       "event": "dispatched",
       "detail": "attempt 1; prioritised ahead of remaining Q2 features because saves are being truncated now"
+    },
+    {
+      "ts": "2026-08-25T18:31:34Z",
+      "event": "merged",
+      "detail": "f54079b"
     }
   ],
   "agent": {

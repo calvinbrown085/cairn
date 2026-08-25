@@ -2,7 +2,7 @@
   "id": "T-0009",
   "title": "Re-extraction command",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Durability > Re-extraction command",
   "depends_on": [
@@ -16,19 +16,34 @@
   ],
   "touches": [
     "Stacks/Services/**",
-    "Stacks/Content/**",
-    "Stacks/Views/**"
+    "Stacks/Views/ReaderView.swift",
+    "Stacks/Views/SidebarView.swift"
   ],
   "risk": "high",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0009-re-extraction",
   "notes": "Constitution P7: must not lossily rewrite the archive.",
   "history": [
     {
       "ts": "2026-08-25T17:34:13Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T18:33:06Z",
+      "event": "touches-corrected",
+      "detail": "dropped stale Stacks/Content/** and narrowed Stacks/Views/** to the two files needing an entry point, so it does not collide with T-0022's reader typography lease"
+    },
+    {
+      "ts": "2026-08-25T18:34:13Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a157ab2935121cb2c",
+    "role": "implementer",
+    "spawned": "2026-08-25T18:34:12Z"
+  }
 }

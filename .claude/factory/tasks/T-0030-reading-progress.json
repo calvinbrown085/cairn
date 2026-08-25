@@ -1,0 +1,17 @@
+{
+  "id": "T-0030",
+  "title": "The article scroll indicator does not reflect position in the document",
+  "type": "implement", "status": "todo", "quarter": "Q2",
+  "roadmap_anchor": "Q2 > Reading experience",
+  "depends_on": ["T-0022"],
+  "acceptance": [
+    "Scrolling a long article shows an indicator that reflects true position in the whole document, not in the realised subset",
+    "It is correct on a very long document — Frankenstein-scale, once T-0027 lands the untruncated text",
+    "It stays correct after the reader's text size changes",
+    "It does not force every block to lay out up front; the lazy rendering that makes long documents usable is preserved"
+  ],
+  "touches": ["Stacks/Views/ReaderView.swift", "Stacks/Views/ArticleBlockView.swift"],
+  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "User report 2026-08-25: 'the scrollbar on the articles does not work'. Diagnosis: there is no .scrollIndicators(.hidden) anywhere — the cause is structural. ReaderView wraps a LazyVStack in a ScrollView, so the ScrollView only knows the height of blocks that have been realised. The indicator therefore sizes and positions itself against a content height that grows as you scroll, which is exactly the symptom. This is a direct consequence of the per-block architecture kept at T-0002; the lazy rendering is what makes an 80,000-word document usable, so the fix must not trade it away. Likely answer is an estimated total height from block count and type, or a purpose-built reading-progress indicator rather than relying on the system scrollbar. Depends on T-0022 to avoid colliding on ArticleBlockView.",
+  "history": []
+}

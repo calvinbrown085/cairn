@@ -2,7 +2,7 @@
   "id": "T-0016",
   "title": "Intent capture — an optional one-line why at save time",
   "type": "implement",
-  "status": "todo",
+  "status": "cancelled",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Retrieval, before intelligence > Intent capture",
   "depends_on": [],
@@ -19,7 +19,7 @@
     "Stacks/Services/SharedInbox.swift"
   ],
   "risk": "high",
-  "factory_eligible": true,
+  "factory_eligible": false,
   "attempts": 0,
   "branch": null,
   "notes": "The roadmap's most differentiated cheap feature and the highest-signal text to embed in Q3. Data-model plus extension change.",
@@ -28,6 +28,11 @@
       "ts": "2026-08-25T17:34:13Z",
       "event": "approved",
       "detail": "human approved all pending drafts"
+    },
+    {
+      "ts": "2026-08-25T18:32:35Z",
+      "event": "cancelled",
+      "detail": "owner does not want the feature; roadmap called it the strongest differentiator, owner disagrees and is the user"
     }
   ]
 }

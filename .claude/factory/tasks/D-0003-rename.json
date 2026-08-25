@@ -1,0 +1,16 @@
+{
+  "id": "D-0003",
+  "title": "Choose a new name: Stacks is unavailable on the App Store",
+  "type": "decide", "status": "todo", "quarter": "Q1",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "A name chosen and confirmed available in App Store Connect, not merely absent from App Store search",
+    "The rename lands before TestFlight, while the CloudKit container still holds only the owner's data",
+    "Bundle identifiers, app group, CloudKit container, product name, scheme, directory names and the repo are all updated together"
+  ],
+  "touches": [],
+  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "TIMING IS THE WHOLE POINT. Renaming changes the CloudKit container from iCloud.com.calvinbrown.Stacks, and container identity is what synced data hangs off — an existing container's records do not follow a rename. Today that costs nothing: the only data is the owner's, and T-0004 has not even confirmed sync works yet. After TestFlight it means abandoning every beta tester's library or writing a migration. Do it now or accept the name forever. Blast radius: project.yml, both .entitlements, Stacks/Services/AppGroup.swift, Tools/seed-simulator.sh, three bundle ids (app, ShareExtension, UITests), the app group, the CloudKit container, and the directories Stacks/, StacksShareExtension/, StacksUITests/, plus the repo name and README. Note SwiftReadability is already name-neutral and needs nothing. CONSTITUTION NOTE: X7 forbids agents changing signing or identity, so the implementation task must carry an explicit written exception from the overseer, the way T-0026 was granted permission to touch verify.sh.",
+  "history": []
+}

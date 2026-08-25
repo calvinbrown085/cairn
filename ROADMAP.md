@@ -188,8 +188,12 @@ outstanding work, not speculation.
 - [ ] **Store the original HTML** alongside extracted blocks, compressed, in
       external storage. This was declined during the initial build; the library
       thesis reverses that call. Without it nothing can ever be re-extracted.
-- [ ] **Export**: whole-library Markdown bundle and per-post EPUB. An archive you
-      can't leave is a trap; export is a trust feature before a convenience one.
+- ~~**Export**~~ — **cut 2026-08-25.** Owner's reasoning: this is an import
+      tool, the content is already being pulled in here. Noting the tension
+      rather than arguing it — the original case was a trust argument, not a
+      convenience one, and it pairs with the privacy positioning. T-0007 now
+      stores the original HTML, so the raw material for an export exists if the
+      call is ever reversed.
 - [ ] Re-extraction command — rebuild blocks from stored HTML when the parser
       improves.
 
@@ -200,10 +204,23 @@ outstanding work, not speculation.
 **Shed the queue**
 - [x] Rethink "unread" as a library concept, not an inbox. No badge counts.
       Recency and "never opened" become *filters*, not accusations.
-- [ ] Make the backlog honest rather than hidden — if the pile is four months
-      deep, say so plainly and offer to bulk-archive, rather than nagging.
+- ~~Make the backlog honest rather than hidden~~ — **cut 2026-08-25.** The
+      unread count is gone; any remaining surface that reports depth-of-pile is
+      a guilt engine in better clothes.
 
 **Reading experience**
+- [ ] **The article scroll indicator does not reflect position in the document.**
+      `LazyVStack` inside a `ScrollView` means only realised blocks contribute to
+      content height, so the indicator sizes itself against a document that
+      appears to grow as you scroll. A consequence of the per-block architecture,
+      and the lazy rendering it depends on is not negotiable — an 80,000-word
+      article has to stay usable. Needs an estimated total height or a
+      purpose-built reading-progress indicator.
+- [ ] **The app needs a new name.** *Stacks* is unavailable in App Store Connect.
+      Must be decided and executed **before TestFlight**: the CloudKit container
+      is named for the app, and container identity is what synced records hang
+      off. Today the only data at risk is the owner's. After beta testers exist,
+      a rename means abandoning their libraries or writing a migration.
 - [ ] **Opening an article goes straight to full screen.** Reading is the point;
       having to ask for it every time is friction the app imposes on its own
       primary action. The chrome comes back on request — the exit affordances
@@ -213,8 +230,11 @@ outstanding work, not speculation.
 **Retrieval, before intelligence**
 - [x] Search result snippets with the matched phrase in context, highlighted.
 - [ ] Saved searches and combined filters (site + tag + date + has-highlights).
-- [ ] **Intent capture** — an optional one-line "why" at save time, searchable,
-      shown in results. Cheap, unique, and the highest-signal field for Q3.
+- ~~**Intent capture**~~ — **cut 2026-08-25.** The roadmap argued this was the
+      strongest differentiator and the best thing to embed in Q3. The owner does
+      not want it, and the owner is the user. Recorded because the argument for
+      it was real: it also means Q3's semantic retrieval has no intent field to
+      lean on and must work on article text alone.
 
 **Preservation**
 - [ ] Periodic source liveness checks; badge dead sources
