@@ -1,0 +1,100 @@
+import SwiftUI
+import Observation
+
+/// Reader typography and theme, persisted locally and mirrored to iCloud's
+/// key-value store so the setup follows you between iPhone and iPad.
+@Observable
+final class ReadingPreferences {
+    static let shared = ReadingPreferences()
+
+    private enum Key {
+        static let theme = "reader.theme"
+        static let family = "reader.family"
+        static let bodySize = "reader.bodySize"
+        static let lineSpacing = "reader.lineSpacing"
+        static let measure = "reader.measure"
+        static let groupBySite = "library.groupBySite"
+    }
+
+    static let bodySizeRange: ClosedRange<Double> = 15...30
+    static let lineSpacingRange: ClosedRange<Double> = 0.30...0.90
+    static let measureRange: ClosedRange<Double> = 520...900
+
+    var theme: ReaderTheme = .paper { didSet { write(theme.rawValue, Key.theme) } }
+    var family: ReaderFontFamily = .serif { didSet { write(family.rawValue, Key.family) } }
+    var bodySize: Double = 19 { didSet { write(bodySize, Key.bodySize) } }
+    var lineSpacingRatio: Double = 0.55 { didSet { write(lineSpacingRatio, Key.lineSpacing) } }
+    var measure: Double = Metrics.readingWidth { didSet { write(measure, Key.measure) } }
+    var groupBySite: Bool = false { didSet { write(groupBySite, Key.groupBySite) } }
+
+    var typography: ReaderTypography {
+        ReaderTypography(
+            family: family,
+            bodySize: bodySize,
+            lineSpacingRatio: lineSpacingRatio,
+            measure: measure
+        )
+    }
+
+    private let defaults = AppGroup.defaults
+    private let cloud = NSUbiquitousKeyValueStore.default
+    private var isLoading = false
+
+    private init() {
+        load()
+        NotificationCenter.default.addObserver(
+            forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: cloud,
+            queue: .main
+        ) { [weak self] _ in
+            self?.load()
+        }
+        cloud.synchronize()
+    }
+
+    func resetToDefaults() {
+        theme = .paper
+        family = .serif
+        bodySize = 19
+        lineSpacingRatio = 0.55
+        measure = Metrics.readingWidth
+    }
+
+    // MARK: - Persistence
+
+    /// iCloud wins on load: a change made on the other device is newer than
+    /// whatever this device last wrote locally.
+    private func load() {
+        isLoading = true
+        defer { isLoading = false }
+
+        if let raw = read(Key.theme) as? String, let value = ReaderTheme(rawValue: raw) { theme = value }
+        if let raw = read(Key.family) as? String, let value = ReaderFontFamily(rawValue: raw) { family = value }
+        if let value = read(Key.bodySize) as? Double, value > 0 {
+            bodySize = value.clamped(to: Self.bodySizeRange)
+        }
+        if let value = read(Key.lineSpacing) as? Double, value > 0 {
+            lineSpacingRatio = value.clamped(to: Self.lineSpacingRange)
+        }
+        if let value = read(Key.measure) as? Double, value > 0 {
+            measure = value.clamped(to: Self.measureRange)
+        }
+        if let value = read(Key.groupBySite) as? Bool { groupBySite = value }
+    }
+
+    private func read(_ key: String) -> Any? {
+        cloud.object(forKey: key) ?? defaults.object(forKey: key)
+    }
+
+    private func write(_ value: Any, _ key: String) {
+        guard !isLoading else { return }
+        defaults.set(value, forKey: key)
+        cloud.set(value, forKey: key)
+    }
+}
+
+extension Comparable {
+    func clamped(to range: ClosedRange<Self>) -> Self {
+        min(max(self, range.lowerBound), range.upperBound)
+    }
+}
