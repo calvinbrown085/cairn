@@ -2,7 +2,7 @@
   "id": "T-0038",
   "title": "Save from Shortcuts and the Action Button",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -43,6 +43,11 @@
       "ts": "2026-08-25T20:42:17Z",
       "event": "re-dispatched",
       "detail": "allowlist unblocked"
+    },
+    {
+      "ts": "2026-08-25T20:47:06Z",
+      "event": "merged",
+      "detail": "c8997fe"
     }
   ],
   "agent": {
