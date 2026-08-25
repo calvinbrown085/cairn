@@ -2,7 +2,7 @@
   "id": "D-0002",
   "title": "Decide how app-target logic gets tested at all",
   "type": "decide",
-  "status": "todo",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -16,6 +16,12 @@
   "factory_eligible": false,
   "attempts": 0,
   "branch": null,
-  "notes": "Surfaced by /code-review on T-0014: ReaderContrastAudit is unreferenced dead code because there is nowhere in the app target to run it from. D-0001 solved testing for the extractor by moving it to Packages/SwiftReadability, and that was right for the gate — but it left every app-target type (Palette, ReaderTheme, LibraryFilter, LibraryIndex, Post) with zero test coverage and no way to acquire any. The factory will keep hitting this: any task whose acceptance says 'and it cannot regress' is currently unsatisfiable for app code. Note the tension — an iOS test target reintroduces the simulator dependency that makes the gate slow and serial, which is exactly what D-0001 escaped.",
-  "history": []
+  "notes": "DECIDED 2026-08-25 under delegated authority: a SECOND local SPM package for pure app logic, not an iOS unit test target. Rationale: D-0001 chose SPM to keep the gate simulator-free, and it works — the whole gate runs in ~20s with no simctl contention, which is what lets worktrees verify in parallel. An iOS test target would claw that back for the whole suite in order to test a handful of pure functions. The logic that actually needs coverage is pure: contrast ratio math over hex values, and search snippet extraction over strings. Neither needs SwiftUI, SwiftData, or a device. What stays in the app target is what genuinely depends on the frameworks — SwiftData predicates, view bodies, Color wrappers. EVIDENCE, not speculation: two casualties in one session. ReaderContrastAudit (T-0014) landed as 160 lines of dead code because nothing could call it, and T-0015 fixed a ranking bug that /code-review caught, then could not add a committed regression test for it. Both would have been ordinary unit tests in a package.",
+  "history": [
+    {
+      "ts": "2026-08-25T17:59:30Z",
+      "event": "decided",
+      "detail": "second SPM package for pure app logic; implementation is T-0026"
+    }
+  ]
 }

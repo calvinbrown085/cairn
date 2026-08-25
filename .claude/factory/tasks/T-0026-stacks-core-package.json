@@ -1,0 +1,19 @@
+{
+  "id": "T-0026",
+  "title": "Extract pure app logic into a testable StacksCore package",
+  "type": "implement", "status": "todo", "quarter": "Q1",
+  "roadmap_anchor": null,
+  "depends_on": ["T-0015"],
+  "acceptance": [
+    "A local package Packages/StacksCore exists, dependency-free, tested via swift test on macOS with no simulator",
+    "Contrast ratio math moves there and ReaderContrastAudit's pairs are asserted as real tests, so the palette cannot regress silently",
+    "SearchSnippetBuilder moves there with tests covering the ranking rule, including a case where a dense later passage must beat a glancing first mention",
+    "The whitespace-straddling query case is covered by a test",
+    "The app depends on the package and behaviour is unchanged; no view or SwiftData code moves",
+    "verify.sh runs the new package's tests and the whole gate stays under 30 seconds"
+  ],
+  "touches": ["Packages/StacksCore/**", "Packages/SwiftReadability/**", "project.yml", "Stacks/Design/**", "Stacks/Views/LibraryFilter.swift", ".claude/factory/bin/verify.sh"],
+  "risk": "high", "factory_eligible": true, "attempts": 0, "branch": null,
+  "notes": "Implements D-0002. Note this task is deliberately allowed to touch verify.sh — normally X3 forbids it, but wiring a new package into the gate is the one legitimate reason, and the overseer is granting it explicitly here rather than leaving the agent to discover the prohibition mid-task. Depends on T-0015 so the snippet code being moved is final. Keep the move a MOVE: no behaviour changes riding along, so the diff stays reviewable.",
+  "history": []
+}
