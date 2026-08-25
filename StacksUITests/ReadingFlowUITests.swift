@@ -57,15 +57,59 @@ final class ReadingFlowUITests: XCTestCase {
         capture("03-reader-scrolled")
 
         app.buttons["reader.typography"].tap()
-        XCTAssertTrue(app.buttons["Sepia"].waitForExistence(timeout: 5))
+        let sepia = app.buttons["Sepia"]
+        let paper = app.buttons["Paper"]
+        XCTAssertTrue(sepia.waitForExistence(timeout: 5))
         capture("04-typography")
 
-        app.buttons["Sepia"].tap()
+        sepia.tap()
+        XCTAssertTrue(sepia.isSelected, "Selecting Sepia should make it the reader's active theme")
         capture("05-reader-sepia")
 
-        app.buttons["Paper"].tap()
+        paper.tap()
+        XCTAssertTrue(paper.isSelected, "Selecting Paper should make it the reader's active theme")
+        XCTAssertFalse(sepia.isSelected, "Only one theme should read as active at a time")
         app.buttons["Done"].tap()
         capture("06-reader-paper")
+    }
+
+    /// The reader remembers where you left off, and hands you back to it
+    /// rather than the top of the article — the thing that makes a long essay
+    /// safe to put down mid-paragraph.
+    func testPositionRestoreAcrossReopen() {
+        let target = firstPost(in: app)
+        let marker = String(target.label.prefix(40))
+        target.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        _ = bodyTextView()
+        // Scroll well past the opening so the restored position is
+        // unambiguous — the title header will not read as "further down".
+        for _ in 0..<6 { app.swipeUp() }
+        let scrolledPassage = bodyTextView().label
+        capture("19-scrolled-before-leaving")
+
+        // Progress is written on a debounce; give it time to land before the
+        // view that would write it goes away.
+        _ = app.staticTexts["nothing"].waitForExistence(timeout: 2)
+
+        app.returnToLibrary()
+        app.showEverything()
+
+        let row = app.descendants(matching: .any)
+            .matching(identifier: "post.row")
+            .matching(NSPredicate(format: "label BEGINSWITH %@", marker))
+            .firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "The post should still be in the library")
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        let reopenedPassage = bodyTextView()
+        XCTAssertTrue(reopenedPassage.waitForExistence(timeout: 15))
+        capture("20-reopened-at-position")
+
+        XCTAssertEqual(
+            reopenedPassage.label, scrolledPassage,
+            "Reopening the post should resume where reading left off, not at the top"
+        )
     }
 
     /// Highlighting is the one reader feature that depends on UIKit text

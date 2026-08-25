@@ -61,7 +61,49 @@ extension XCTestCase {
             app.showEverything()
             post = app.firstPostRow
         }
+        if !post.waitForExistence(timeout: 5) {
+            // A clean simulator has nothing in it, and `xcodebuild test`
+            // reinstalls the app before every run, so nothing placed there by
+            // a previous session survives. Rather than depend on an external
+            // seeding step, add one real article through the same "Save a
+            // link" flow a reader would use, then look again.
+            seedArchive(in: app)
+            post = app.firstPostRow
+        }
         XCTAssertTrue(post.waitForExistence(timeout: 25), "The library should list saved posts")
         return post
+    }
+
+    /// Saves one real article so the suite has something to read even when
+    /// nothing pre-seeded the archive. Slower than a fixture, but it stays on
+    /// the app's own public path instead of reaching into its storage from
+    /// outside — which a build with code signing (and so the App Group the
+    /// share extension's inbox relies on) disabled can't do anyway.
+    ///
+    /// A few thousand words, not the 233-block essay `ScrollPerformanceTests`
+    /// reaches for: long enough that scrolling six screens down still lands
+    /// mid-article, short enough that a text-selection query doesn't time out
+    /// walking the accessibility tree.
+    private func seedArchive(in app: XCUIApplication) {
+        app.buttons["Save a link"].tap()
+
+        let field = app.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5), "The link sheet should offer a field to paste into")
+        field.tap()
+        field.typeText("https://www.paulgraham.com/own.html")
+        app.buttons["Save"].tap()
+
+        // Saving jumps straight to the new post rather than back to the list
+        // it was added to, and can lose the race with its own row's first
+        // render — step back to the list before looking for the row.
+        app.returnToLibrary()
+
+        // The row appears right away; wait for the article behind it to
+        // finish fetching and extracting before any test tries to read it.
+        XCTAssertTrue(app.firstPostRow.waitForExistence(timeout: 15), "Saving a link should add it to the library")
+        app.firstPostRow.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 30), "The seeded article should finish extracting")
+        app.returnToLibrary()
+        app.showEverything()
     }
 }
