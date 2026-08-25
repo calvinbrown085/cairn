@@ -113,7 +113,13 @@ fi
 
 # --- X8: the gate may not be weakened --------------------------------------
 if [ -n "$CHANGED" ]; then
-  skips="$(git diff "$BASE"...HEAD -- '*.swift' | grep -E '^\+.*(XCTSkip|\.disabled\(|throw XCTSkip)' || true)"
+  # XCTSkip anywhere is always a skipped test. `.disabled(` is NOT: it is
+  # swift-testing's trait in a test file, and SwiftUI's View.disabled(_:)
+  # everywhere else — the app already has dozens of legitimate uses. Scoping the
+  # trait check to test paths is what keeps this from flagging ordinary UI code.
+  skips="$(git diff "$BASE"...HEAD -- '*.swift' | grep -E '^\+.*XCTSkip' || true)"
+  test_skips="$(git diff "$BASE"...HEAD -- '*Tests/*.swift' '*Tests.swift' | grep -E '^\+.*\.disabled\(' || true)"
+  skips="$skips$test_skips"
   if [ -n "$skips" ]; then
     flag "X8  tests disabled or skipped in this diff:"; echo "$skips" | sed 's/^/        /' | head -4
   else
