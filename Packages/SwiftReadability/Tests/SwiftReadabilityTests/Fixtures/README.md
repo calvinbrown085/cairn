@@ -28,27 +28,9 @@ currently handles badly — recorded rather than silently made to look correct.
 inert until `ArticleExtractor` or `HTMLParser` is fixed; nothing here is a
 placeholder waiting to be filled in with whatever the extractor happens to
 produce today, because that would assert a bug as if it were the intended
-shape. As of the last audit (T-0006), these have no expectation:
-
-- `commons_gallery` — the gallery's real, non-lazy `<img>` elements sit inside
-  `<li class="gallerybox">`. `BlockBuilder`'s `"li"` case (a stray list item
-  outside a list) always converts to a text paragraph and never looks for an
-  image inside; the same is true for `appendList`'s per-item text extraction.
-  Every one of the 28 photos is dropped; only the filename-and-size caption
-  text survives.
-- `gnu_philosophy` — content extraction is complete, but the title carries the
-  page's full "Article - Section - Site" `<title>` tag verbatim
-  (`"What is Free Software? - GNU Project - Free Software Foundation"`). The
-  page has no `<h1>` (its top heading is an `<h2>`) and no `og:title`, so
-  `ArticleMetadata` falls back to `<title>`; `trimmingSiteSuffix` only checks
-  the text after the *last* separator, which here is "Free Software
-  Foundation" and never matches any token derived from `gnu.org`.
-- `rfc_editor_2616` — the capture has no `<html>`, `<head>`, `<title>`, or
-  `<h1>` at all (the page's visible heading is a `<span class="h1">`, not a
-  real heading element), so every entry in `ArticleMetadata`'s title fallback
-  chain comes up empty and it lands on the request URL's host. The body text
-  itself is captured completely and correctly — all 176 pages, none dropped —
-  so this is a title-only defect.
+shape. As of the last audit (T-0028), every real capture in the corpus has a
+frozen expectation — see "Fixed by T-0028" below for the three that didn't
+until now.
 
 ### Fixed by T-0027: sibling-section truncation
 
@@ -110,6 +92,65 @@ the entire page loses all of its content, not just its heading. The fixture
 here keeps its `<h1>` closed so it exercises the nesting cases it's named for
 instead of this unrelated one; the unclosed-heading behaviour is recorded here
 rather than turned into a fixture of its own.
+
+### Fixed by T-0028: gallery images, title suffixes, and the missing-title fallback
+
+Three more real captures had no expectation for three unrelated reasons; all
+three now do.
+
+`commons_gallery`'s 28 real, non-lazy `<img>` elements sit inside
+`<li class="gallerybox">`, each wrapping a `<div class="thumb">` (the image)
+and a `<div class="gallerytext">` (a filename-and-size caption) rather than
+being a `<ul>`/`<ol>` nested somewhere below the winning candidate — on this
+page the gallery `<ul>` *is* the winning candidate, so `BlockBuilder` descends
+straight into its `<li>` children as stray list items. Neither that `"li"`
+case in `emit()` nor `appendList`'s per-item extraction ever looked inside an
+item for an image, so every photo was dropped and only the caption text
+survived. Both now check whether an item's image sits inside a genuine
+block-level wrapper of its own — the same `cellHoldsBlockContent` test a table
+cell is judged by, reused here — and if so pull it out as an image block with
+the rest of the item's text riding along as its caption, instead of
+flattening the item to a plain paragraph. An item whose image is stitched
+inline into a run of prose instead (no block wrapper around it) is
+untouched: this is what keeps `wikipedia_readability`'s MathJax
+fallback-image list items — three `<li>`s under its "Artificial intelligence"
+section, each an inline formula rendered as an `<img>` alongside surrounding
+words with no wrapping `<div>` — reading as text, exactly as before.
+
+`gnu_philosophy`'s title carried its full "Article - Section - Site" `<title>`
+tag verbatim — `"What is Free Software? - GNU Project - Free Software
+Foundation"` — because the page has no `<h1>` (its top heading is an `<h2>`)
+and no `og:site_name`, so the only site-identity signal `trimmingSiteSuffix`
+had to check the trailing segment against was the request host, and this
+fixture's capture carries no `<link rel="canonical">` or `og:url` either,
+so that host is the fixture harness's placeholder `example.com` — nothing
+close to "Free Software Foundation". `trimmingSiteSuffix` now also collects
+candidate site names from the page's own ARIA `role="banner"` landmark: every
+link's text inside it, on the theory that a site's own banner conventionally
+names it even when no meta tag does. On this page that pulls in "Free
+Software Foundation" from a "Supported by the Free Software Foundation"
+credit next to the GNU logo, which is enough to confirm the title's trailing
+segment is site chrome. Once confirmed, the trimmer no longer stops at
+stripping only that last segment: a title chained on the *same* separator
+more than once is a breadcrumb, not prose that happens to contain a dash, so
+it now cuts back to the first occurrence of that separator instead of the
+last, dropping "GNU Project" along with "Free Software Foundation" rather
+than leaving it stuck to the headline. None of the 18 previously-frozen
+fixtures repeat the same separator twice in their title, so this only ever
+changes behaviour here.
+
+`rfc_editor_2616`'s capture has no `<html>`, `<head>`, `<title>`, or `<h1>` at
+all — its visible heading is `<span class="h1">Hypertext Transfer Protocol --
+HTTP/1.1</span>`, a styled span standing in for a real heading tag, and the
+page in fact uses the same convention down through `class="h2"`/`"h3"`/`"h4"`
+for its section headings. `ArticleMetadata`'s title fallback chain now ends
+with one more entry, after `<title>` itself: the text of the first element
+anywhere in the document carrying an exact `class="h1"` token. It only ever
+fires when every earlier source — Open Graph, JSON-LD, a real `<h1>`, a real
+`<title>` — has already come up empty, which no previously-frozen fixture
+triggers, so this is a pure addition. The body text itself was already
+captured completely and correctly (all 176 pages, none dropped); this was a
+title-only defect.
 
 ## Licensing
 

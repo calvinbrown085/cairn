@@ -122,6 +122,14 @@ struct BlockBuilder {
 
         case "li":
             // A stray <li> outside a list — keep the prose, drop the bullet.
+            // But if the item's image sits in its own block wrapper (a
+            // gallery thumbnail, say) rather than stitched inline into a run
+            // of prose, pull it out instead of losing it to flattening.
+            if let image = blockWrappedImage(in: element) {
+                let caption = richText(of: element)
+                appendImage(image, caption: caption.isEmpty ? nil : caption)
+                return
+            }
             let text = richText(of: element)
             if !text.isEmpty { blocks.append(.paragraph(text)) }
 
@@ -154,13 +162,45 @@ struct BlockBuilder {
 
     private mutating func appendList(_ element: HTMLElement, ordered: Bool) {
         var items: [RichText] = []
+
+        func flushItems() {
+            guard !items.isEmpty else { return }
+            blocks.append(.list(ordered: ordered, items: items))
+            items = []
+        }
+
         for child in element.childElements where child.tag == "li" {
+            // A gallery item — an image in its own wrapper div, a caption in
+            // another — needs pulling out as a figure, or the image is
+            // silently dropped by the plain-text flattening below. An item
+            // with an inline image stitched into running prose (a MathJax
+            // fallback glyph, say) has no such wrapper and stays plain text.
+            if let image = blockWrappedImage(in: child) {
+                flushItems()
+                let caption = richText(of: child)
+                appendImage(image, caption: caption.isEmpty ? nil : caption)
+                continue
+            }
             // Nested lists get flattened into their parent item's text.
             let text = richText(of: child)
             if !text.isEmpty { items.append(text) }
         }
-        guard !items.isEmpty else { return }
-        blocks.append(.list(ordered: ordered, items: items))
+        flushItems()
+    }
+
+    /// An image sitting inside a block-level wrapper of a list item (its own
+    /// `<div>`, `<figure>`, ...) the way a gallery thumbnail does — as opposed
+    /// to an image stitched inline into a run of prose, which has no such
+    /// wrapper. Reuses `cellHoldsBlockContent`'s block/inline test, the same
+    /// signal a table cell is judged by. Checked against the same source
+    /// rules any other image needs, so a decorative icon too small or too
+    /// generic to count doesn't hijack the item.
+    private func blockWrappedImage(in listItem: HTMLElement) -> HTMLElement? {
+        guard cellHoldsBlockContent(listItem),
+              let image = listItem.firstElement(tagged: "img"),
+              imageSource(from: image) != nil
+        else { return nil }
+        return image
     }
 
     private mutating func appendFigure(_ element: HTMLElement) {

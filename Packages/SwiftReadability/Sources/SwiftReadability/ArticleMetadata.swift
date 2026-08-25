@@ -27,10 +27,14 @@ struct ArticleMetadata {
             linkedData?["name"] as? String,
             document.firstElement(tagged: "h1")?.textContent,
             document.firstElement(tagged: "title")?.textContent,
+            ArticleMetadata.styledHeading(in: document),
         ]) ?? url.host() ?? "Untitled"
 
         // Page titles usually carry a "— Site Name" tail that the headline doesn't.
-        title = ArticleMetadata.trimmingSiteSuffix(from: title, siteName: siteName, url: url)
+        title = ArticleMetadata.trimmingSiteSuffix(
+            from: title, siteName: siteName, url: url,
+            extraNames: ArticleMetadata.bannerNames(in: document)
+        )
         title = title.squeezed
 
         author = ArticleMetadata.firstNonEmpty([
@@ -175,10 +179,14 @@ struct ArticleMetadata {
 
     /// Strips a trailing "| Site Name". The tail rarely matches the site name
     /// exactly — "overreacted" vs "overreacted.io" — so both sides are reduced to
-    /// letters and numbers and compared by containment.
-    private static func trimmingSiteSuffix(from title: String, siteName: String?, url: URL) -> String {
+    /// letters and numbers and compared by containment. `extraNames` gives a page
+    /// with no `og:site_name` a second chance: text pulled from its own banner
+    /// landmark, where a site conventionally names itself even without the meta
+    /// tag to say so.
+    private static func trimmingSiteSuffix(from title: String, siteName: String?, url: URL, extraNames: [String] = []) -> String {
         var names: [String] = []
         if let siteName, !siteName.isEmpty { names.append(siteName) }
+        names += extraNames
         if let host = url.host() {
             names.append(host)
             let bare = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
@@ -196,11 +204,10 @@ struct ArticleMetadata {
         guard !keys.isEmpty else { return title }
 
         for separator in [" | ", " – ", " — ", " - ", " · ", " :: ", " » ", " // "] {
-            guard let range = title.range(of: separator, options: .backwards) else { continue }
-            let head = String(title[..<range.lowerBound]).squeezed
-            let rawTail = String(title[range.upperBound...]).squeezed
+            guard let lastRange = title.range(of: separator, options: .backwards) else { continue }
+            let rawTail = String(title[lastRange.upperBound...]).squeezed
             let tail = key(rawTail)
-            guard !head.isEmpty, !tail.isEmpty, tail.count <= 40 else { continue }
+            guard !tail.isEmpty, tail.count <= 40 else { continue }
 
             // "Rust Blog" names the same site as blog.rust-lang.org, so the
             // generic half of the suffix is dropped before comparing.
@@ -217,9 +224,55 @@ struct ArticleMetadata {
             let matches = candidates.contains { candidate in
                 keys.contains { $0 == candidate || $0.hasPrefix(candidate) || candidate.hasPrefix($0) }
             }
-            if matches { return head }
+            guard matches else { continue }
+
+            // The trailing segment is confirmed site chrome. A title chained
+            // on the same separator more than once ("Article - Section -
+            // Site") is a breadcrumb, not prose that happens to use a dash,
+            // so every link back to the first occurrence goes — not just the
+            // one segment that happened to match.
+            let firstRange = title.range(of: separator) ?? lastRange
+            let head = String(title[..<firstRange.lowerBound]).squeezed
+            guard !head.isEmpty else { continue }
+            return head
         }
         return title
+    }
+
+    /// Text pulled from the page's own banner landmark — the ARIA role a site
+    /// puts on its site-wide header, distinct from an `<header>` scoped to one
+    /// article or section — to give the site-suffix trimmer something to match
+    /// against when there is no `og:site_name` at all. A banner conventionally
+    /// carries a home link and often a supporting credit alongside it (a "GNU"
+    /// logo next to "Supported by the Free Software Foundation", say), so every
+    /// link's text inside it is offered as a candidate rather than guessing
+    /// which one is "the" name.
+    private static func bannerNames(in document: HTMLElement) -> [String] {
+        var banners: [HTMLElement] = []
+        document.walk { if $0.attributes["role"]?.lowercased() == "banner" { banners.append($0) } }
+        guard !banners.isEmpty else { return [] }
+        return banners.flatMap { $0.elements(tagged: ["a"]) }
+            .map { $0.textContent.squeezed }
+            .filter { !$0.isEmpty }
+    }
+
+    /// Some pages fake a heading with CSS instead of a real `<h1>` — a plain
+    /// element carrying a `class="h1"` token, styled to read as one. This is
+    /// the last resort in the title fallback chain, after `<title>` itself, so
+    /// it only ever fires on a page with no `<title>`, `<h1>`, or Open Graph
+    /// title at all — a page whose only remaining title signal would otherwise
+    /// be the request URL's host.
+    private static func styledHeading(in document: HTMLElement) -> String? {
+        var found: String?
+        document.walk { element in
+            guard found == nil else { return }
+            let classes = (element.attributes["class"] ?? "").lowercased().split(separator: " ")
+            guard classes.contains("h1") else { return }
+            let text = element.textContent.squeezed
+            guard !text.isEmpty else { return }
+            found = text
+        }
+        return found
     }
 
     /// Formats that carry no time of day. Parsed at midnight UTC, "2000-04-06"
