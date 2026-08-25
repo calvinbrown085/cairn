@@ -16,11 +16,12 @@
     "Stacks/Views/LibraryView.swift",
     "Stacks/Views/LibraryIndex.swift",
     "Stacks/Views/PostRow.swift",
-    "Stacks/Views/LibraryFilter.swift"
+    "Stacks/Views/LibraryFilter.swift",
+    "Stacks/Views/PostCard.swift"
   ],
   "risk": "medium",
   "factory_eligible": true,
-  "attempts": 0,
+  "attempts": 1,
   "branch": "factory/T-0015-search-snippets",
   "notes": "Retrieval before intelligence — this ships before any embedding work.",
   "history": [
@@ -33,6 +34,11 @@
       "ts": "2026-08-25T17:29:07Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T17:48:01Z",
+      "event": "revise",
+      "detail": "criterion 1 unmet in the default cards style; touches widened to include PostCard.swift (planning error, PostCard was omitted)"
     }
   ],
   "agent": {
