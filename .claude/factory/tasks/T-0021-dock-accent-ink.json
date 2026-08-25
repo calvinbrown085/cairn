@@ -2,7 +2,7 @@
   "id": "T-0021",
   "title": "ReaderDock picks white-on-accent in Paper dark mode, where accent is light",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > Contrast audit",
   "depends_on": [
@@ -32,6 +32,11 @@
       "ts": "2026-08-25T18:41:51Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T18:44:57Z",
+      "event": "merged",
+      "detail": "4c54ded"
     }
   ],
   "agent": {

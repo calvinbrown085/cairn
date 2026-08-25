@@ -1,0 +1,19 @@
+{
+  "id": "T-0032",
+  "title": "Rename the GitHub repo and the local checkout to cairn",
+  "type": "chore", "status": "todo", "quarter": "Q1",
+  "roadmap_anchor": null,
+  "depends_on": ["T-0031"],
+  "acceptance": [
+    "The GitHub repository is renamed from stacks to cairn and origin points at the new URL",
+    "The local checkout is ~/Documents/cairn and git worktree metadata is consistent",
+    "The worktree root is ~/Documents/cairn-worktrees and config.json's worktree_root agrees",
+    ".claude/settings.json's permission allowlist points at the new absolute path",
+    "The gate passes from the renamed checkout and main-health.sh is green",
+    "No factory script, task file, or setting still refers to the old path"
+  ],
+  "touches": [],
+  "risk": "high", "factory_eligible": false, "attempts": 0, "branch": null,
+  "notes": "NOT AGENT WORK, and not because of policy — an agent cannot rename the directory its own shell is running inside, and every brief it was given carries absolute paths through the old name. This is an overseer operation performed directly, after T-0031 has landed and with an empty fleet. Order matters: (1) confirm no worktrees remain, since git worktree metadata stores absolute paths and a rename orphans them; (2) gh repo rename cairn, which also updates origin; (3) mv ~/Documents/stacks ~/Documents/cairn and mv the worktrees root; (4) update config.json worktree_root and .claude/settings.json allowlist; (5) re-run main-health.sh from the new path to prove the gate still works. The scratchpad and session paths keep the old name and that is harmless — they are session-scoped.",
+  "history": []
+}
