@@ -46,7 +46,18 @@ struct SelectableTextView: UIViewRepresentable {
             target: context.coordinator,
             action: #selector(Coordinator.handleTap(_:))
         )
+        // `cancelsTouchesInView` stays false: UITextView's own recognisers
+        // (caret placement, the loupe, double-tap word selection) still need
+        // the touch for selection and links to work outside markup mode.
+        // Without a delegate answering `shouldBeRequiredToFailBy`, that leaves
+        // this tap and UITextView's built-in tap-to-place-a-caret recogniser
+        // racing for the same touch with no defined winner. Marking up needs
+        // a deterministic winner, so the delegate below makes this recogniser
+        // require the built-in one to wait, but only while marking up —
+        // see `gestureRecognizer(_:shouldBeRequiredToFailBy:)`.
         tap.cancelsTouchesInView = false
+        tap.delegate = context.coordinator
+        context.coordinator.tapRecognizer = tap
         view.addGestureRecognizer(tap)
 
         return view
@@ -78,11 +89,40 @@ struct SelectableTextView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
 
-    final class Coordinator: NSObject, UITextViewDelegate {
+    final class Coordinator: NSObject, UITextViewDelegate, UIGestureRecognizerDelegate {
         var parent: SelectableTextView
+        /// The custom tap added in `makeUIView`, kept so the delegate method
+        /// below can tell it apart from UITextView's own recognisers.
+        weak var tapRecognizer: UITapGestureRecognizer?
 
         init(parent: SelectableTextView) {
             self.parent = parent
+        }
+
+        /// Makes the custom tap win the race against UITextView's built-in
+        /// tap-to-place-a-caret recogniser, but only while marking up.
+        ///
+        /// Both are plain single-tap recognisers attached to the same view,
+        /// so with no failure requirement between them, UIKit has no defined
+        /// winner — either can recognise first, which is exactly why the
+        /// caret used to win about half the time. Answering `true` here (for
+        /// a sibling recogniser on the same text view) makes *this*
+        /// recogniser required to fail before that sibling can succeed, which
+        /// is the one relationship we can establish without touching
+        /// UITextView's own private recognisers or their delegate. Since a
+        /// plain tap almost always lets this recogniser succeed, the sibling
+        /// then never gets a turn — no caret. Outside markup mode this
+        /// returns false, so the two race exactly as they did before: not a
+        /// bug there, since placing a caret on a plain tap is the ordinary,
+        /// desired outcome of a selectable text view.
+        func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer
+        ) -> Bool {
+            guard gestureRecognizer === tapRecognizer else { return false }
+            guard otherGestureRecognizer.view === gestureRecognizer.view else { return false }
+            guard let tool = parent.markupTool, tool != .pen else { return false }
+            return true
         }
 
         /// Adds "Highlight" ahead of the system's copy/look-up items.
