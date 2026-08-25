@@ -28,6 +28,12 @@ struct ArticleBlockView: View {
     private var typography: ReaderTypography { builder.typography }
     private var theme: ReaderTheme { builder.theme }
 
+    /// Set only for the image case, and only while its `fullScreenCover` is up.
+    /// Scoped to this one block rather than lifted to `ReaderView`: each image
+    /// block presents its own viewer, so there is nothing to coordinate across
+    /// blocks and no shared state to plumb through `MarkupContext`.
+    @State private var isImageViewerPresented = false
+
     /// Cache keys for this block. Blocks that hold several text views — a list,
     /// an image with a caption — give each one its own slot.
     private func key(_ part: Int = 0) -> Int { (index << 20) | part }
@@ -156,6 +162,22 @@ struct ArticleBlockView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .strokeBorder(theme.rule, lineWidth: 0.5)
                         )
+                        .contentShape(.rect)
+                        .onTapGesture {
+                            // Inert, not just unlikely to win a hit-test race:
+                            // while any markup tool is out — pen most of all —
+                            // a tap here does nothing at all, so it can never
+                            // be the thing that eats a stroke's first touch.
+                            // The full-screen open is a plain-reading-mode
+                            // affordance only.
+                            guard markup == nil else { return }
+                            isImageViewerPresented = true
+                        }
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel("Image, double tap to view full screen")
+                        .fullScreenCover(isPresented: $isImageViewerPresented) {
+                            ImageViewer(image: stored, caption: image.caption, typography: typography, theme: theme)
+                        }
 
                     if let caption = image.caption, !caption.isEmpty {
                         SelectableTextView(
