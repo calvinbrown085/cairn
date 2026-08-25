@@ -1,7 +1,9 @@
 {
   "id": "T-0028",
   "title": "Three metadata defects: gallery images, title suffixes, missing-title fallback",
-  "type": "implement", "status": "todo", "quarter": "Q1",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [],
   "acceptance": [
@@ -10,8 +12,25 @@
     "A page with no <html>, <head>, <title> or <h1> derives a better title than the request host; rfc_editor_2616 is the case",
     "Each of the three gains a frozen expectation, replacing its finding in Fixtures/README.md"
   ],
-  "touches": ["Packages/SwiftReadability/Sources/**", "Packages/SwiftReadability/Tests/**"],
-  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Packages/SwiftReadability/Sources/**",
+    "Packages/SwiftReadability/Tests/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0028",
   "notes": "Three separate metadata-only defects from T-0006's findings; content extraction is correct in all three. (1) BlockBuilder's li case and appendList never look inside a stray <li> for an <img>. (2) trimmingSiteSuffix only checks the last separator segment, so gnu.org's 'Article - Section - Free Software Foundation' never matches the host. (3) rfc_editor_2616's capture has no html/head/title/h1 at all — its heading is a styled span — so title falls back to the host.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T19:54:13Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "ad251e0bcfeb342f4",
+    "role": "implementer",
+    "spawned": "2026-08-25T19:54:13Z"
+  }
 }

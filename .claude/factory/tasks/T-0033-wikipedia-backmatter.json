@@ -2,7 +2,7 @@
   "id": "T-0033",
   "title": "Reference lists and external links are extracted as article prose",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q1",
   "roadmap_anchor": "Q1 > Extractor hardening",
   "depends_on": [
@@ -29,6 +29,11 @@
       "ts": "2026-08-25T19:40:20Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-25T19:52:21Z",
+      "event": "merged",
+      "detail": "077d158"
     }
   ],
   "agent": {

@@ -1,15 +1,42 @@
 {
-  "id": "T-0040", "title": "Bulk archive tools you invoke, never prompted",
-  "type": "implement", "status": "todo", "quarter": "next",
-  "roadmap_anchor": null, "depends_on": [],
+  "id": "T-0040",
+  "title": "Bulk archive tools you invoke, never prompted",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
   "acceptance": [
     "Multiple posts can be selected and archived in one action",
     "Everything older than a chosen date can be archived in one action, with the count shown before it happens",
     "Never-opened is available as a filter",
     "Nothing counts, badges, or prompts: these surfaces appear only when the user goes looking for them"
   ],
-  "touches": ["Cairn/Views/**"],
-  "risk": "medium", "factory_eligible": true, "attempts": 0, "branch": null,
+  "touches": [
+    "Cairn/Views/LibraryView.swift",
+    "Cairn/Views/SidebarView.swift",
+    "Cairn/Views/LibraryFilter.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0040",
   "notes": "Owner wants tools they reach for, not nagging — explicitly different in kind from T-0020, which was cut for speaking first. The distinction is the whole design constraint: invoked, never volunteered.",
-  "history": []
+  "history": [
+    {
+      "ts": "2026-08-25T19:53:15Z",
+      "event": "touches-narrowed",
+      "detail": "was Cairn/Views/**; narrowed to the three files bulk actions and a never-opened filter need"
+    },
+    {
+      "ts": "2026-08-25T19:54:14Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "a378bb4ffbe7a0b14",
+    "role": "implementer",
+    "spawned": "2026-08-25T19:54:13Z"
+  }
 }
