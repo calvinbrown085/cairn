@@ -32,6 +32,11 @@
       "ts": "2026-08-25T17:40:52Z",
       "event": "rescoped",
       "detail": "decoupled from T-0002: only 2 of 77 call sites are in the reader text stack. Chrome work needs no architecture decision."
+    },
+    {
+      "ts": "2026-08-25T18:01:15Z",
+      "event": "worktree-staged",
+      "detail": "worktree created at ../stacks-worktrees/T-0012, no agent dispatched (usage checkpoint); status remains todo"
     }
   ]
 }

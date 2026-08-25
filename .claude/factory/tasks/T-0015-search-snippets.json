@@ -2,7 +2,7 @@
   "id": "T-0015",
   "title": "Search result snippets with the matched phrase highlighted in context",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Retrieval, before intelligence > Search result snippets",
   "depends_on": [],
@@ -49,6 +49,11 @@
       "ts": "2026-08-25T18:00:02Z",
       "event": "review-disputed",
       "detail": "code-review claimed SnippetRequest must be Hashable for .task(id:) and would not compile. Disproven: SwiftUI's task(id:) is constrained to Equatable per the SDK swiftinterface, and the gate builds the app. Finding rejected."
+    },
+    {
+      "ts": "2026-08-25T18:00:23Z",
+      "event": "merged",
+      "detail": "02f021b"
     }
   ],
   "agent": {

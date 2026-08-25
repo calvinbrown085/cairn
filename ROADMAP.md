@@ -211,7 +211,7 @@ outstanding work, not speculation.
       post in, not a mode you *switch to* once you are there.
 
 **Retrieval, before intelligence**
-- [ ] Search result snippets with the matched phrase in context, highlighted.
+- [x] Search result snippets with the matched phrase in context, highlighted.
 - [ ] Saved searches and combined filters (site + tag + date + has-highlights).
 - [ ] **Intent capture** — an optional one-line "why" at save time, searchable,
       shown in results. Cheap, unique, and the highest-signal field for Q3.

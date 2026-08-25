@@ -14,9 +14,7 @@
     "Any real page the extractor handles badly is reported as a finding, not papered over by writing the bad output into the expectation"
   ],
   "touches": [
-    "StacksTests/**",
-    "Tests/**",
-    "Fixtures/**"
+    "Packages/SwiftReadability/Tests/**"
   ],
   "risk": "low",
   "factory_eligible": true,
@@ -43,6 +41,11 @@
       "ts": "2026-08-25T17:49:02Z",
       "event": "dispatched",
       "detail": "attempt 1; 14 real captures awaiting honest expectations"
+    },
+    {
+      "ts": "2026-08-25T18:01:15Z",
+      "event": "touches-corrected",
+      "detail": "were stale pre-SPM paths (StacksTests/**, Tests/**, Fixtures/**) left over from the iOS-target era; corrected to the package path the agent is actually working in"
     }
   ],
   "agent": {
