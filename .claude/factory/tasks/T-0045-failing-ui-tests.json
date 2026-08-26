@@ -25,6 +25,11 @@
       "ts": "2026-08-26T00:02:30Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-26T00:29:19Z",
+      "event": "capped",
+      "detail": "121k tokens and 27 min with no edits; told to conclude after the current baseline. Landing nothing is an acceptable outcome if both tests now pass."
     }
   ],
   "agent": {
