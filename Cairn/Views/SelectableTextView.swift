@@ -13,6 +13,19 @@ struct SelectableTextView: UIViewRepresentable {
     /// Block index, used to memoise the measured height. Nil means measure every
     /// time — correct, just slower.
     var measurementKey: Int?
+    /// Marks this block as a heading for VoiceOver's rotor. A `UITextView` is
+    /// its own accessibility element regardless of what SwiftUI modifiers are
+    /// applied to the `SelectableTextView` wrapper around it, so the `.header`
+    /// trait has to be set on the underlying view directly — it will not take
+    /// effect if attached as a SwiftUI `.accessibilityAddTraits` on this view.
+    var isHeading: Bool = false
+    /// Character ranges (into `attributed.string`) that are currently
+    /// highlighted, unclamped — this view clamps and merges them. A
+    /// highlight is only a background colour, which VoiceOver never speaks on
+    /// its own, so when this is non-empty the spoken value is rebuilt with an
+    /// explicit "Highlighted … end highlight" narration around each span
+    /// rather than relying on the paint underneath it.
+    var highlightedRanges: [NSRange] = []
     /// Non-nil while the reader is marking up, which changes what a plain tap
     /// means: it selects a sentence instead of following a link.
     var markupTool: MarkupTool?
@@ -70,6 +83,55 @@ struct SelectableTextView: UIViewRepresentable {
         if view.attributedText !== attributed {
             view.attributedText = attributed
         }
+        // Assigned unconditionally (not just when `attributed` changes): this
+        // view is reused across `updateUIView` calls for the same block, and
+        // both of these can change independently of the text — a highlight
+        // added elsewhere already forces a new `attributed` through the
+        // render cache, but `isHeading` never does, since it never varies for
+        // a given block.
+        view.accessibilityTraits = isHeading ? [.header] : []
+        view.accessibilityValue = Self.accessibilityValue(for: attributed, highlightedRanges: highlightedRanges)
+    }
+
+    /// The spoken content for a block that has highlights, or `nil` to leave
+    /// `UITextView`'s own default (which reads `attributedText` as plain
+    /// prose — correct, and untouched, for the common case of no highlights).
+    ///
+    /// Every character in `attributed.string` ends up in exactly one segment
+    /// below, highlighted or not, in its original order, so this can only add
+    /// narration — it cannot drop or reorder any of the underlying text.
+    static func accessibilityValue(for attributed: NSAttributedString, highlightedRanges: [NSRange]) -> String? {
+        guard !highlightedRanges.isEmpty else { return nil }
+        let string = attributed.string as NSString
+        let bounds = NSRange(location: 0, length: string.length)
+
+        let ranges = highlightedRanges
+            .map { NSIntersectionRange($0, bounds) }
+            .filter { $0.length > 0 }
+            .sorted { $0.location < $1.location }
+        guard !ranges.isEmpty else { return nil }
+
+        var merged: [NSRange] = []
+        for range in ranges {
+            if let last = merged.last, NSMaxRange(last) >= range.location {
+                let end = max(NSMaxRange(last), NSMaxRange(range))
+                merged[merged.count - 1] = NSRange(location: last.location, length: end - last.location)
+            } else {
+                merged.append(range)
+            }
+        }
+
+        var result = ""
+        var cursor = 0
+        for range in merged {
+            result += string.substring(with: NSRange(location: cursor, length: range.location - cursor))
+            result += "Highlighted, "
+            result += string.substring(with: range)
+            result += ", end highlight. "
+            cursor = NSMaxRange(range)
+        }
+        result += string.substring(with: NSRange(location: cursor, length: string.length - cursor))
+        return result
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct ReaderView: View {
     @Bindable var post: Post
@@ -539,8 +540,10 @@ struct ReaderView: View {
             if let existing = highlight(blockIndex: blockIndex, overlapping: range) {
                 if existing.tint == tint, (existing.note ?? "").isEmpty {
                     context.delete(existing)
+                    announce("Highlight removed")
                 } else {
                     existing.tint = tint
+                    announce("Highlight color changed")
                 }
             } else {
                 addHighlight(blockIndex: blockIndex, range: range, text: text, tint: tint)
@@ -557,11 +560,20 @@ struct ReaderView: View {
             if let existing = highlight(blockIndex: blockIndex, overlapping: range) {
                 context.delete(existing)
                 try? context.save()
+                announce("Highlight removed")
             }
 
         case .pen:
             break
         }
+    }
+
+    /// A highlight is silent by itself — it's only a background colour — so
+    /// creating, removing, or recolouring one gets a spoken confirmation
+    /// VoiceOver users would otherwise have no way to notice. Harmless with
+    /// VoiceOver off: `UIAccessibility.post` is a no-op unless it's running.
+    private func announce(_ message: String) {
+        UIAccessibility.post(notification: .announcement, argument: message)
     }
 
     private func highlight(blockIndex: Int, overlapping range: NSRange) -> Highlight? {
@@ -623,6 +635,7 @@ struct ReaderView: View {
         highlight.post = post
         context.insert(highlight)
         try? context.save()
+        announce("Highlighted")
         return highlight
     }
 

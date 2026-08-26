@@ -38,6 +38,23 @@ struct ArticleBlockView: View {
     /// an image with a caption — give each one its own slot.
     private func key(_ part: Int = 0) -> Int { (index << 20) | part }
 
+    /// What VoiceOver says the image *is*, as distinct from the caption
+    /// (which reads separately, right after, as its own element) and the
+    /// `.accessibilityHint` above (which says what double-tapping *does*).
+    /// Previously this was a hardcoded string that discarded the extracted
+    /// `alt` text entirely — every image read identically regardless of what
+    /// it showed. Falls back to a generic label only when there is no `alt`,
+    /// and skips it when it just repeats the caption word for word, so the
+    /// two elements never say the same sentence twice back to back.
+    private func imageAccessibilityLabel(for image: ArticleImage) -> String {
+        let alt = image.alt?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let caption = image.caption?.plain.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let alt, !alt.isEmpty, alt != caption {
+            return alt
+        }
+        return "Image"
+    }
+
     private func cachedText(_ part: Int = 0, _ build: () -> NSAttributedString) -> NSAttributedString {
         ReaderRenderCache.shared.string(block: key(part), build: build)
     }
@@ -61,6 +78,9 @@ struct ArticleBlockView: View {
             )
         }
         .allowsHitTesting(false)
+        // Layout plumbing only, same as the ink layer it feeds — not a stop
+        // VoiceOver should ever land on between two blocks of real content.
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -77,6 +97,8 @@ struct ArticleBlockView: View {
                     )
                 },
                 measurementKey: key(),
+                isHeading: true,
+                highlightedRanges: highlights.map(\.range),
                 markupTool: markup?.tool,
                 onHighlight: onHighlight,
                 onSentenceTap: { markup?.onSentenceTap(index, $0, $1) },
@@ -89,6 +111,7 @@ struct ArticleBlockView: View {
             SelectableTextView(
                 attributed: cachedText { builder.paragraph(text, highlights: highlights) },
                 measurementKey: key(),
+                highlightedRanges: highlights.map(\.range),
                 markupTool: markup?.tool,
                 onHighlight: onHighlight,
                 onSentenceTap: { markup?.onSentenceTap(index, $0, $1) },
@@ -100,6 +123,10 @@ struct ArticleBlockView: View {
                 Rectangle()
                     .fill(theme.accent.opacity(0.45))
                     .frame(width: 2.5)
+                    // Decorative rule, not content — without this, SwiftUI
+                    // exposes it as a blank, unlabelled stop that VoiceOver
+                    // lands on between the surrounding text and the quote.
+                    .accessibilityHidden(true)
 
                 SelectableTextView(
                     attributed: cachedText {
@@ -111,6 +138,7 @@ struct ArticleBlockView: View {
                         )
                     },
                     measurementKey: key(),
+                    highlightedRanges: highlights.map(\.range),
                     markupTool: markup?.tool,
                     onHighlight: onHighlight,
                     onSentenceTap: { markup?.onSentenceTap(index, $0, $1) },
@@ -174,7 +202,8 @@ struct ArticleBlockView: View {
                             isImageViewerPresented = true
                         }
                         .accessibilityAddTraits(.isButton)
-                        .accessibilityLabel("Image, double tap to view full screen")
+                        .accessibilityLabel(imageAccessibilityLabel(for: image))
+                        .accessibilityHint("Double tap to view full screen")
                         .fullScreenCover(isPresented: $isImageViewerPresented) {
                             ImageViewer(image: stored, caption: image.caption, typography: typography, theme: theme)
                         }
@@ -205,6 +234,9 @@ struct ArticleBlockView: View {
                 Spacer()
             }
             .padding(.vertical, typography.bodySize * 0.7)
+            // A typographic flourish, not content — left unhidden, VoiceOver
+            // would read out the glyph's name between two unrelated sections.
+            .accessibilityHidden(true)
         }
     }
 }
