@@ -160,9 +160,29 @@ Run `Tools/screenshots.sh` from the repo root. Output lands in
 Both `screenshots/` and `.dd-screenshots/` are gitignored — they are build
 artefacts, and this repository is public.
 
-**iPad works today. iPhone is currently blocked** — see T-0049. Apple needs
-both a 6.9-inch iPhone and a 13-inch iPad set, so the iPhone half must be
-resolved before submission.
+Both devices work. The iPhone half was blocked on T-0049 (compact-width
+navigation landed on the wrong column); that shipped, and the script now
+targets iPhone 14 Plus at 1284×2778, one of the source sizes Apple accepts.
+
+## Uploading a build
+
+Run `Tools/upload-appstore.sh` from the repo root. It gates, archives, signs
+for distribution, and uploads. Uploading is not submitting — the build sits in
+App Store Connect until someone attaches it to a version in the web UI.
+
+The team ID is `ZM4J56DC3Q`, from `DEVELOPMENT_TEAM` in `project.yml`. It is
+not the ID in the certificate name (`VE8UL5JBLS`), which identifies the person
+rather than the team; passing that one fails with "No Account for Team", which
+sounds like a signed-out Xcode and is not.
+
+The one credential the script cannot supply is Xcode's own Apple ID session —
+`-allowProvisioningUpdates` uses it to mint the distribution certificate and
+App Store profile on demand, and to authenticate the upload. If export starts
+failing, check Xcode > Settings > Accounts first.
+
+**Uploaded so far:** 1.0 (1), from `12eb31f`, on 2026-08-25.
+Bump `CURRENT_PROJECT_VERSION` before re-uploading under the same version —
+App Store Connect refuses a build number it has already seen.
 
 ## Category
 
