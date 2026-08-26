@@ -1,0 +1,20 @@
+{
+  "id": "T-0052",
+  "title": "VoiceOver may find a link in the rotor but be unable to open it",
+  "type": "spike",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "With VoiceOver on, a link found via the Links rotor opens when double-tapped",
+    "If it does not, the fix keeps ordinary taps routing through the app's own handler"
+  ],
+  "touches": [],
+  "risk": "medium",
+  "factory_eligible": false,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Flagged honestly by T-0051 rather than assumed. To stop UIKit's own link interaction double-opening a link, it returns nil from textView(_:primaryActionFor:defaultAction:). That guarantees ordinary taps still route through the app's gesture recogniser. What is unknown is whether VoiceOver's synthetic activation on a rotor-found link goes through that same recogniser or dead-ends on the declined default action. A link a VoiceOver user can find but cannot open is worse than one they cannot find. Needs a device \u2014 see docs/DEVICE-CHECKS.md item 4.",
+  "history": []
+}
