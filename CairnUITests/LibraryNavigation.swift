@@ -66,11 +66,14 @@ extension XCTestCase {
             post = app.firstPostRow
         }
         if !post.waitForExistence(timeout: 5) {
-            // A clean simulator has nothing in it, and `xcodebuild test`
-            // reinstalls the app before every run, so nothing placed there by
-            // a previous session survives. Rather than depend on an external
-            // seeding step, add one real article through the same "Save a
-            // link" flow a reader would use, then look again.
+            // A clean simulator has nothing in it. Back-to-back `xcodebuild
+            // test` invocations do NOT reinstall the app — the container
+            // persists, so a post saved by an earlier invocation (or by an
+            // earlier test in this same run) is usually still here, and this
+            // branch is only reached after a genuinely fresh install. Rather
+            // than depend on an external seeding step, add one real article
+            // through the same "Save a link" flow a reader would use, then
+            // look again.
             seedArchive(in: app)
             post = app.firstPostRow
         }
