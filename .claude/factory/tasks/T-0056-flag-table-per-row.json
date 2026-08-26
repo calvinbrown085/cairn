@@ -1,0 +1,26 @@
+{
+  "id": "T-0056",
+  "title": "appendTable decides layout-vs-data once for a whole table, so one odd row flattens hundreds",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "now",
+  "roadmap_anchor": null,
+  "depends_on": [
+    "T-0055"
+  ],
+  "acceptance": [
+    "The layout-vs-data decision is made per row (rowCells.contains(where: cellHoldsBlockContent)) rather than once for the whole table",
+    "wikipedia_flag_gallery gains a .json expectation asserting the row structure survives and materially more than 225 of its 589 images are rescued, with landmark passages at start, middle and end",
+    "mdn_img_element and wikipedia_epub are re-frozen ONLY where the new output is genuinely better; the diff for each is inspected block by block and the reasoning recorded in PROVENANCE.md or the fixtures README",
+    "swift test green with all other fixtures passing unmodified"
+  ],
+  "touches": [
+    "Packages/SwiftReadability/**"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Filed from T-0055, which found this with a real capture and documented it under 'Known but unfixed: the flag table' in the fixtures README. Read that section first — it has the measurements.\n\nThe defect: `appendTable` evaluates `cells.contains(where: cellHoldsBlockContent)` once for the entire table, so a single atypical cell anywhere — a nested table for a multi-flag entry, say — flips every ordinary row into per-cell paragraph flattening. On the flag-list capture that yields 1,126 single-cell paragraph blocks and rescues only 225 of 589 images.\n\nThe product call, already made, so do not re-litigate it: judging per row is the more correct rule. Rows within one table genuinely can differ in kind, and a rule that lets the weirdest row dictate the treatment of hundreds of ordinary ones is wrong on its face. T-0055 left it alone only because its lease could not cover re-freezing two existing fixtures.\n\nWhat is NOT settled, and is the real work here: `mdn_img_element` and `wikipedia_epub` were frozen against the old all-or-nothing behaviour and their output changes. Do not re-record them blindly — that would turn a regression guard into a rubber stamp. Read the before/after for each affected block, decide whether the new shape is actually better for a reader, and write down why. If either one gets worse, that is a finding worth reporting rather than absorbing.",
+  "history": []
+}
