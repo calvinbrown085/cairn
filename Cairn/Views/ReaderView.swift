@@ -229,6 +229,12 @@ struct ReaderView: View {
                 .scrollTargetLayout()
             }
             .scrollPosition(id: $topBlock, anchor: .top)
+            // The system indicator measures content height, and a LazyVStack
+            // only reports the height of whatever is currently realised — on
+            // a long article that grows as you scroll, so the thumb doesn't
+            // track true position. `progressRule` above is the real
+            // indicator; the system one is just noise on top of it.
+            .scrollIndicators(.hidden)
             // A pen stroke and a scroll are the same gesture; the pen wins
             // while it is out.
             .scrollDisabled(isMarkingUp && tool == .pen)
@@ -325,17 +331,41 @@ struct ReaderView: View {
     /// How far through the article you are, as a hairline. It replaces the
     /// percentage that used to sit in the metadata: a reader wants to feel the
     /// remaining distance, not read a number.
+    ///
+    /// This is the reader's whole position indicator; the system's own
+    /// scrollbar is hidden below because it can't be trusted to draw one — see
+    /// the `.scrollIndicators(.hidden)` comment on the `ScrollView`. Rather
+    /// than resurrect a pixel-accurate content height for a lazily-rendered
+    /// document, this is keyed to block index, the same signal
+    /// `scrollPosition(id:)` already tracks for restoring your place: block
+    /// count doesn't change with how many blocks happen to be realised, and
+    /// it doesn't change when the text-size slider does, so nothing here
+    /// needs to be recomputed when either changes.
     private var progressRule: some View {
         ZStack(alignment: .leading) {
             Rectangle().fill(theme.rule)
             GeometryReader { geometry in
                 Rectangle()
                     .fill(theme.accent.opacity(0.75))
-                    .frame(width: geometry.size.width * max(0.02, post.readProgress))
+                    .frame(width: geometry.size.width * max(0.02, progressFraction))
             }
         }
         .frame(height: 2)
         .accessibilityHidden(true)
+    }
+
+    /// Fraction of the document above the current top-of-viewport block.
+    /// Updates live as `topBlock` changes rather than waiting on the
+    /// debounced write to `post.readProgress` (see `scheduleProgressWrite`),
+    /// which exists to limit disk/CloudKit writes, not to gate what the
+    /// indicator shows. Falls back to the last persisted position — rather
+    /// than 0 — while the document is still loading or before the reader has
+    /// scrolled, so the rule doesn't flash empty on reopen.
+    private var progressFraction: Double {
+        guard let document, document.count > 1 else { return post.readProgress }
+        let index = topBlock ?? post.lastBlockIndex
+        let total = Double(document.count - 1)
+        return min(1, max(0, Double(index) / total))
     }
 
     @ViewBuilder
