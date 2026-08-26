@@ -8,7 +8,7 @@ Everything App Store Connect asks for, in one place. Copy from here.
 
     Cairnfield
 
-*(10 characters.)*
+*(10 characters. **Reserved in App Store Connect 2026-08-25.**)*
 
 ## Subtitle (30 char max)
 

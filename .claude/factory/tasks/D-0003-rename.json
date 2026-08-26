@@ -22,6 +22,11 @@
       "ts": "2026-08-25T18:38:34Z",
       "event": "decided",
       "detail": "Cairn; user-visible rename only, container identifiers preserved to protect the library"
+    },
+    {
+      "ts": "2026-08-26T00:58:29Z",
+      "event": "confirmed",
+      "detail": "Cairnfield reserved in App Store Connect"
     }
   ]
 }
