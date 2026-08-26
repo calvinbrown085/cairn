@@ -5,9 +5,10 @@ import SwiftUI
 /// The share sheet target.
 ///
 /// It does no networking and touches neither SwiftData nor CloudKit — it drops
-/// the URL into the shared app-group inbox and gets out of the way. The app
-/// fetches and extracts the article when it next runs, which keeps sharing
-/// instant and well under the extension's memory limit.
+/// a URL, or a copy of a shared PDF's bytes, into the shared app-group inbox
+/// and gets out of the way. The app fetches and extracts the article (or
+/// imports the PDF) when it next runs, which keeps sharing instant and well
+/// under the extension's memory limit.
 final class ShareViewController: UIViewController {
 
     private let card = UIHostingController(rootView: ConfirmationCard(state: .working))
@@ -18,7 +19,7 @@ final class ShareViewController: UIViewController {
         embedCard()
 
         Task {
-            let result = await resolveSharedURL()
+            let result = await resolveSharedItem()
             await MainActor.run { self.finish(with: result) }
         }
     }
@@ -37,14 +38,31 @@ final class ShareViewController: UIViewController {
         card.didMove(toParent: self)
     }
 
-    private func finish(with result: (url: URL, title: String?)?) {
-        guard let result, SharedInbox.deposit(url: result.url, title: result.title) else {
+    private func finish(with result: SharedItem?) {
+        guard let result else {
             card.rootView = ConfirmationCard(state: .failed)
             dismissAfterDelay(0.9)
             return
         }
 
-        card.rootView = ConfirmationCard(state: .saved(host: hostLabel(result.url)))
+        let succeeded: Bool
+        let label: String
+        switch result {
+        case .link(let url, let title):
+            succeeded = SharedInbox.deposit(url: url, title: title)
+            label = hostLabel(url)
+        case .pdf(let fileURL, let title):
+            succeeded = SharedInbox.depositPDF(fileURL: fileURL, title: title)
+            label = fileURL.lastPathComponent
+        }
+
+        guard succeeded else {
+            card.rootView = ConfirmationCard(state: .failed)
+            dismissAfterDelay(0.9)
+            return
+        }
+
+        card.rootView = ConfirmationCard(state: .saved(host: label))
         dismissAfterDelay(0.65)
     }
 
@@ -61,17 +79,40 @@ final class ShareViewController: UIViewController {
 
     // MARK: - Reading the shared item
 
-    /// Safari offers the page as a URL; other apps sometimes offer only text
-    /// containing one, so both are handled.
-    private func resolveSharedURL() async -> (url: URL, title: String?)? {
+    /// What Safari, Files, Mail, or a stray text share can hand over.
+    private enum SharedItem {
+        case link(url: URL, title: String?)
+        case pdf(fileURL: URL, title: String?)
+    }
+
+    /// A PDF file takes priority when one is offered directly — Files, Mail,
+    /// and most PDF viewers share the document itself, not a link to it.
+    /// Failing that, Safari offers the page as a URL; other apps sometimes
+    /// offer only text containing one, so both are handled too.
+    private func resolveSharedItem() async -> SharedItem? {
         let items = (extensionContext?.inputItems as? [NSExtensionItem]) ?? []
+
+        for item in items {
+            for provider in item.attachments ?? [] {
+                if provider.hasItemConformingToTypeIdentifier(UTType.pdf.identifier),
+                   let url = await load(UTType.pdf, from: provider) as? URL {
+                    // Sharing text rarely accompanies a file the way it does a
+                    // link, so the file's own suggested name — the original
+                    // "Report.pdf", not the inbox's timestamped copy — is the
+                    // better title source here.
+                    let suggested = provider.suggestedName.map { ($0 as NSString).deletingPathExtension }
+                    let title = item.attributedContentText?.string ?? suggested
+                    return .pdf(fileURL: url, title: title)
+                }
+            }
+        }
 
         for item in items {
             let title = item.attributedContentText?.string
             for provider in item.attachments ?? [] {
                 if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier),
                    let url = await load(UTType.url, from: provider) as? URL {
-                    return (url, title)
+                    return .link(url: url, title: title)
                 }
             }
         }
@@ -81,7 +122,7 @@ final class ShareViewController: UIViewController {
                 if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier),
                    let text = await load(UTType.plainText, from: provider) as? String,
                    let url = ShareViewController.firstURL(in: text) {
-                    return (url, nil)
+                    return .link(url: url, title: nil)
                 }
             }
         }
@@ -174,7 +215,7 @@ private struct ConfirmationCard: View {
         switch state {
         case .working: nil
         case .saved(let host): host
-        case .failed: "No link was found to save."
+        case .failed: "No link or PDF was found to save."
         }
     }
 }

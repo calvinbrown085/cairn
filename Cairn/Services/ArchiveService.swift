@@ -55,17 +55,59 @@ final class ArchiveService {
         Task { await process(post) }
     }
 
-    /// Picks up everything the share extension left behind.
+    /// Picks up everything the share extension left behind — links and PDFs
+    /// both, drained through the one inbox.
     @discardableResult
     func drainSharedInbox() -> Int {
         let items = SharedInbox.drain()
         var saved = 0
         for item in items {
-            guard let url = URL.fromUserInput(item.url) else { continue }
-            save(url: url)
-            saved += 1
+            switch item.kind {
+            case .link:
+                guard let url = URL.fromUserInput(item.url) else { continue }
+                save(url: url)
+                saved += 1
+
+            case .pdf:
+                guard let fileName = item.fileName else { continue }
+                let fileURL = AppGroup.sharedFilesURL.appending(path: fileName)
+                defer { try? FileManager.default.removeItem(at: fileURL) }
+                guard savePDF(fileURL: fileURL, suggestedTitle: item.title) != nil else { continue }
+                saved += 1
+            }
         }
         return saved
+    }
+
+    /// Saves a PDF already sitting at `fileURL` — typically the copy the
+    /// share extension left in the app group — or returns the existing post
+    /// if an identical file is already archived. Returns `nil` only when the
+    /// file at `fileURL` can't even be read.
+    @discardableResult
+    func savePDF(fileURL: URL, suggestedTitle: String?) -> Post? {
+        guard let data = try? Data(contentsOf: fileURL) else { return nil }
+
+        let canonical = "cairn-pdf-sha256:\(Post.sha256Hex(data))"
+        if let existing = findPost(canonicalURL: canonical) {
+            if existing.state == .failed { retryPDF(existing) }
+            return existing
+        }
+
+        let suggested = suggestedTitle?.squeezed
+        let name = (suggested?.isEmpty == false) ? suggested! : fileURL.deletingPathExtension().lastPathComponent
+        let post = Post(pdfNamed: name, data: data)
+        context.insert(post)
+        try? context.save()
+
+        Task { await processPDF(post, data: data) }
+        return post
+    }
+
+    private func retryPDF(_ post: Post) {
+        guard !inFlight.contains(post.id), let data = post.pdfData else { return }
+        post.state = .pending
+        post.failureReason = nil
+        Task { await processPDF(post, data: data) }
     }
 
     // MARK: - Pipeline
@@ -150,6 +192,44 @@ final class ArchiveService {
             let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             fail(post, reason: message)
         }
+    }
+
+    /// The PDF pipeline: no network fetch (the bytes are already local, and
+    /// already on `post.pdfData` — see `Post.init(pdfNamed:data:)`), just
+    /// parsing and text extraction, which is CPU-bound enough on a large
+    /// document to keep off the main actor.
+    ///
+    /// Unlike a web article, a PDF that yields little or no text is not
+    /// treated as a failure: the file itself — pages, not prose — is what
+    /// "readable" means here, and PDFKit renders those regardless of whether
+    /// a text layer exists. Only bytes that don't parse as a PDF at all fail.
+    private func processPDF(_ post: Post, data: Data) async {
+        guard !inFlight.contains(post.id) else { return }
+
+        inFlight.insert(post.id)
+        post.state = .fetching
+        try? context.save()
+
+        defer { inFlight.remove(post.id) }
+
+        guard let imported = await Self.importPDF(data: data, fallbackTitle: post.title) else {
+            fail(post, reason: "That file couldn't be opened as a PDF.")
+            return
+        }
+
+        post.applyPDF(
+            title: imported.title,
+            author: imported.author,
+            pageCount: imported.pageCount,
+            text: imported.text
+        )
+        try? context.save()
+    }
+
+    private nonisolated static func importPDF(data: Data, fallbackTitle: String) async -> PDFImportService.Result? {
+        await Task.detached(priority: .userInitiated) {
+            PDFImportService.extract(data: data, fallbackTitle: fallbackTitle)
+        }.value
     }
 
     /// Extraction is pure and self-contained, so it runs off the main actor.

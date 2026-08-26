@@ -36,6 +36,8 @@
 				<integer>1</integer>
 				<key>NSExtensionActivationSupportsText</key>
 				<true/>
+				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
+				<integer>1</integer>
 			</dict>
 		</dict>
 	</dict>

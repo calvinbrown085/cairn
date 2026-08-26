@@ -1,12 +1,21 @@
 import Foundation
 import SwiftData
 import SwiftReadability
+import CryptoKit
 
 enum PostState: String, Codable, CaseIterable {
     case pending    // queued, not yet fetched
     case fetching
     case ready
     case failed
+}
+
+/// What a post actually holds. `.article` covers every post ever saved before
+/// this existed — see `kindRaw`'s default — and keeps meaning exactly what it
+/// always did: fetched HTML, extracted into `ArticleContent` blocks.
+enum PostKind: String, Codable, CaseIterable {
+    case article
+    case pdf
 }
 
 /// One archived blog post.
@@ -44,6 +53,11 @@ final class Post {
     var stateRaw: String = PostState.pending.rawValue
     var failureReason: String?
 
+    /// Defaults to `.article`, so every post saved before PDFs existed decodes
+    /// with exactly the behaviour it always had — nothing reads this field
+    /// unless it was explicitly set to `.pdf` at import time.
+    var kindRaw: String = PostKind.article.rawValue
+
     var tagNames: [String] = []
 
     /// The block list, JSON-encoded. External storage keeps the article body out
@@ -57,6 +71,19 @@ final class Post {
     /// may have changed or vanished by then. Posts saved before this field
     /// existed simply have it `nil`.
     @Attribute(.externalStorage) var originalHTMLData: Data?
+
+    /// A PDF's own bytes, kept in external storage for the same reason as
+    /// `originalHTMLData` — see T-0007 — and by the same rule: captured before
+    /// anything that could fail the save, so the file is never lost even if
+    /// text extraction below turns up nothing. Unlike page HTML, a PDF's
+    /// internal streams are already compressed, so this is stored as-is
+    /// rather than LZFSE-compressed a second time. `nil` for every post that
+    /// isn't a PDF.
+    @Attribute(.externalStorage) var pdfData: Data?
+
+    /// Page count, cached at import time so the library can show it without
+    /// opening the document. `nil` for every non-PDF post.
+    var pdfPageCount: Int?
 
     /// Flattened body text, kept inline so `#Predicate` can search it.
     var searchText: String = ""
@@ -86,6 +113,31 @@ final class Post {
         self.inkStrokes = []
     }
 
+    /// A PDF has no web URL to key off. Identity comes from the file's own
+    /// bytes instead, via `canonicalURLString` — so sharing the same PDF
+    /// twice collapses to one post, exactly the way two links to the same
+    /// article do for `init(url:)`.
+    ///
+    /// `pdfData` is set here, at construction, rather than after extraction
+    /// succeeds — the same rule `originalHTMLData` follows for web posts (see
+    /// T-0007): the source is captured before anything that could fail, so a
+    /// PDF that turns out to be corrupt or image-only still keeps its file.
+    init(pdfNamed name: String, data: Data) {
+        self.id = UUID()
+        self.kindRaw = PostKind.pdf.rawValue
+        self.urlString = "cairn-pdf:///\(id.uuidString)"
+        self.canonicalURLString = "cairn-pdf-sha256:\(Post.sha256Hex(data))"
+        self.host = name
+        self.siteName = name
+        self.title = name
+        self.savedAt = .now
+        self.stateRaw = PostState.pending.rawValue
+        self.pdfData = data
+        self.images = []
+        self.highlights = []
+        self.inkStrokes = []
+    }
+
     init() {}
 
     // MARK: - Derived
@@ -93,6 +145,11 @@ final class Post {
     var state: PostState {
         get { PostState(rawValue: stateRaw) ?? .ready }
         set { stateRaw = newValue.rawValue }
+    }
+
+    var kind: PostKind {
+        get { PostKind(rawValue: kindRaw) ?? .article }
+        set { kindRaw = newValue.rawValue }
     }
 
     var url: URL? { URL(string: urlString) }
@@ -174,6 +231,26 @@ final class Post {
         )
     }
 
+    /// Applies a freshly imported PDF, replacing any previous content. Mirrors
+    /// `apply(_:content:)` for web articles, but a PDF has no `ArticleContent`
+    /// blocks to store — `contentData` is left untouched (nil, for a post
+    /// created via `init(pdfNamed:data:)`) and `PDFReaderView` renders
+    /// `pdfData` (already set at construction) directly instead. `text` feeds
+    /// `searchText` exactly the way `content.plainText` does for an article,
+    /// so search doesn't gain a second path.
+    func applyPDF(title: String, author: String?, pageCount: Int, text: String) {
+        self.title = title.isEmpty ? host : title
+        self.author = author
+        self.pdfPageCount = pageCount
+        self.wordCount = text.split(whereSeparator: { $0.isWhitespace }).count
+        self.searchText = Post.buildSearchText(
+            title: self.title, author: author, siteName: siteName,
+            host: host, tags: tagNames, body: text
+        )
+        state = .ready
+        failureReason = nil
+    }
+
     static func buildSearchText(
         title: String, author: String?, siteName: String,
         host: String, tags: [String], body: String
@@ -198,6 +275,14 @@ final class Post {
             return nil
         }
         return String(data: raw, encoding: .utf8)
+    }
+
+    // MARK: - PDF identity
+
+    /// A stable content fingerprint, used as `canonicalURLString` for a PDF
+    /// post since there is no URL to canonicalize.
+    static func sha256Hex(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 }
 

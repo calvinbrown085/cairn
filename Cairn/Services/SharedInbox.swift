@@ -2,24 +2,69 @@ import Foundation
 
 /// A drop-off point between the share extension and the app.
 ///
-/// The extension writes one small JSON file per shared URL and exits immediately;
-/// the app drains the directory when it next becomes active. Keeping the
-/// extension out of SwiftData and CloudKit entirely is what makes sharing feel
-/// instant and keeps it well inside the extension memory budget.
+/// The extension writes one small JSON file per shared item — a URL, or a
+/// PDF's bytes copied alongside it — and exits immediately; the app drains
+/// the directory when it next becomes active. Keeping the extension out of
+/// SwiftData and CloudKit entirely is what makes sharing feel instant and
+/// keeps it well inside the extension memory budget.
 enum SharedInbox {
+
+    enum ItemKind: String, Codable {
+        case link
+        case pdf
+    }
 
     struct Item: Codable, Identifiable, Hashable {
         var id: UUID = UUID()
-        var url: String
+        var kind: ItemKind = .link
+        /// The shared URL, for `.link`. Empty for `.pdf`.
+        var url: String = ""
         var title: String?
         var receivedAt: Date = .now
+        /// The file's name inside `AppGroup.sharedFilesURL`, for `.pdf`.
+        /// `nil` for `.link`.
+        var fileName: String?
     }
 
     // MARK: - Writing (share extension)
 
     @discardableResult
     static func deposit(url: URL, title: String? = nil) -> Bool {
-        let item = Item(url: url.absoluteString, title: title)
+        let item = Item(kind: .link, url: url.absoluteString, title: title)
+        return write(item)
+    }
+
+    /// Copies a shared PDF's bytes into the app group before recording the
+    /// drop-off, so the app never has to reach back into the extension's own
+    /// (security-scoped, often temporary) copy of the file.
+    @discardableResult
+    static func depositPDF(fileURL: URL, title: String? = nil) -> Bool {
+        let id = UUID()
+        let destinationName = "\(Date.now.timeIntervalSince1970)-\(id.uuidString).pdf"
+
+        do {
+            try FileManager.default.createDirectory(
+                at: AppGroup.sharedFilesURL, withIntermediateDirectories: true
+            )
+            let destination = AppGroup.sharedFilesURL.appending(path: destinationName)
+            let didAccess = fileURL.startAccessingSecurityScopedResource()
+            defer { if didAccess { fileURL.stopAccessingSecurityScopedResource() } }
+            try FileManager.default.copyItem(at: fileURL, to: destination)
+        } catch {
+            return false
+        }
+
+        let item = Item(id: id, kind: .pdf, title: title, fileName: destinationName)
+        guard write(item) else {
+            try? FileManager.default.removeItem(
+                at: AppGroup.sharedFilesURL.appending(path: destinationName)
+            )
+            return false
+        }
+        return true
+    }
+
+    private static func write(_ item: Item) -> Bool {
         guard let data = try? JSONEncoder().encode(item) else { return false }
 
         do {
