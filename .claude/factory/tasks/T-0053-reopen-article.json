@@ -27,6 +27,11 @@
       "ts": "2026-08-26T00:37:15Z",
       "event": "dispatched",
       "detail": "attempt 1; real user-facing defect found by T-0045's baseline"
+    },
+    {
+      "ts": "2026-08-26T00:59:14Z",
+      "event": "nudged",
+      "detail": "stranded 18m with no live process; fix is in place, told to run the two tests in the foreground and land or report"
     }
   ],
   "agent": {

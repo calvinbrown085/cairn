@@ -27,6 +27,11 @@
       "ts": "2026-08-26T00:58:29Z",
       "event": "confirmed",
       "detail": "Cairnfield reserved in App Store Connect"
+    },
+    {
+      "ts": "2026-08-26T00:58:41Z",
+      "event": "confirmed",
+      "detail": "Cairnfield reserved in App Store Connect by the owner"
     }
   ]
 }
