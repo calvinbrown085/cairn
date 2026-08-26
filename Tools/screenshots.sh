@@ -21,9 +21,14 @@
 # the same `ArchiveService.save`, but never opens the sheet or touches
 # `selectedPost`, so there is nothing there to race.
 #
-# Apple currently asks for a 6.9-inch iPhone and a 13-inch iPad; every other
+# App Store Connect accepts 1242x2688 or 1284x2778 for iPhone. Verified by
+# screenshotting each candidate rather than trusting a spec sheet: iPhone 14
+# Plus gives exactly 1284x2778, iPhone 11 Pro Max gives 1242x2688. The 6.9-inch
+# iPhone 17 Pro Max produces 1320x2868, which Connect rejects — and its aspect
+# ratio differs (0.4603 vs 0.4622), so rescaling would distort rather than fit.
+# Apple asks for an iPhone and a 13-inch iPad; every other
 # size App Store Connect wants is derived from those two, so those are the
-# only devices this runs. Concretely: iPhone 17 Pro Max (6.9") and iPad Pro
+# only devices this runs. Concretely: iPhone 14 Plus (6.7", 1284x2778) and iPad Pro
 # 13-inch M5 (13") — the current simulator models matching each size.
 #
 # *** Simulator isolation ***
@@ -49,7 +54,7 @@ MAX_ATTEMPTS=3
 # split view's sidebar is a real column there, not an overlay) — orientation
 # here just says which devices that applies to, for the rotation fix below.
 DEVICES=(
-  "Cairn-Screenshots-iPhone-6.9|com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max|iphone-6.9|portrait"
+  "Cairn-Screenshots-iPhone-6.7|com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus|iphone-6.7|portrait"
   "Cairn-Screenshots-iPad-13|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB|ipad-13|landscape"
 )
 # The numbered attachment names `AppStoreScreenshotUITests` captures, in
