@@ -92,20 +92,20 @@ of real captured pages.
 - [x] **A scroll indicator that means something.** *(T-0030, `8da3e05` — the broken system thumb is hidden; the block-index hairline is now live.)* `LazyVStack` means only realised blocks count toward content height, so the bar measures a document that appears to grow as you scroll.
 - [ ] **Profile the scroll cost.** 3.8s of CPU for 8 swipes, still unexplained. Cut once as "nobody is complaining" — reinstated, because *reading is unpleasant* is the complaint.
 - [x] **Images behave.** *(T-0041/T-0046, `165329f`/`f2f645b`.)* Tap to zoom, captions as captions, and galleries that currently yield nothing.
-- [ ] **Reference lists are not prose.** Wikipedia backmatter is 40% of some pages and reads as article text.
+- [x] **Reference lists are not prose.** *(T-0033, `077d158` — keyed on Parsoid's `aria-labelledby` section boundary; Wikipedia articles dropped 30% and 21% of extracted words, all citations.)* Wikipedia backmatter is 40% of some pages and reads as article text.
 - [x] **VoiceOver through the reader.** *(T-0013, `7223d7f`.)* Also the evidence that would overturn the per-block text architecture, if reading order turns out bad.
 
 ### Capture — the other stated pain
 
-- [ ] **Failed saves are visible and retryable.** A paywalled save currently looks like a good one. For an app whose primary verb is *save*, silent failure is the worst possible bug.
+- [x] **Failed saves are visible and retryable.** *(T-0039, `f1ca60d` — most of it already existed; the gap was that retry took two taps.)* A paywalled save currently looks like a good one. For an app whose primary verb is *save*, silent failure is the worst possible bug.
 - [x] **Capture from anywhere.** *(T-0038, `c8997fe` — Shortcuts and the Action Button; widget deferred.)* Shortcuts and the Action Button first, through the one existing inbox; a widget only if a second extension target earns its keep. One pipeline, never two.
 - [x] **Import PDFs.** *(T-0037 `5ec26fd` + T-0050 `c0f1631` — shared in, stored, searchable, and readable. Highlighting in PDFs is stated as unavailable rather than faked.)* Papers and documents cannot get in at all. The largest hole, and now the largest build.
-- [ ] **Titles and galleries.** Site suffixes left on titles, gallery images dropped, pages with no `<title>` falling back to the host.
+- [x] **Titles and galleries.** *(T-0028, `7b3c84e` — gallery images inside stray list items, multi-segment title suffixes, and a styled-heading fallback for pages with no `<title>` at all.)* Site suffixes left on titles, gallery images dropped, pages with no `<title>` falling back to the host.
 
 ### The pile — tools I reach for, never prompted
 
-- [ ] **Time-to-read as a filter.** "What fits in seven minutes" turns a paralysing list into a menu. `wordCount` already exists.
-- [ ] **Bulk archive.** Multi-select, archive-everything-before-a-date, never-opened as a filter. Invoked, never volunteered.
+- [x] **Time-to-read as a filter.** *(T-0036, `128c044` — reused the existing `PostMetaLine`; no duplicate label added.)* "What fits in seven minutes" turns a paralysing list into a menu. `wordCount` already exists.
+- [x] **Bulk archive.** *(T-0040, `9c37dff` — the only count appears inside a confirmation you already asked for.)* Multi-select, archive-everything-before-a-date, never-opened as a filter. Invoked, never volunteered.
 
 ### Not a feature, but required
 
