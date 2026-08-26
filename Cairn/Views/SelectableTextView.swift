@@ -53,8 +53,15 @@ struct SelectableTextView: UIViewRepresentable {
         view.setContentCompressionResistancePriority(.required, for: .vertical)
         view.setContentHuggingPriority(.required, for: .vertical)
 
-        // Links carry a custom attribute rather than `.link` so the theme owns
-        // their colour, which means resolving taps by hand.
+        // Links carry a custom attribute (`AttributedTextBuilder.linkAttribute`)
+        // so the theme owns their colour, which means resolving taps by hand
+        // below. They also carry the standard `.link` key now, purely so
+        // VoiceOver's Links rotor can find them; `updateUIView` overrides
+        // `linkTextAttributes` so that addition doesn't hand colour back to
+        // UIKit, and the delegate methods further down decline UIKit's own
+        // link tap/menu handling so `.link` changes nothing about how a tap
+        // is resolved — this gesture recogniser stays the only thing that
+        // ever opens a link.
         let tap = UITapGestureRecognizer(
             target: context.coordinator,
             action: #selector(Coordinator.handleTap(_:))
@@ -83,6 +90,16 @@ struct SelectableTextView: UIViewRepresentable {
         if view.attributedText !== attributed {
             view.attributedText = attributed
         }
+        // UIKit renders any `.link` range using `linkTextAttributes`, not the
+        // literal foreground colour/underline already sitting on that range
+        // in `attributed` — its own default is system blue with a single
+        // underline, which is exactly the regression criterion 2 rules out.
+        // Copying the run's own colours back in here, rather than reaching
+        // for a theme this view is never handed, keeps `AttributedTextBuilder`
+        // the one place that decides what a link looks like. `[:]` when the
+        // block has no link is harmless: there is no `.link` range for it to
+        // apply to.
+        view.linkTextAttributes = Self.linkTextAttributes(in: attributed) ?? [:]
         // Assigned unconditionally (not just when `attributed` changes): this
         // view is reused across `updateUIView` calls for the same block, and
         // both of these can change independently of the text — a highlight
@@ -149,6 +166,32 @@ struct SelectableTextView: UIViewRepresentable {
         return CGSize(width: width, height: height)
     }
 
+    /// The colour/underline UIKit should use for this block's `.link` ranges,
+    /// or `nil` if it has none.
+    ///
+    /// Reads them back off the first `.link` run rather than being handed a
+    /// theme, since every link in a block was built by the same call to
+    /// `AttributedTextBuilder.paragraph(_:)` and so shares one colour — this
+    /// view only ever sees the finished `NSAttributedString`, never the
+    /// theme that produced it.
+    static func linkTextAttributes(in attributed: NSAttributedString) -> [NSAttributedString.Key: Any]? {
+        let bounds = NSRange(location: 0, length: attributed.length)
+        var firstLinkLocation: Int?
+        attributed.enumerateAttribute(.link, in: bounds) { value, range, stop in
+            guard value != nil else { return }
+            firstLinkLocation = range.location
+            stop.pointee = true
+        }
+        guard let location = firstLinkLocation else { return nil }
+
+        let runAttributes = attributed.attributes(at: location, effectiveRange: nil)
+        var linkAttributes: [NSAttributedString.Key: Any] = [:]
+        linkAttributes[.foregroundColor] = runAttributes[.foregroundColor]
+        linkAttributes[.underlineStyle] = runAttributes[.underlineStyle]
+        linkAttributes[.underlineColor] = runAttributes[.underlineColor]
+        return linkAttributes
+    }
+
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
 
     final class Coordinator: NSObject, UITextViewDelegate, UIGestureRecognizerDelegate {
@@ -207,6 +250,38 @@ struct SelectableTextView: UIViewRepresentable {
             }
 
             return UIMenu(children: [highlight] + suggestedActions)
+        }
+
+        /// Declines UIKit's own "open the link" action for `.link` ranges.
+        ///
+        /// That attribute is on links now so VoiceOver's Links rotor can find
+        /// them, but taps are already resolved by hand in `handleTap` below,
+        /// against the custom `cairn.link` attribute those same ranges carry
+        /// — unchanged by this task. Without this override, UIKit would also
+        /// try to act on the same tap (its default: open the URL directly,
+        /// bypassing `onOpenLink` and the app's own routing, in Safari or
+        /// Mail rather than through the app). Returning `nil` leaves this
+        /// gesture-driven path as the only thing that ever opens a link, so
+        /// tapping still behaves exactly as it did before `.link` existed.
+        func textView(
+            _ textView: UITextView,
+            primaryActionFor textItem: UITextItem,
+            defaultAction: UIAction
+        ) -> UIAction? {
+            nil
+        }
+
+        /// Declines UIKit's own long-press menu for `.link` ranges, for the
+        /// same reason as `primaryActionFor` above: that menu (Open, Copy
+        /// Link, Share…) is a new capability `.link` brings for free, not one
+        /// this reader had before, and it isn't part of what this task asked
+        /// for.
+        func textView(
+            _ textView: UITextView,
+            menuConfigurationFor textItem: UITextItem,
+            defaultMenu: UIMenu
+        ) -> UITextItem.MenuConfiguration? {
+            nil
         }
 
         @objc func handleTap(_ recognizer: UITapGestureRecognizer) {

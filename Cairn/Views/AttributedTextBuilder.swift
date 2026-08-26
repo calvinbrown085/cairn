@@ -8,6 +8,10 @@ struct AttributedTextBuilder {
     let theme: ReaderTheme
 
     /// Marks a link's destination so taps can be resolved back to a URL.
+    ///
+    /// Kept alongside the standard `.link` attribute below rather than
+    /// replaced by it: `SelectableTextView.linkURL(at:)` reads this one, so
+    /// tap resolution is untouched by adding `.link` for accessibility.
     static let linkAttribute = NSAttributedString.Key("cairn.link")
 
     /// Changes whenever anything that affects rendering changes, which is what
@@ -75,6 +79,15 @@ struct AttributedTextBuilder {
                 attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
                 attributes[.underlineColor] = UIColor(theme.accent).withAlphaComponent(0.35)
                 attributes[Self.linkAttribute] = url
+                // Also the standard key, purely so VoiceOver's Links rotor —
+                // which looks for `.link`, not custom attributes — can find
+                // article links at all. Setting it hands UIKit its own idea
+                // of link styling (system blue, its own underline) unless
+                // overridden; `SelectableTextView` overrides it with exactly
+                // the colours set above via `linkTextAttributes`, and
+                // declines UIKit's own tap/menu handling so this attribute
+                // changes nothing about how a tap is resolved.
+                attributes[.link] = url
             }
 
             output.append(NSAttributedString(string: run.text, attributes: attributes))
