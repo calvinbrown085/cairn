@@ -2,7 +2,7 @@
   "id": "T-0051",
   "title": "Links are invisible to VoiceOver's Links rotor",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -18,7 +18,18 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "Found by T-0013 while doing the VoiceOver pass, and flagged as out of scope rather than quietly fixed. Prose links carry a custom `cairn.link` attribute instead of NSAttributedString.Key.link, so VoiceOver's Links rotor never sees them. The custom attribute exists for a reason \u2014 SelectableTextView's own comment says links use it so the theme owns their colour, which means resolving taps by hand. So this is not a one-line swap: using the standard key may hand colour control back to UIKit. The acceptance criteria require keeping both.",
-  "history": []
+  "branch": "factory/T-0051",
+  "notes": "Found by T-0013 while doing the VoiceOver pass, and flagged as out of scope rather than quietly fixed. Prose links carry a custom `cairn.link` attribute instead of NSAttributedString.Key.link, so VoiceOver's Links rotor never sees them. The custom attribute exists for a reason — SelectableTextView's own comment says links use it so the theme owns their colour, which means resolving taps by hand. So this is not a one-line swap: using the standard key may hand colour control back to UIKit. The acceptance criteria require keeping both.",
+  "history": [
+    {
+      "ts": "2026-08-26T00:20:07Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
+    }
+  ],
+  "agent": {
+    "id": "a4e1ba87ca52ecc32",
+    "role": "implementer",
+    "spawned": "2026-08-26T00:20:07Z"
+  }
 }
