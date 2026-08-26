@@ -2,7 +2,7 @@
   "id": "T-0018",
   "title": "The share extension needs its own privacy manifest",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Ship a beta > PrivacyInfo.xcprivacy",
   "depends_on": [
@@ -43,6 +43,11 @@
       "ts": "2026-08-26T00:57:53Z",
       "event": "dispatched",
       "detail": "attempt 1; pre-submission requirement"
+    },
+    {
+      "ts": "2026-08-26T01:00:49Z",
+      "event": "merged",
+      "detail": "aebdc4a"
     }
   ],
   "agent": {
