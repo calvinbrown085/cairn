@@ -2,7 +2,7 @@
   "id": "T-0013",
   "title": "VoiceOver pass over the reader",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > VoiceOver pass over the reader",
   "depends_on": [
@@ -45,6 +45,11 @@
       "ts": "2026-08-26T00:07:30Z",
       "event": "dispatched",
       "detail": "attempt 1; also the named evidence check for the T-0002 architecture decision"
+    },
+    {
+      "ts": "2026-08-26T00:16:55Z",
+      "event": "merged",
+      "detail": "7223d7f"
     }
   ],
   "agent": {

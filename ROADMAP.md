@@ -99,7 +99,7 @@ of real captured pages.
 
 - [ ] **Failed saves are visible and retryable.** A paywalled save currently looks like a good one. For an app whose primary verb is *save*, silent failure is the worst possible bug.
 - [x] **Capture from anywhere.** *(T-0038, `c8997fe` — Shortcuts and the Action Button; widget deferred.)* Shortcuts and the Action Button first, through the one existing inbox; a widget only if a second extension target earns its keep. One pipeline, never two.
-- [ ] **Import PDFs.** Papers and documents cannot get in at all. The largest hole, and now the largest build.
+- [x] **Import PDFs.** *(T-0037, `5ec26fd` — saved, stored and searchable. Opening them is T-0050.)* Papers and documents cannot get in at all. The largest hole, and now the largest build.
 - [ ] **Titles and galleries.** Site suffixes left on titles, gallery images dropped, pages with no `<title>` falling back to the host.
 
 ### The pile — tools I reach for, never prompted

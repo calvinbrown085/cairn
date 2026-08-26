@@ -1,8 +1,8 @@
 {
   "id": "T-0050",
-  "title": "Open a saved PDF \u2014 route .pdf posts to PDFReaderView",
+  "title": "Open a saved PDF — route .pdf posts to PDFReaderView",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": "Reading experience",
   "depends_on": [],
@@ -18,7 +18,18 @@
   "risk": "medium",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
-  "notes": "URGENT, and it closes a gap the app currently has in a user-visible way. T-0037 (5ec26fd) landed PDF import: the share extension now accepts a PDF, the bytes are stored, the text feeds the same searchText web articles use. But RootView.swift line ~39 unconditionally builds ReaderView(post:), so a .pdf post opens a reader with no blocks. The app therefore ACCEPTS PDFs it cannot display, which is worse than refusing them. PDFReaderView.swift already exists, is complete, and renders a Post's pdfData through PDFKit \u2014 this task is the dispatch on post.kind and nothing more. It was left undone deliberately, not by oversight: T-0037's lease was narrowed off Cairn/Views/** so it could run beside the scroll-indicator work, which meant it could not touch RootView. Keep this change small \u2014 a branch on kind, not a refactor of navigation.",
-  "history": []
+  "branch": "factory/T-0050",
+  "notes": "URGENT, and it closes a gap the app currently has in a user-visible way. T-0037 (5ec26fd) landed PDF import: the share extension now accepts a PDF, the bytes are stored, the text feeds the same searchText web articles use. But RootView.swift line ~39 unconditionally builds ReaderView(post:), so a .pdf post opens a reader with no blocks. The app therefore ACCEPTS PDFs it cannot display, which is worse than refusing them. PDFReaderView.swift already exists, is complete, and renders a Post's pdfData through PDFKit — this task is the dispatch on post.kind and nothing more. It was left undone deliberately, not by oversight: T-0037's lease was narrowed off Cairn/Views/** so it could run beside the scroll-indicator work, which meant it could not touch RootView. Keep this change small — a branch on kind, not a refactor of navigation.",
+  "history": [
+    {
+      "ts": "2026-08-26T00:17:18Z",
+      "event": "dispatched",
+      "detail": "attempt 1; urgent — closes a gap where the app accepts PDFs it cannot display"
+    }
+  ],
+  "agent": {
+    "id": "a11fe067e81295331",
+    "role": "implementer",
+    "spawned": "2026-08-26T00:17:17Z"
+  }
 }
