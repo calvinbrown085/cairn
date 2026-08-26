@@ -2,7 +2,7 @@
   "id": "T-0050",
   "title": "Open a saved PDF — route .pdf posts to PDFReaderView",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": "Reading experience",
   "depends_on": [],
@@ -25,6 +25,11 @@
       "ts": "2026-08-26T00:17:18Z",
       "event": "dispatched",
       "detail": "attempt 1; urgent — closes a gap where the app accepts PDFs it cannot display"
+    },
+    {
+      "ts": "2026-08-26T00:18:54Z",
+      "event": "merged",
+      "detail": "c0f1631"
     }
   ],
   "agent": {
