@@ -1,0 +1,30 @@
+{
+  "id": "T-0055",
+  "title": "Widen the fixture corpus and fix the extraction defects it exposes",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "now",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "At least 10 new frozen fixtures from real pages, chosen for shapes the current 21 do not cover, with PROVENANCE.md updated the same way the existing entries are",
+    "Every new fixture has an expectation JSON asserting title, word count, and that named landmark passages near the start, middle and end of the article all survive",
+    "Every extraction defect the new fixtures expose is either fixed in SwiftReadability, or written up as a new ledger task with the evidence if the fix is genuinely out of scope",
+    "swift test green, and the 21 existing fixtures still pass unchanged"
+  ],
+  "touches": [
+    "Packages/SwiftReadability/**"
+  ],
+  "risk": "low",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Extraction quality is the whole reading experience: a page that extracts badly is unpleasant to read no matter how good the typography is, and the owner named 'reading itself is unpleasant' as a top pain. This is the method that found T-0027, where the extractor was silently dropping 89% of a long multi-section document (8,239 words of 75,085) and no existing fixture noticed. Broad, adversarial fixtures are how that class of bug surfaces at all.\n\nThe corpus is 21 pairs. Deliberately go after shapes it does not have: very long multi-section documents, pages whose article is wrapped in sidebars or newsletter interstitials, documentation pages with code blocks, pages with footnotes or endnote-style references, non-English text, pages where the title appears in several conflicting places, and pages that are mostly images with sparse prose.\n\nAssert landmark passages near the start, middle AND end, not just word counts. A word-count assertion alone is what let T-0027 hide: truncation at the tail passes any check that only looks at the head.\n\nFixtures live in the SPM test target and must stay there. They are third-party HTML in a public repository, so they never enter the app bundle and their provenance is recorded.",
+  "history": [
+    {
+      "ts": "2026-08-26T02:33:00Z",
+      "event": "dispatched",
+      "detail": "attempt 1; extraction breadth — the method that found T-0027"
+    }
+  ]
+}
