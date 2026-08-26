@@ -28,5 +28,17 @@ are not fixture expectations.
 | `wikipedia_epub` | tables, infobox, footnotes | CC BY-SA 4.0 | 2026-08-25 | 200 |
 | `wikipedia_readability` | infobox, references, edit links, categories | CC BY-SA 4.0 | 2026-08-25 | 200 |
 | `wikisource_essay` | long prose, old typography, page anchors | public domain | 2026-08-25 | 200 |
+| `gnu_make_manual` | very long single-page manual, code blocks, endnote-style index | GNU FDL 1.3 | 2026-08-25 | 200 |
+| `gutenberg_the_prince` | very long document, translator's footnotes | public domain | 2026-08-25 | 200 |
+| `rfc_editor_9110` | very long multi-section spec, code/ABNF blocks, split title heading | IETF Trust, freely distributable | 2026-08-25 | 200 |
+| `wikibooks_python_programming` | doc chapter wrapped in TOC sidebar, code blocks | CC BY-SA 3.0 | 2026-08-25 | 200 |
+| `wikipedia_ada_lovelace` | biography, dense inline footnote markers | CC BY-SA 4.0 | 2026-08-25 | 200 |
+| `wikipedia_french_tour_eiffel` | non-English (French) prose, infobox | CC BY-SA 4.0 | 2026-08-25 | 200 |
+| `wikipedia_world_war_two` | very long multi-section article, inline footnotes | CC BY-SA 4.0 | 2026-08-25 | 200 |
 
-_14 real captures._
+_21 real captures._
+
+`wikipedia_flag_gallery` is also a real capture (CC BY-SA 4.0, 2026-08-25, HTTP 200,
+https://en.wikipedia.org/wiki/List_of_national_flags_of_sovereign_states) but is
+deliberately excluded from the count above and has no `.json` expectation — see
+"Known but unfixed: the flag table" in `README.md`.

@@ -19,7 +19,18 @@ struct BlockBuilder {
     mutating func build(from root: HTMLElement) -> ArticleContent {
         blocks = []
         seenImageSources = []
-        descend(root)
+        // `descend` only recognizes a block producer among an element's
+        // *children* — it never asks whether the element handed to it is one.
+        // That is right for the ordinary case (root is a wrapping <div> or
+        // <article>, and `emit` falls through those to `descend` anyway), but
+        // when `ArticleExtractor.bestCandidate` legitimately picks something
+        // atomic as the winning candidate — most dangerously a <table>, whose
+        // <tbody>/<tr>/<td> children are not block producers — going straight
+        // to `descend` flattens every cell into one inline run and silently
+        // drops every image and row boundary inside it. Routing the root
+        // through `emit` first gives it the same dedicated handling any
+        // identical element would get if found a level lower.
+        emit(root)
         return ArticleContent(blocks: blocks)
     }
 
@@ -30,8 +41,9 @@ struct BlockBuilder {
     /// Tags that end the current paragraph and produce their own block.
     private static let blockProducers: Set<String> = [
         "h1", "h2", "h3", "h4", "h5", "h6", "p", "pre", "blockquote", "ul", "ol",
-        "dl", "figure", "img", "picture", "hr", "table", "div", "section", "article",
-        "main", "header", "footer", "aside", "details", "li", "figcaption", "center",
+        "dl", "figure", "img", "picture", "hr", "table", "thead", "tbody", "tfoot",
+        "div", "section", "article", "main", "header", "footer", "aside", "details",
+        "li", "figcaption", "center",
     ]
 
     private mutating func descend(_ element: HTMLElement) {
@@ -117,7 +129,14 @@ struct BlockBuilder {
         case "hr":
             blocks.append(.divider)
 
-        case "table":
+        case "table", "thead", "tbody", "tfoot":
+            // `bestCandidate`'s climb up from a scored cell can rest on the
+            // row-group instead of the enclosing `<table>` — the table itself
+            // sometimes has a link density its `<tbody>` alone doesn't share
+            // — so a "table" fixed up here needs to handle winning candidates
+            // shaped like a bare `<tbody>` too. `appendTable` only ever asks
+            // `directRows` for descendant `<tr>`s, which works identically
+            // whichever of these wraps them.
             appendTable(element)
 
         case "li":
@@ -276,13 +295,30 @@ struct BlockBuilder {
         guard rows.count > 1 else { descend(element); return }
 
         var lines: [RichText] = []
+        func flushLines() {
+            guard !lines.isEmpty else { return }
+            blocks.append(.list(ordered: false, items: lines))
+            lines = []
+        }
+
         for row in rows {
             let rowCells = row.childElements.filter { $0.tag == "td" || $0.tag == "th" }
             let text = rowCells.map { $0.textContent.squeezed }.filter { !$0.isEmpty }.joined(separator: "  ·  ")
+
+            // A data row that also carries an image — a flag, a headshot, a
+            // thumbnail column — gets the same rescue `appendList` already
+            // gives a gallery `<li>`: pull the image out as its own block
+            // with the row's text riding along as a caption, instead of
+            // losing every photo to the row's plain-text flattening below.
+            if let image = rowCells.lazy.compactMap({ $0.firstElement(tagged: "img") }).first(where: { imageSource(from: $0) != nil }) {
+                flushLines()
+                appendImage(image, caption: text.isEmpty ? nil : RichText(text))
+                continue
+            }
+
             if !text.isEmpty { lines.append(RichText(text)) }
         }
-        guard !lines.isEmpty else { return }
-        blocks.append(.list(ordered: false, items: lines))
+        flushLines()
     }
 
     private mutating func appendImage(_ element: HTMLElement, caption: RichText? = nil) {

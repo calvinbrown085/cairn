@@ -152,6 +152,82 @@ triggers, so this is a pure addition. The body text itself was already
 captured completely and correctly (all 176 pages, none dropped); this was a
 title-only defect.
 
+### Fixed by T-0055: a wider corpus surfaces three real defects
+
+T-0055 widened the corpus by hunting deliberately for shapes the previous 21
+fixtures didn't cover — very long multi-section documents from new markup
+families, footnotes, non-English prose, documentation with code blocks, and a
+page whose title is split across conflicting elements. Three of the eight new
+real captures exposed genuine extraction defects, all now fixed.
+
+**A winning candidate that is itself a `<tbody>` lost every image and all row
+structure.** On `wikipedia_flag_gallery` (see below), `bestCandidate`'s climb
+from a scored `<td>` rested on the `<tbody>` rather than climbing one more
+level to the enclosing `<table>` — the table's overall link density can clear
+the climb's threshold even when the row-group alone doesn't.
+`BlockBuilder.build(from:)` called `descend(root)` unconditionally, which only
+recognizes a block producer among an element's *children*; neither `"tbody"`
+nor `"tr"` nor `"td"` was ever in that set, so a `<tbody>` handed in as the
+root got flattened into one inline run, silently dropping every image and
+every row boundary along the way. `build(from:)` now routes the root through
+`emit()` first — the same dispatch a `<table>` already got when found a level
+lower — and `"thead"`/`"tbody"`/`"tfoot"` were added to `blockProducers` and
+routed to `appendTable` (tag-agnostic already, since it only ever asks
+`directRows` for descendant `<tr>`s). While in there, `appendTable`'s
+"genuine data table" row-joining also gained the same image rescue
+`appendList` already gives a gallery `<li>`: a data row that also carries an
+image now becomes its own `.image` block with the row's text as a caption,
+instead of losing the image to the row's plain-text flattening. Reproduced
+synthetically in `ExtractorTests.tbodyCandidateKeepsStructure`.
+
+**A page whose title is split across two `<h1>` elements kept only the
+first.** `rfc_editor_9110`'s template renders `<h1 id="rfcnum">RFC 9110</h1>`
+and `<h1 id="title">HTTP Semantics</h1>` as two separate headings;
+`document.firstElement(tagged: "h1")` picked the first and stopped, so every
+RFC read as just "RFC 9110" in a saved-articles list — indistinguishable from
+"RFC 9111". `ArticleMetadata.headingTitle(in:)` now joins a short,
+letter-and-digit-only first `<h1>` (no lowercase prose) with a second,
+different `<h1>` when both are present, and falls back to the first `<h1>`
+alone otherwise — which is every other fixture in the corpus, since none of
+the previous 21 carries more than one `<h1>`. Reproduced synthetically in
+`ExtractorTests.splitHeadingTitle` and `.repeatedHeadingTitleUnchanged`.
+
+**A non-English site suffix survived because its name carries a diacritic.**
+`wikipedia_french_tour_eiffel`'s `<title>` reads `"Tour Eiffel — Wikipédia"`;
+with no `og:site_name`, the only candidate name comes from the URL host
+(`fr.wikipedia.org` → the ASCII component `"wikipedia"`), and
+`trimmingSiteSuffix`'s `key()` was case-insensitive but not
+diacritic-insensitive, so `"wikipédia"` never matched `"wikipedia"` and the
+suffix stuck. `key()` now folds diacritics before comparing
+(`.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)`),
+which is a no-op for the plain-ASCII titles the other 21 fixtures all carry.
+Reproduced synthetically in `ExtractorTests.diacriticSiteSuffixTrims`.
+
+### Known but unfixed: the flag table
+
+`wikipedia_flag_gallery` (`List_of_national_flags_of_sovereign_states`) sits
+in this directory with no `.json` expectation, per the convention above: the
+extractor still handles it badly. Its ~200-row wikitable of flag images is a
+genuine data table (no cell wraps block content), but `appendTable` decides
+layout-vs-data once for the *whole table*: `cells.contains(where:
+cellHoldsBlockContent)` is true if even one cell anywhere in the table wraps
+block content (a nested table for a multi-flag entry, say), and that flips
+*every* row — hundreds of ordinary data rows along with it — into per-cell
+paragraph flattening instead of the tidy per-row list-and-image handling
+ordinary rows deserve. As of this capture that produces 1,126 single-cell
+paragraph blocks and rescues only 225 of the page's 589 flag images (most of
+the rest are the second, redundant "former flag" image some rows carry, which
+the row-image rescue above only ever pulls one of).
+
+A per-row version of the same decision (judge `rowCells.contains(where:
+cellHoldsBlockContent)` inside the loop, instead of `cells.contains(...)`
+once outside it) fixes this page cleanly, but changes the frozen output of
+two existing fixtures — `mdn_img_element` and `wikipedia_epub` — which were
+apparently frozen against the same all-or-nothing behavior this bug shares.
+Deciding whether those two fixtures' current frozen shape is itself correct,
+or whether it should be re-frozen alongside a per-row fix, is a product call
+this task's lease doesn't cover; filed as a follow-up.
+
 ## Licensing
 
 This repository goes public. Every real capture is from a permissively licensed

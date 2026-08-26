@@ -25,7 +25,7 @@ struct ArticleMetadata {
             meta["twitter:title"],
             linkedData?["headline"] as? String,
             linkedData?["name"] as? String,
-            document.firstElement(tagged: "h1")?.textContent,
+            ArticleMetadata.headingTitle(in: document),
             document.firstElement(tagged: "title")?.textContent,
             ArticleMetadata.styledHeading(in: document),
         ]) ?? url.host() ?? "Untitled"
@@ -197,8 +197,13 @@ struct ArticleMetadata {
             names += bare.split(separator: ".").map(String.init).filter { !noise.contains($0.lowercased()) }
         }
 
+        // Diacritic-folded so a site's own name still matches its ASCII host
+        // component — "Wikipédia" against the "wikipedia" pulled out of
+        // fr.wikipedia.org, say. Plain-ASCII titles are untouched by folding,
+        // so this only ever helps a non-English site match, never hurts one.
         func key(_ value: String) -> String {
-            value.lowercased().filter { $0.isLetter || $0.isNumber }
+            value.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)
+                .filter { $0.isLetter || $0.isNumber }
         }
         let keys = Set(names.map(key)).filter { $0.count >= 3 }
         guard !keys.isEmpty else { return title }
@@ -254,6 +259,23 @@ struct ArticleMetadata {
         return banners.flatMap { $0.elements(tagged: ["a"]) }
             .map { $0.textContent.squeezed }
             .filter { !$0.isEmpty }
+    }
+
+    /// The page's own `<h1>` — but some templates split a bare identifier and
+    /// the real headline across two separate `<h1>` elements (an RFC's
+    /// number next to its actual title, say, each its own `<h1>`). Using
+    /// only the first in that case leaves a saved article titled "RFC 9110",
+    /// indistinguishable in a library from "RFC 9111". When the first `<h1>`
+    /// reads as a short, letter-and-digit identifier (no lowercase prose)
+    /// and a second, different `<h1>` follows, the pair together is the
+    /// actual headline.
+    private static func headingTitle(in document: HTMLElement) -> String? {
+        let headings = document.elements(tagged: ["h1"]).map { $0.textContent.squeezed }.filter { !$0.isEmpty }
+        guard let first = headings.first else { return nil }
+        guard first.count <= 12, !first.contains(where: \.isLowercase),
+              let second = headings.dropFirst().first(where: { $0 != first })
+        else { return first }
+        return "\(first): \(second)"
     }
 
     /// Some pages fake a heading with CSS instead of a real `<h1>` — a plain

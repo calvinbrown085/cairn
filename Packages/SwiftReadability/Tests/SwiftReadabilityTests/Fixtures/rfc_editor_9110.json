@@ -1,0 +1,15 @@
+{
+  "title": "RFC 9110: HTTP Semantics",
+  "wordCount": 64865,
+  "blockCounts": {
+    "code": 147,
+    "heading": 420,
+    "paragraph": 1416,
+    "list": 63
+  },
+  "landmarks": [
+    "The Hypertext Transfer Protocol (HTTP) is a stateless application-level protocol",
+    "Proactive negotiation is advantageous when the algorithm for selecting from among the available representations is difficult to describe to a user agent",
+    "Roy T. Fielding (editor) Adobe 345 Park Ave"
+  ]
+}

@@ -9,6 +9,24 @@ struct FixtureExpectation: Decodable {
     /// Block-type name (see `ArticleBlock.kind` in `FixtureTests.swift`) to
     /// how many of that block the extractor is expected to produce.
     let blockCounts: [String: Int]
+    /// Short, verbatim passages that must survive extraction somewhere in the
+    /// article's plain text — see `landmarks(near:)` below. Absent on the 21
+    /// fixtures frozen before this field existed, so it decodes to `[]` for
+    /// them rather than failing; a fixture with no landmarks simply skips the
+    /// check instead of asserting an empty requirement.
+    let landmarks: [String]
+
+    private enum CodingKeys: String, CodingKey {
+        case title, wordCount, blockCounts, landmarks
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        title = try container.decode(String.self, forKey: .title)
+        wordCount = try container.decode(Int.self, forKey: .wordCount)
+        blockCounts = try container.decode([String: Int].self, forKey: .blockCounts)
+        landmarks = try container.decodeIfPresent([String].self, forKey: .landmarks) ?? []
+    }
 }
 
 /// Loads frozen fixtures — an HTML capture plus its expected extraction — from

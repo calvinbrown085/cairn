@@ -1,0 +1,15 @@
+{
+  "title": "Python Programming/Input and Output",
+  "wordCount": 2549,
+  "blockCounts": {
+    "heading": 13,
+    "code": 43,
+    "list": 8,
+    "paragraph": 73
+  },
+  "landmarks": [
+    "Python 3.x has one function for input from user, input()",
+    "Objects can be printed on the same line without needing to be on the same line",
+    "mentions sys.stdout, and sys.stderr"
+  ]
+}

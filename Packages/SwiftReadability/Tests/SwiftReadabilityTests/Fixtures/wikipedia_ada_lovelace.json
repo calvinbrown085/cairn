@@ -1,0 +1,16 @@
+{
+  "title": "Ada Lovelace",
+  "wordCount": 6384,
+  "blockCounts": {
+    "heading": 24,
+    "image": 15,
+    "list": 10,
+    "quote": 8,
+    "paragraph": 89
+  },
+  "landmarks": [
+    "The Right Honourable",
+    "she was not the very first person to write a program for the Analytical Engine",
+    "a letter written by Ada Lovelace was forfeited by Martin Shkreli to the New York State Department of Taxation and Finance"
+  ]
+}

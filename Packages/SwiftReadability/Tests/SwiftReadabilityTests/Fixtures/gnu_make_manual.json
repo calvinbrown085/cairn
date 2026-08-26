@@ -1,0 +1,17 @@
+{
+  "title": "GNU make",
+  "wordCount": 85365,
+  "blockCounts": {
+    "quote": 3,
+    "code": 322,
+    "heading": 650,
+    "paragraph": 1666,
+    "list": 26,
+    "divider": 172
+  },
+  "landmarks": [
+    "This file documents the GNU make utility, which determines automatically which pieces of a large program need to be recompiled",
+    "A makefile that says how to recompile a program can be used in more than one way",
+    "vpath:  ·  Selective Search"
+  ]
+}

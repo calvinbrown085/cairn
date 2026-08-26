@@ -87,6 +87,34 @@ struct ExtractorTests {
             #expect(article.content.plainText.contains("Chapter marker \(index)."), "chapter \(index) was dropped")
         }
     }
+
+    @Test("A bare-identifier <h1> next to the real headline become one title")
+    func splitHeadingTitle() {
+        // Found on rfc-editor.org's RFC pages, which render the RFC number
+        // and its actual title as two separate <h1> elements. Taking only
+        // the first (`document.firstElement(tagged: "h1")`) left every RFC
+        // titled just "RFC 9110" — indistinguishable from "RFC 9111" in a
+        // saved-articles list.
+        let article = extract(page("<article><h1>RFC 9999</h1><h1>Testing Split Headings</h1><p>\(paragraph)</p></article>"))
+        #expect(article.title == "RFC 9999: Testing Split Headings")
+    }
+
+    @Test("A second <h1> identical to the first doesn't get appended")
+    func repeatedHeadingTitleUnchanged() {
+        let article = extract(page("<article><h1>Same Title</h1><h1>Same Title</h1><p>\(paragraph)</p></article>"))
+        #expect(article.title == "Same Title")
+    }
+
+    @Test("A non-English site suffix trims even when the site's own name carries a diacritic")
+    func diacriticSiteSuffixTrims() {
+        // fr.wikipedia.org's <title> reads "Page — Wikipédia"; the host-derived
+        // candidate name is the ASCII "wikipedia" pulled out of the domain, so
+        // a plain case-insensitive comparison against "wikipédia" never
+        // matched and the site suffix was never trimmed.
+        let html = "<html><head><title>Tour Eiffel — Wikipédia</title></head><body><article><p>\(paragraph)</p></article></body></html>"
+        let article = ArticleExtractor.extract(html: html, url: URL(string: "https://fr.wikipedia.org/wiki/Tour_Eiffel")!)
+        #expect(article.title == "Tour Eiffel")
+    }
 }
 
 @Suite("Tables")
@@ -145,6 +173,34 @@ struct TableTests {
         }
         #expect(lists.count == 1)
         #expect(lists.first?.count == 3)
+    }
+
+    @Test("A winning candidate that is itself a <tbody> still finds its rows and images")
+    func tbodyCandidateKeepsStructure() {
+        // `ArticleExtractor.bestCandidate`'s climb from a scored cell can
+        // rest on the <tbody> instead of climbing one more level to the
+        // enclosing <table> (a wikitable's overall link density can clear
+        // the climb's threshold even though the row-group alone doesn't).
+        // `BlockBuilder.build(from:)` used to call `descend` unconditionally,
+        // which only recognizes a block producer among an element's
+        // *children* — neither "tbody" nor "tr" nor "td" was ever one, so a
+        // <tbody> handed in as the root got flattened into one inline run
+        // with every image silently dropped (found via a real capture of
+        // Wikipedia's flag table, https://en.wikipedia.org/wiki/List_of_national_flags_of_sovereign_states).
+        let html = """
+        <table><tbody>
+        <tr><td><img src="https://example.com/a.jpg" width="80" height="80"></td><td>Alpha</td></tr>
+        <tr><td><img src="https://example.com/b.jpg" width="80" height="80"></td><td>Beta</td></tr>
+        </tbody></table>
+        """
+        let document = HTMLParser.parse(html)
+        guard let tbody = document.firstElement(tagged: "tbody") else {
+            Issue.record("expected the fixture to parse a <tbody>")
+            return
+        }
+        let content = BlockBuilder.content(from: tbody, baseURL: URL(string: "https://example.com/post")!)
+        let images = content.blocks.filter { if case .image = $0 { return true } else { return false } }
+        #expect(images.count == 2, "a <tbody> passed straight to the block builder should still rescue its row images")
     }
 }
 
