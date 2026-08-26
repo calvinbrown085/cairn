@@ -258,20 +258,13 @@ final class ReadingFlowUITests: XCTestCase {
     /// happened on and nothing else. Reopening — even the very same post —
     /// starts immersive again, exactly as if it had never been left.
     ///
-    /// T-0045: this fails deterministically (reproduced on 4/4 clean-install
-    /// runs, both isolated and inside the full suite), always at the same
-    /// point — the second `waitForExistence` below, after tapping the same
-    /// post row a second time. No TextView ever appears: the tap registers
-    /// (the driver reports the event synthesized) but nothing navigates, as
-    /// if the row tap were a no-op the second time around. This is not the
-    /// "Timed out while evaluating UI query" accessibility-tree flakiness it
-    /// was originally suspected to be — it is a real, reproducible failure
-    /// to reopen a post that was just left. The identical symptom shows up
-    /// in `testPositionRestoreAcrossReopen` (also a same-post reopen), which
-    /// rules out a test-only cause. The fix is in app navigation code, out
-    /// of this task's touches (`CairnUITests/**`); left failing rather than
-    /// rewritten around, per T-0045's instruction not to weaken a test that
-    /// is catching a real defect.
+    /// T-0045 found this failing deterministically at the second
+    /// `waitForExistence` below: reopening the same post was a navigation
+    /// no-op, a real app-code defect out of that task's touches
+    /// (`CairnUITests/**`), so it was left failing rather than rewritten
+    /// around. T-0053 fixed the underlying cause (`RootView`/`ReaderView`
+    /// now force a fresh reader on every selection, including a reselection
+    /// of the post already open) — this should reopen cleanly now.
     func testFullScreenEntryIsNotSticky() {
         let target = firstPost(in: app)
         let marker = String(target.label.prefix(40))

@@ -18,6 +18,14 @@ extension XCUIApplication {
     /// brings the library column back, so there is nothing further to do.
     /// Each query snapshots the whole accessibility tree, and the reader's is
     /// 200+ text views on a long article — so this asks once, not twice.
+    ///
+    /// Only call this from inside the reader. With no full screen to leave,
+    /// `exit` correctly doesn't exist, and this falls through to a bare
+    /// navigation-bar tap that pops past whatever screen is actually showing
+    /// — the library's own back arrow, not a no-op. Seeding used to call
+    /// this straight after "Save", which does not open a reader; that
+    /// leftover call, not fetch or extraction speed, was the real cause of
+    /// this suite's seeding failures (see `seedArchive`).
     func returnToLibrary() {
         let exit = buttons["reader.exitFullScreen"]
         if exit.exists { exit.tap() }
@@ -100,17 +108,102 @@ extension XCTestCase {
         field.typeText("https://www.paulgraham.com/own.html")
         app.buttons["Save"].tap()
 
-        // Saving jumps straight to the new post rather than back to the list
-        // it was added to, and can lose the race with its own row's first
-        // render — step back to the list before looking for the row.
-        app.returnToLibrary()
+        // Saving dismisses the sheet and lands back on the list the post was
+        // added to directly — there is no reader here to leave first. A
+        // stale assumption that there was one used to send this through
+        // `returnToLibrary()` regardless; with no full screen actually up,
+        // that fell through to a bare navigation-bar tap that popped past
+        // the list itself. That — not fetch or extraction speed — was the
+        // real cause of this suite's reported seeding failures: the row
+        // this test went on to wait for was never on screen to find, no
+        // matter how long the wait.
+        //
+        // The post is inserted locally — and so into the list — before any
+        // network call is even made, so the row itself shows up right away.
+        // What is genuinely slow is what happens behind it: a real HTTP
+        // fetch, then extraction, then (for a post with images) a few image
+        // downloads, all before the post leaves `.pending`/`.fetching`.
+        let row = app.firstPostRow
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "Saving a link should add it to the library")
 
-        // The row appears right away; wait for the article behind it to
-        // finish fetching and extracting before any test tries to read it.
-        XCTAssertTrue(app.firstPostRow.waitForExistence(timeout: 15), "Saving a link should add it to the library")
+        guard waitForSeedingToFinish(row, in: app) else { return }
+
+        // Extraction has already finished by this point — this opens a
+        // reader on content that already exists, not a second network wait.
         app.firstPostRow.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 30), "The seeded article should finish extracting")
+        XCTAssertTrue(
+            app.textViews.firstMatch.waitForExistence(timeout: 10),
+            "The seeded article should open once extraction has finished"
+        )
         app.returnToLibrary()
         app.showEverything()
+    }
+
+    /// Waits for a just-saved post's row to leave the in-flight state,
+    /// polling the row's own status text — the same "Queued"/"Fetching…" a
+    /// reader sees, via `PostMetaLine` — rather than assuming any fixed
+    /// duration for a real fetch and extraction.
+    ///
+    /// The budget below is not a bigger guess: `PageFetcher` gives its own
+    /// network fetch up to 60 seconds before giving up, and extraction plus
+    /// any image downloads run after that succeeds — a real run of this same
+    /// seed while fixing T-0053 needed up to 90 seconds end to end. That
+    /// replaces what used to be two separate, inconsistent guesses (15
+    /// seconds for the row, 30 for extraction) about the same underlying
+    /// operation with one wait against what the row is actually reporting.
+    ///
+    /// A seed can also fail for reasons no amount of waiting fixes — no
+    /// network, the URL 404ing, or extraction landing under the app's
+    /// 40-word floor, any of which marks the post `.failed`. A failed row
+    /// does not open into the reader when tapped; tapping it retries
+    /// instead — so pressing on regardless would hang out the reader wait
+    /// above and report a misleading "extraction didn't finish." Recognizing
+    /// the row's own failure text here reports that as the specific, real
+    /// failure it is. Returns `false` (having already failed the test) in
+    /// either the timeout or the failure case; `true` once the row is ready.
+    @discardableResult
+    private func waitForSeedingToFinish(_ row: XCUIElement, in app: XCUIApplication) -> Bool {
+        let deadline = Date().addingTimeInterval(90)
+        var status = row.label
+
+        while Date() < deadline {
+            status = row.label
+            if !status.contains("Queued"), !status.contains("Fetching") { break }
+            _ = app.staticTexts["nothing"].waitForExistence(timeout: 1)
+        }
+
+        // Exact wording a `.failed` row shows — see `PostMetaLine`, and the
+        // failure reasons `ArchiveService`/`PageFetcher` attach to a post.
+        let failureSignals = [
+            "doesn't look like a web address",
+            "couldn't be found (404)",
+            "refused the request (403)",
+            "needs a login",
+            "returned an error",
+            "not an article",
+            "text couldn't be read",
+            "appear to be offline",
+            "No readable article was found",
+            "Only a few words could be read",
+            "Couldn't be saved",
+        ]
+        if let reason = failureSignals.first(where: { status.contains($0) }) {
+            XCTFail("""
+                Seeding failed rather than merely being slow — the row reports \
+                "\(reason)". A longer wait will not fix this: check that this \
+                simulator can actually reach the seed URL.
+                """)
+            return false
+        }
+        if status.contains("Queued") || status.contains("Fetching") {
+            XCTFail("""
+                Seeding is still \(status.contains("Queued") ? "queued" : "fetching") \
+                after 90 seconds — past even the 60-second timeout the fetch \
+                itself is given up on. That makes this an environment or \
+                network problem, not a feature bug.
+                """)
+            return false
+        }
+        return true
     }
 }
