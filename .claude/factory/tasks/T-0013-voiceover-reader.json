@@ -16,7 +16,9 @@
     "Verified by a human with VoiceOver on a device, not inferred from code"
   ],
   "touches": [
-    "Cairn/Views/**"
+    "Cairn/Views/ReaderView.swift",
+    "Cairn/Views/ArticleBlockView.swift",
+    "Cairn/Views/SelectableTextView.swift"
   ],
   "risk": "high",
   "factory_eligible": true,
@@ -33,6 +35,11 @@
       "ts": "2026-08-25T00:00:00Z",
       "event": "touches-renamed",
       "detail": "Stacks/ paths rewritten to Cairn/ after T-0031; a lease naming a directory that no longer exists is the drift that bit T-0006 and T-0007"
+    },
+    {
+      "ts": "2026-08-26T00:06:52Z",
+      "event": "touches-narrowed",
+      "detail": "was Cairn/Views/**, which collides with T-0037's new PDFReaderView; narrowed to the three files the reader's VoiceOver pass actually needs"
     }
   ]
 }

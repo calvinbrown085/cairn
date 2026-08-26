@@ -89,7 +89,7 @@ of real captured pages.
 
 - [x] **Opening an article goes straight to full screen.** *(T-0024, `1b0f846`.)* Reading is the point; asking for it every time is friction the app imposes on its own primary action.
 - [x] **Markup taps land.** *(T-0034, `ebb15bb`.)* A tap in markup mode places a text caret instead of highlighting roughly half the time — `UITextView`'s own recogniser races the custom one.
-- [ ] **A scroll indicator that means something.** `LazyVStack` means only realised blocks count toward content height, so the bar measures a document that appears to grow as you scroll.
+- [x] **A scroll indicator that means something.** *(T-0030, `8da3e05` — the broken system thumb is hidden; the block-index hairline is now live.)* `LazyVStack` means only realised blocks count toward content height, so the bar measures a document that appears to grow as you scroll.
 - [ ] **Profile the scroll cost.** 3.8s of CPU for 8 swipes, still unexplained. Cut once as "nobody is complaining" — reinstated, because *reading is unpleasant* is the complaint.
 - [x] **Images behave.** *(T-0041/T-0046, `165329f`/`f2f645b`.)* Tap to zoom, captions as captions, and galleries that currently yield nothing.
 - [ ] **Reference lists are not prose.** Wikipedia backmatter is 40% of some pages and reads as article text.
