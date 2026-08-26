@@ -1,24 +1,24 @@
 {
   "id": "T-0048",
   "title": "Opening an image may drop the reader out of full screen",
-  "type": "implement",
-  "status": "in_progress",
+  "type": "spike",
+  "status": "todo",
   "quarter": "next",
   "roadmap_anchor": "Reading experience",
   "depends_on": [],
   "acceptance": [
-    "Tapping an image and dismissing it leaves the reader exactly as it was: still immersive, same scroll position, library column still collapsed on iPad",
-    "The behaviour is confirmed by running it, not reasoned from the code",
-    "Leaving the reader for real — going back to the library — still exits immersive as it does today"
+    "On a real iPad: open an article, tap an image, dismiss it, and observe whether the reader is still full screen with the library column still collapsed",
+    "If it is, close this — there is no bug",
+    "If the library column reappears or the reader leaves full screen, it is real and becomes an implementation task"
   ],
   "touches": [
     "Cairn/Views/ReaderView.swift"
   ],
   "risk": "medium",
-  "factory_eligible": true,
+  "factory_eligible": false,
   "attempts": 0,
   "branch": "factory/T-0048",
-  "notes": "Flagged by T-0046 as the one thing it could not verify without a screen, and it looks real. ReaderView.swift line ~171 has .onDisappear { ... if isImmersive { onImmersiveChange(false) } }, and RootView uses that callback to restore the split view. If SwiftUI fires onDisappear when a DESCENDANT presents a fullScreenCover — ArticleBlockView now does exactly that for the image viewer — then opening an image restores the library column behind the cover and leaves the reader non-immersive on dismiss. Most visible on iPad, which is where the owner is testing. FIRST STEP IS TO REPRODUCE, not to fix: if onDisappear does not fire in this case, there is no bug and the correct outcome is to say so and close it. If it does, the fix is to distinguish 'covered' from 'left' — leaving for the library should still exit immersive.",
+  "notes": "Converted to a human check on 2026-08-25 after an agent spent 152k tokens and could not deliver a single tap: this sandbox has no display session at all — screencapture fails with \"could not create image from display\" — so no GUI automation is possible. It behaved correctly throughout: reverted its instrumentation, left the tree clean, landed nothing, declined to force past Homebrew tap-trust for a side tool, and disclosed the two tools it had installed (since removed). THE QUESTION IS TEN SECONDS OF HUMAN TIME ON HARDWARE THE OWNER ALREADY HAS. ReaderView.onDisappear calls onImmersiveChange(false), and RootView uses that to restore the split view. If SwiftUI fires onDisappear when a descendant presents a fullScreenCover — which ArticleBlockView now does for images — tapping a picture would bring the library column back behind the cover. Open an article on the iPad, tap an image, dismiss, look.",
   "history": [
     {
       "ts": "2026-08-25T20:49:19Z",
@@ -34,6 +34,11 @@
       "ts": "2026-08-25T23:50:37Z",
       "event": "nudged",
       "detail": "no live process and no edits for 20 minutes; told to conclude and land"
+    },
+    {
+      "ts": "2026-08-26T00:00:29Z",
+      "event": "converted",
+      "detail": "agent could not run a GUI in this sandbox; cheaper as a ten-second human check on real hardware"
     }
   ],
   "agent": {
