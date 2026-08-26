@@ -148,6 +148,30 @@ extension so a link saved from another app arrives correctly.
 
 ---
 
+## Content Rights (App Information)
+
+> **Does your app contain, show, or access third-party content? — YES.**
+
+Then tick the confirmation that you hold the necessary rights or are otherwise
+permitted to use it.
+
+Yes is the honest answer and the safe one. Cairnfield fetches pages the user
+chooses to save and shows their text, so it plainly accesses content someone
+else wrote. Answering No would be the kind of claim App Review can disprove by
+opening the app once.
+
+The rights confirmation holds for the same reason it holds for a browser: the
+user supplies the URL, the page is one they can already read, the fetch happens
+on their device for their own reading, and nothing is republished, aggregated,
+or shown to any other user. The app ships no third-party content of its own —
+an empty library stays empty until someone saves something.
+
+Worth knowing if this is ever questioned: the app has no `WKWebView`. It
+renders extracted text, and every link goes out to Safari via `openURL`. So it
+never acts as a browser surface for arbitrary web content.
+
+---
+
 ## Screenshots
 
 Run `Tools/screenshots.sh` from the repo root. Output lands in
