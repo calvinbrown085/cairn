@@ -69,3 +69,10 @@ cannot be done inside `touches` — **stop and report why**. Do not widen scope,
 do not substitute your own interpretation of the task, do not disable the check
 that is failing. A clear, honest block is worth far more to this system than a
 diff that merely compiles.
+
+## Running UI tests — traps that have already cost real time
+
+- **`xcodebuild test` does NOT reinstall the app.** Container state persists between runs. Uninstall first (`xcrun simctl uninstall <udid> com.calvinbrown.Cairn`) or you will chase a phantom: persisted highlights toggling on and off once produced a convincing alternating pass/fail that nearly incriminated a correct fix.
+- **Never pass `CODE_SIGNING_ALLOWED=NO` to a test run.** It is right for `verify.sh`'s static build, but it strips the CloudKit entitlement and the app `SIGTRAP`s in `PFCloudKitSetupAssistant` before any UI renders. It reproduces identically on unfixed code, so it looks like your change broke something.
+- **Address simulators BY UDID, never by name.** Two agents on the same named simulator kill each other with `signal kill`.
+- **Run in the foreground.** Backgrounding a run behind a watcher has stranded four agents; the notification does not always arrive and you wait forever on a job that already finished.
