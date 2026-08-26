@@ -1,26 +1,27 @@
 {
   "id": "T-0018",
-  "title": "Decide whether the share extension needs its own privacy manifest",
-  "type": "decide",
-  "status": "cancelled",
+  "title": "The share extension needs its own privacy manifest",
+  "type": "implement",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Ship a beta > PrivacyInfo.xcprivacy",
   "depends_on": [
     "T-0010"
   ],
   "acceptance": [
-    "A determination, from Apple's current documentation, of whether an app extension bundle requires its own PrivacyInfo.xcprivacy for required-reason APIs it calls",
-    "If it does: StacksShareExtension gets one declaring the same UserDefaults reason",
-    "If it does not: the reasoning is recorded so App Review does not reopen it"
+    "CairnShareExtension carries a PrivacyInfo.xcprivacy declaring the UserDefaults required-reason API it actually calls",
+    "The reason code is the app-group one, matching the app's existing manifest",
+    "Collected data types are declared as none, matching Data Not Collected",
+    "The manifest is bundled into the extension by the build, not merely present on disk"
   ],
   "touches": [
-    "StacksShareExtension/**",
+    "CairnShareExtension/**",
     "project.yml"
   ],
   "risk": "medium",
-  "factory_eligible": false,
+  "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0018",
   "notes": "Surfaced reviewing T-0010. project.yml compiles Stacks/Services/AppGroup.swift into StacksShareExtension too, so the extension binary also calls UserDefaults — but T-0010's manifest lands only in the app bundle. Apple's guidance on per-extension manifests is ambiguous enough that this is a judgement call, not an implementation task. Kept out of T-0010 rather than widening its scope.",
   "history": [
     {
@@ -32,6 +33,21 @@
       "ts": "2026-08-25T18:28:05Z",
       "event": "cancelled",
       "detail": "compliance question; defer until the TestFlight submission actually needs an answer"
+    },
+    {
+      "ts": "2026-08-26T00:57:14Z",
+      "event": "uncancelled",
+      "detail": "cancelled earlier as 'answer it when submission needs it'; submission now needs it. Confirmed project.yml compiles AppGroup.swift into the extension and that file calls UserDefaults(suiteName:)."
+    },
+    {
+      "ts": "2026-08-26T00:57:53Z",
+      "event": "dispatched",
+      "detail": "attempt 1; pre-submission requirement"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a004cb5b89b49b810",
+    "role": "implementer",
+    "spawned": "2026-08-26T00:57:53Z"
+  }
 }
