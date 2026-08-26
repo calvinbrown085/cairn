@@ -2,7 +2,7 @@
   "id": "T-0037",
   "title": "Import PDFs",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -15,20 +15,36 @@
   "touches": [
     "Cairn/Services/**",
     "Cairn/Models/Post.swift",
-    "Cairn/Views/ArticleBlockView.swift",
+    "Cairn/Views/PDFReaderView.swift",
     "CairnShareExtension/**",
     "project.yml"
   ],
   "risk": "high",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0037",
   "notes": "Named by the owner as the largest hole in capture: papers and documents currently cannot get in at all. High risk because it touches the data model and the reader's rendering assumptions — Post currently assumes extracted HTML blocks. PDFKit is on the import allowlist. Held as draft-equivalent until the reading-quality work lands, since it is the biggest build now that Listen is cut.",
   "history": [
     {
       "ts": "2026-08-25T23:50:37Z",
       "event": "approved",
       "detail": "reading-quality work it was held behind has landed (full screen, margins, images, Dynamic Type, contrast); touches narrowed off Cairn/Views/** so it can actually be scheduled"
+    },
+    {
+      "ts": "2026-08-26T00:01:08Z",
+      "event": "touches-narrowed",
+      "detail": "PDF rendering goes in its own PDFReaderView rather than ArticleBlockView, so it does not collide with the scroll-indicator work"
+    },
+    {
+      "ts": "2026-08-26T00:02:30Z",
+      "event": "dispatched",
+      "detail": "attempt 1"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a9494be731ba70795",
+    "role": "implementer",
+    "model": "sonnet",
+    "spawned": "2026-08-26T00:02:29Z"
+  }
 }
