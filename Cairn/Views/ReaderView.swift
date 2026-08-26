@@ -45,9 +45,10 @@ struct ReaderView: View {
 
     // Full screen is where every post starts — not a remembered preference,
     // just this view's own initial state. RootView mounts a fresh `ReaderView`
-    // per post (and per reopen of the same post, via `.id(post.id)`), so this
-    // default is what makes leaving full screen apply only to the post it
-    // happened on: nothing here survives to the next post.
+    // on every selection, including a reselection of the post already open,
+    // so this default is what makes leaving full screen apply only to the
+    // post — and the specific opening of it — where it happened: nothing
+    // here survives to the next post, or to the next reopen of this one.
     @State private var isImmersive = true
 
     private var theme: ReaderTheme { preferences.theme }

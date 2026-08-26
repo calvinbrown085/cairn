@@ -303,6 +303,52 @@ final class ReadingFlowUITests: XCTestCase {
         )
     }
 
+    /// TEMP, verification-only: not part of T-0053's deliverable, reverted
+    /// before commit. Confirms the reopen fix didn't regress switching to a
+    /// genuinely different post, and that its scroll position is untouched by
+    /// having opened something else in between.
+    func tempTestDifferentArticleAndScrollRestoreUnaffected() {
+        let postA = firstPost(in: app)
+        let markerA = String(postA.label.prefix(40))
+        postA.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        _ = bodyTextView()
+        for _ in 0..<4 { app.swipeUp() }
+        let scrolledA = bodyTextView().label
+        app.returnToLibrary()
+        app.showEverything()
+
+        app.buttons["Save a link"].tap()
+        let field = app.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("https://www.paulgraham.com/genius.html")
+        app.buttons["Save"].tap()
+
+        // Saving jumps straight into the new post's reader. A real network
+        // fetch in this environment can run well past the 15s `bodyTextView`
+        // waits on internally, so give this one specifically more room
+        // before asking it to find something.
+        XCTAssertTrue(app.textViews.firstMatch.waitForExistence(timeout: 90), "The new article should open and extract")
+        let bodyB = bodyTextView()
+        XCTAssertNotEqual(bodyB.label, scrolledA, "A different article should show different content, not the last one read")
+
+        app.returnToLibrary()
+        app.showEverything()
+
+        let rowA = app.descendants(matching: .any)
+            .matching(identifier: "post.row")
+            .matching(NSPredicate(format: "label BEGINSWITH %@", markerA))
+            .firstMatch
+        XCTAssertTrue(rowA.waitForExistence(timeout: 10))
+        rowA.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        let reopenedA = bodyTextView()
+        XCTAssertEqual(
+            reopenedA.label, scrolledA,
+            "Reopening the first post should restore its own scroll position, unaffected by reading a different post in between"
+        )
+    }
+
     /// The two sheets that hang off the library: how it is ordered and drawn,
     /// and how a link gets in.
     func testBrowsingControls() {

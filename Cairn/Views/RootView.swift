@@ -10,6 +10,15 @@ struct RootView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var isAddingURL = false
     @State private var clipboardOffer: URL?
+    // Bumped on every row tap the library reports, including a tap on the
+    // post already selected. `selectedPost` alone can't carry that signal —
+    // reselecting the same post is a no-op write as far as `Equatable` and
+    // `.onChange` are concerned, so nothing below would otherwise notice a
+    // second open of the same article. Folded into the reader's `.id(...)`
+    // so a reopen tears down and rebuilds it exactly as a switch to a
+    // different post already does, and used directly (not just inferred
+    // from `onChange`) to push the compact stack forward below.
+    @State private var selectionToken = 0
     // `columnVisibility` only controls which columns share the screen at
     // regular width; on compact width (iPhone) the split view collapses to
     // one stacked column and looks at this instead to decide which one is
@@ -28,7 +37,19 @@ struct RootView: View {
         } content: {
             LibraryView(
                 filter: filter,
-                selection: $selectedPost,
+                // Not `$selectedPost` directly: a plain binding only writes
+                // through when the new value differs from the old one, so
+                // tapping the row that is already selected — the exact
+                // reopen this task is about — would otherwise never reach
+                // `selectionToken` or `preferredCompactColumn` below.
+                selection: Binding(
+                    get: { selectedPost },
+                    set: { newValue in
+                        selectedPost = newValue
+                        selectionToken += 1
+                        preferredCompactColumn = newValue == nil ? .content : .detail
+                    }
+                ),
                 isAddingURL: $isAddingURL,
                 clipboardOffer: $clipboardOffer
             )
@@ -52,9 +73,14 @@ struct RootView: View {
                             PDFReaderView(post: post)
                         }
                     }
-                        // Rebuild the reader when the selection changes, so scroll
-                        // position and typography state don't leak between posts.
-                        .id(post.id)
+                        // Rebuild the reader on every selection, so scroll
+                        // position and typography state don't leak between posts
+                        // *and* so reopening the same post gets a fresh reader
+                        // rather than the one left behind, still mounted, from
+                        // the last time it was open — `post.id` alone doesn't
+                        // change on a same-post reopen, so `selectionToken` is
+                        // folded in to force the rebuild anyway.
+                        .id("\(post.id)#\(selectionToken)")
                 } else {
                     ReaderPlaceholder()
                 }
