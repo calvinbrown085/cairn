@@ -2,7 +2,7 @@
   "id": "T-0013",
   "title": "VoiceOver pass over the reader",
   "type": "implement",
-  "status": "todo",
+  "status": "in_progress",
   "quarter": "Q2",
   "roadmap_anchor": "Q2 > Accessibility > VoiceOver pass over the reader",
   "depends_on": [
@@ -23,7 +23,7 @@
   "risk": "high",
   "factory_eligible": true,
   "attempts": 0,
-  "branch": null,
+  "branch": "factory/T-0013",
   "notes": "Depends on the T-0002 architecture call. Final sign-off is human.",
   "history": [
     {
@@ -40,6 +40,16 @@
       "ts": "2026-08-26T00:06:52Z",
       "event": "touches-narrowed",
       "detail": "was Cairn/Views/**, which collides with T-0037's new PDFReaderView; narrowed to the three files the reader's VoiceOver pass actually needs"
+    },
+    {
+      "ts": "2026-08-26T00:07:30Z",
+      "event": "dispatched",
+      "detail": "attempt 1; also the named evidence check for the T-0002 architecture decision"
     }
-  ]
+  ],
+  "agent": {
+    "id": "a08340094a956ed74",
+    "role": "implementer",
+    "spawned": "2026-08-26T00:07:30Z"
+  }
 }
