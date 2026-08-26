@@ -93,7 +93,7 @@ of real captured pages.
 - [ ] **Profile the scroll cost.** 3.8s of CPU for 8 swipes, still unexplained. Cut once as "nobody is complaining" — reinstated, because *reading is unpleasant* is the complaint.
 - [x] **Images behave.** *(T-0041/T-0046, `165329f`/`f2f645b`.)* Tap to zoom, captions as captions, and galleries that currently yield nothing.
 - [ ] **Reference lists are not prose.** Wikipedia backmatter is 40% of some pages and reads as article text.
-- [ ] **VoiceOver through the reader.** Also the evidence that would overturn the per-block text architecture, if reading order turns out bad.
+- [x] **VoiceOver through the reader.** *(T-0013, `7223d7f`.)* Also the evidence that would overturn the per-block text architecture, if reading order turns out bad.
 
 ### Capture — the other stated pain
 

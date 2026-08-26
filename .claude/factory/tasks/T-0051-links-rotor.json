@@ -1,0 +1,24 @@
+{
+  "id": "T-0051",
+  "title": "Links are invisible to VoiceOver's Links rotor",
+  "type": "implement",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [],
+  "acceptance": [
+    "A link in article prose appears in VoiceOver's Links rotor",
+    "Link colour still follows the reader theme rather than reverting to system blue",
+    "Tapping a link still opens it the way it does today"
+  ],
+  "touches": [
+    "Cairn/Views/AttributedTextBuilder.swift",
+    "Cairn/Views/SelectableTextView.swift"
+  ],
+  "risk": "medium",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Found by T-0013 while doing the VoiceOver pass, and flagged as out of scope rather than quietly fixed. Prose links carry a custom `cairn.link` attribute instead of NSAttributedString.Key.link, so VoiceOver's Links rotor never sees them. The custom attribute exists for a reason \u2014 SelectableTextView's own comment says links use it so the theme owns their colour, which means resolving taps by hand. So this is not a one-line swap: using the standard key may hand colour control back to UIKit. The acceptance criteria require keeping both.",
+  "history": []
+}

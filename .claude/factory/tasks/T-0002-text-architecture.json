@@ -29,6 +29,11 @@
       "ts": "2026-08-25T17:40:52Z",
       "event": "decided",
       "detail": "keep per-block UITextView; failure condition recorded"
+    },
+    {
+      "ts": "2026-08-26T00:18:10Z",
+      "event": "evidence",
+      "detail": "T-0013 partial evidence AGAINST: per-block text views give correct linear reading order, but LazyVStack means VoiceOver's rotor only ever sees materialised blocks, so rotor-by-heading cannot list a whole document. Unfixable by attributes. Needs the owner's device check to confirm."
     }
   ]
 }
