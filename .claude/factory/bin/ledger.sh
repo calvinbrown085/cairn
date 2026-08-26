@@ -74,15 +74,33 @@ case "$cmd" in
       | map(select([ .touches[]? as $t | ($busy[] | ov($t; .)) ] | any | not))'
     ;;
   set)
+    # The value is used as JSON when it parses as JSON ('"merged"', 42, true,
+    # null) and as a plain string otherwise, so `set T-1 status '"todo"'` and
+    # `set T-1 status todo` now mean the same thing.
+    #
+    # Before this, a bare word failed --argjson, the `&& mv` was skipped, and
+    # the echo below still announced a write that never happened — exit 0 and
+    # all. That silently left T-0055 marked `todo` with a null branch after it
+    # had been dispatched into a worktree, which is exactly the state that lets
+    # a second agent be dispatched onto the same lease. Same shape as the
+    # verify.sh `die()` bug: reporting success is worse than failing.
     f=$(find_task "$1")
-    tmp=$(mktemp); jq --arg k "$2" --argjson v "$3" '.[$k] = $v' "$f" > "$tmp" && mv "$tmp" "$f"
+    tmp=$(mktemp)
+    if printf '%s' "$3" | jq . >/dev/null 2>&1; then
+      jq --arg k "$2" --argjson v "$3" '.[$k] = $v' "$f" > "$tmp"
+    else
+      jq --arg k "$2" --arg v "$3" '.[$k] = $v' "$f" > "$tmp"
+    fi || { rm -f "$tmp"; echo "ledger set failed: $1 $2" >&2; exit 1; }
+    mv "$tmp" "$f"
     echo "$1: $2 = $3"
     ;;
   log)
     f=$(find_task "$1")
     tmp=$(mktemp)
     jq --arg ts "$(date -u +%FT%TZ)" --arg e "$2" --arg d "${3:-}" \
-       '.history += [{ts: $ts, event: $e, detail: $d}]' "$f" > "$tmp" && mv "$tmp" "$f"
+       '.history += [{ts: $ts, event: $e, detail: $d}]' "$f" > "$tmp" \
+      || { rm -f "$tmp"; echo "ledger log failed: $1 $2" >&2; exit 1; }
+    mv "$tmp" "$f"
     ;;
   drift)
     # A task's `touches` is its lease on the tree, and selection trusts it. If an
