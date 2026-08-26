@@ -36,11 +36,20 @@ struct RootView: View {
         } detail: {
             NavigationStack {
                 if let post = selectedPost {
-                    ReaderView(post: post) { isImmersive in
-                        // Full screen means full screen: the sidebar and the
-                        // library step aside for the duration.
-                        withAnimation(.snappy) {
-                            columnVisibility = isImmersive ? .detailOnly : .all
+                    Group {
+                        switch post.kind {
+                        case .article:
+                            ReaderView(post: post) { isImmersive in
+                                // Full screen means full screen: the sidebar and the
+                                // library step aside for the duration.
+                                withAnimation(.snappy) {
+                                    columnVisibility = isImmersive ? .detailOnly : .all
+                                }
+                            }
+                        case .pdf:
+                            // PDFReaderView has no immersive mode of its own,
+                            // so there's no `columnVisibility` toggle to wire up.
+                            PDFReaderView(post: post)
                         }
                     }
                         // Rebuild the reader when the selection changes, so scroll
