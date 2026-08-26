@@ -148,6 +148,20 @@ extension so a link saved from another app arrives correctly.
 
 ---
 
+## Copyright (General App Information)
+
+    2026 Calvin Brown
+
+Year of first publication, then whoever holds the rights. No `©` — Apple adds
+the symbol itself and asks you not to type one — and no URL.
+
+`Calvin Brown` because the developer account is an individual rather than a
+company; this field should match the legal entity on the account, so if the app
+ever moves to an LLC, this moves with it. The year stays 2026 on later updates:
+it records first publication, not the date of the current version.
+
+---
+
 ## Content Rights (App Information)
 
 > **Does your app contain, show, or access third-party content? — YES.**
