@@ -2,7 +2,7 @@
   "id": "T-0037",
   "title": "Import PDFs",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -39,6 +39,11 @@
       "ts": "2026-08-26T00:02:30Z",
       "event": "dispatched",
       "detail": "attempt 1"
+    },
+    {
+      "ts": "2026-08-26T00:15:31Z",
+      "event": "merged",
+      "detail": "5ec26fd"
     }
   ],
   "agent": {
