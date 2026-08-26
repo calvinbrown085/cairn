@@ -2,7 +2,7 @@
   "id": "T-0054",
   "title": "UI seed timeout is too short for a real network fetch",
   "type": "debt",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -24,6 +24,11 @@
       "ts": "2026-08-26T01:39:48Z",
       "event": "dispatched",
       "detail": "attempt 1; the seed timeout failed my own verification run for T-0053"
+    },
+    {
+      "ts": "2026-08-26T02:27:37Z",
+      "event": "merged",
+      "detail": "a1d94d2"
     }
   ],
   "agent": {
