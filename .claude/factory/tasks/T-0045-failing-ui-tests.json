@@ -2,7 +2,7 @@
   "id": "T-0045",
   "title": "Two failing UI tests, one of them newly added",
   "type": "debt",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": null,
   "depends_on": [],
@@ -30,6 +30,11 @@
       "ts": "2026-08-26T00:29:19Z",
       "event": "capped",
       "detail": "121k tokens and 27 min with no edits; told to conclude after the current baseline. Landing nothing is an acceptable outcome if both tests now pass."
+    },
+    {
+      "ts": "2026-08-26T00:35:31Z",
+      "event": "merged",
+      "detail": "36290df"
     }
   ],
   "agent": {

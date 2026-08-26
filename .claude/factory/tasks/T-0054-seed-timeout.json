@@ -1,0 +1,25 @@
+{
+  "id": "T-0054",
+  "title": "UI seed timeout is too short for a real network fetch",
+  "type": "debt",
+  "status": "todo",
+  "quarter": "next",
+  "roadmap_anchor": null,
+  "depends_on": [
+    "T-0053"
+  ],
+  "acceptance": [
+    "testBrowsingControls passes on a clean install",
+    "The seeding wait accommodates a real fetch and extraction rather than assuming a fast one",
+    "No test is weakened to reach green"
+  ],
+  "touches": [
+    "CairnUITests/**"
+  ],
+  "risk": "low",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": null,
+  "notes": "Third of the four failures T-0045 found, and the only one that is genuinely a test problem rather than an app defect. On a clean install the suite seeds by saving a real URL, which fetches and extracts over the network; the 15s wait is not always enough, so testBrowsingControls fails before the library has anything in it. Depends on T-0053 only to avoid two agents in CairnUITests at once.",
+  "history": []
+}

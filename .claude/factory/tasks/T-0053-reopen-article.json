@@ -1,0 +1,37 @@
+{
+  "id": "T-0053",
+  "title": "Reopening the same article renders nothing",
+  "type": "implement",
+  "status": "in_progress",
+  "quarter": "next",
+  "roadmap_anchor": "Reading experience",
+  "depends_on": [],
+  "acceptance": [
+    "Opening an article, returning to the library, and opening the SAME article again renders it",
+    "testFullScreenEntryIsNotSticky and testPositionRestoreAcrossReopen both pass on a clean install",
+    "Opening a different article still works, and scroll-position restore is unaffected",
+    "The fix is verified by running the suite, not by reasoning about it"
+  ],
+  "touches": [
+    "Cairn/Views/RootView.swift",
+    "Cairn/Views/ReaderView.swift",
+    "CairnUITests/**"
+  ],
+  "risk": "high",
+  "factory_eligible": true,
+  "attempts": 0,
+  "branch": "factory/T-0053",
+  "notes": "REAL, REPRODUCIBLE, AND USER-FACING. Found by T-0045 (36290df) while establishing a baseline. Two INDEPENDENT tests fail the same way, 4/4 on clean installs: testFullScreenEntryIsNotSticky and testPositionRestoreAcrossReopen. Symptom: after reopening the same post a second time, no TextView ever appears within 15s. Because two different tests reproduce it identically, this is not a test-query problem — it is the app. Reopening an article is a core interaction and it is broken. SUSPECTS, in order: RootView mounts ReaderView inside a Group with .id(post.id), so re-selecting the SAME post may not force the remount that selecting a different one does; T-0049 added preferredCompactColumn wiring on .onChange(of: selectedPost), which may not fire usefully when the value returns to a previous one; and T-0024 made isImmersive default true with an onAppear callback, so a view that is reused rather than rebuilt may never re-run it. Reproduce first with the existing failing tests — they are already written and already fail, so the loop is fast.",
+  "history": [
+    {
+      "ts": "2026-08-26T00:37:15Z",
+      "event": "dispatched",
+      "detail": "attempt 1; real user-facing defect found by T-0045's baseline"
+    }
+  ],
+  "agent": {
+    "id": "a123477041b64c6e7",
+    "role": "implementer",
+    "spawned": "2026-08-26T00:37:15Z"
+  }
+}
