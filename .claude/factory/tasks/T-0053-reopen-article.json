@@ -2,7 +2,7 @@
   "id": "T-0053",
   "title": "Reopening the same article renders nothing",
   "type": "implement",
-  "status": "in_progress",
+  "status": "merged",
   "quarter": "next",
   "roadmap_anchor": "Reading experience",
   "depends_on": [],
@@ -32,6 +32,11 @@
       "ts": "2026-08-26T00:59:14Z",
       "event": "nudged",
       "detail": "stranded 18m with no live process; fix is in place, told to run the two tests in the foreground and land or report"
+    },
+    {
+      "ts": "2026-08-26T01:33:58Z",
+      "event": "merged",
+      "detail": "095b856"
     }
   ],
   "agent": {
